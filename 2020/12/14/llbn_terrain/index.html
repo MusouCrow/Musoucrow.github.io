@@ -1,0 +1,1103 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Graphics,Blender," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　之前由前篇决定场景的制作模式为Tile流，这种面片堆砌的流派对于方方正正的场景（如室内）很有效。但是对于如山地草原一般的场景就很难受了：　　可能粗看下去感觉还行，实际上是不禁细看的，地形是在方方正正的基础上揉捏而成，可以在斜边处可以到明显的采样变形，且草地边缘的石边是手动暴力贴上去的，制作起来非常的耗时且嗨奴。经此一役后美术决定引入业界更通用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="地形系统挣扎录——从Blender到Unity">
+<meta property="og:url" content="https://musoucrow.github.io/2020/12/14/llbn_terrain/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　之前由前篇决定场景的制作模式为Tile流，这种面片堆砌的流派对于方方正正的场景（如室内）很有效。但是对于如山地草原一般的场景就很难受了：　　可能粗看下去感觉还行，实际上是不禁细看的，地形是在方方正正的基础上揉捏而成，可以在斜边处可以到明显的采样变形，且草地边缘的石边是手动暴力贴上去的，制作起来非常的耗时且嗨奴。经此一役后美术决定引入业界更通用">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/0.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/1.jpeg">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/2.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/3.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/4.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/5.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/6.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/7.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/8.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/9.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/10.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/11.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/12.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/13.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/14.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/15.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/16.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_terrain/17.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.493Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="地形系统挣扎录——从Blender到Unity">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　之前由前篇决定场景的制作模式为Tile流，这种面片堆砌的流派对于方方正正的场景（如室内）很有效。但是对于如山地草原一般的场景就很难受了：　　可能粗看下去感觉还行，实际上是不禁细看的，地形是在方方正正的基础上揉捏而成，可以在斜边处可以到明显的采样变形，且草地边缘的石边是手动暴力贴上去的，制作起来非常的耗时且嗨奴。经此一役后美术决定引入业界更通用">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/lbbn_terrain/0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2020/12/14/llbn_terrain/"/>
+
+
+
+
+
+  <title> 地形系统挣扎录——从Blender到Unity | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/12/14/llbn_terrain/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                地形系统挣扎录——从Blender到Unity
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-12-14T02:38:44+08:00">
+                2020-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/12/14/llbn_terrain/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/12/14/llbn_terrain/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/12/14/llbn_terrain/" class="leancloud_visitors" data-flag-title="地形系统挣扎录——从Blender到Unity">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>　　之前由<a href="https://musoucrow.github.io/2020/06/07/lbbn_tile/">前篇</a>决定场景的制作模式为Tile流，这种面片堆砌的流派对于方方正正的场景（如室内）很有效。但是对于如山地草原一般的场景就很难受了：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/0.png" alt="0"><br>　　可能粗看下去感觉还行，实际上是不禁细看的，地形是在方方正正的基础上揉捏而成，可以在斜边处可以到明显的采样变形，且草地边缘的石边是手动暴力贴上去的，制作起来非常的耗时且嗨奴。经此一役后美术决定引入业界更通用的场景制作方案——Terrain流：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/1.jpeg" alt="1"><br>　　如上图所示，所谓Terrain流就是非常常见的那种在场景编辑器对模型<strong>揉揉捏捏塑形，涂涂抹抹上色</strong>的制作流派。对于制作<strong>地形复杂、贴图混杂</strong>的场景可谓相当受用。那么按理来说直接使用现有的地形编辑工具不就好了？——若是那么简单便没有本篇喽。<br>　　首先经过一番实验后发现，由于美术风格、建模习惯等因素，决定采用传统建模方式，而非这些场景编辑器惯用的揉捏平面生成高度图。如此一来这些场景编辑器便都Pass，将目光放到了传统建模软件·Blender上……于是便有了本文的副标题：<strong>从Blender到Unity</strong>。Unity版本为2019.4（URP），Blender版本为2.9。  </p>
+<h3 id="牛刀小试"><a href="#牛刀小试" class="headerlink" title="牛刀小试"></a>牛刀小试</h3><p>　　由于这波算是造轮子了，没得现有的套件可蹭，所以还是先整点最基本的实现吧。在抛开建模那块，Terrain流的贴图着色说白了就是由<strong>1张索引贴图+若干张地形贴图</strong>组成，通过工具绘制索引贴图，最终<strong>根据索引采样对应的地形贴图</strong>，实现贴图混杂的显示效果：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/2.png" alt="2"><br><img src="https://musoucrow.github.io/images/lbbn_terrain/3.png" alt="3"><br>　　大致Shader实现如下：  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">half4 Frag(Varyings input) : SV_Target</div><div class="line">&#123;</div><div class="line">    half4 mask = SAMPLE_TEXTURE2D(_MaskMap, sampler_MaskMap, input.uv);</div><div class="line">    half4 color1 = SAMPLE_TEXTURE2D(_TerrainMap1, sampler_MaskMap, input.uv) * mask.r;</div><div class="line">    half4 color2 = SAMPLE_TEXTURE2D(_TerrainMap2, sampler_MaskMap, input.uv) * mask.g;</div><div class="line">    half4 color = color1 + color2;</div><div class="line"></div><div class="line">    return color;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　可见实现原理并不算复杂，将贴图的每个通道（RGBA）作为贴图的透明度值显示即可，但一切才刚刚开始……</p>
+<h3 id="图集-OR-纹理数组"><a href="#图集-OR-纹理数组" class="headerlink" title="图集 OR 纹理数组"></a>图集 OR 纹理数组</h3><p>　　首先第一个问题便是贴图的管理方式：根据上文代码可以看出，目前的地形贴图是一张张独立的存在。那么就会变成<strong>有多少张地形纹理就要开多少个口</strong>了，不利于环保且哈批。业界相关流行的解决方法有<strong>图集（Atlas）</strong>与<strong>纹理数组（TextureArray）</strong>两种。<br>　　所谓图集便是将各种贴图整合进一张大图里，按偏移采样，是很常见的做法：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/4.png" alt="4"><br>　　相关的采样方法可以参考冯乐乐的<a href="https://zhuanlan.zhihu.com/p/34397097" target="_blank" rel="external">地形纹理合并</a>，大致如此：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function">half4 <span class="title">SampleIndex</span><span class="params">(<span class="keyword">int</span> index, half2 pos)</span> </span>&#123;</div><div class="line">    half2 uv = frac(pos) * <span class="number">0.484375</span> + <span class="number">0.0078125</span>;</div><div class="line">    <span class="keyword">int</span> lines = <span class="built_in">floor</span>(index / <span class="number">2</span>);</div><div class="line">    half2 uv2 = half2(index - lines * <span class="number">2</span>, lines);</div><div class="line">    uv2.y = <span class="number">1</span> - uv2.y;</div><div class="line">    </div><div class="line">    uv += uv2 / <span class="number">2.0</span>;</div><div class="line"></div><div class="line">    half4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> color;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　大致思路为根据要采样的贴图索引（index），结合世界坐标的小数点(pos)，得到对应的uv坐标。其中这里的<code>0.484375</code>、<code>0.0078125</code>为采样收缩的魔法数字（0.0078125=1/128，128位图集的宽高，0.484375=0.5-0.0078125），这么做的理由与<a href="https://musoucrow.github.io/2020/06/07/lbbn_tile/">瓦片地图</a>一致：<strong>由于贴图的密集性，线性采样两者的贴图边缘会产生混色现象</strong>，注意红色框选的部分：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/5.png" alt="5"><br>　　为了解决这个问题，于是选择人工收缩了采样范围。但相对而言，在镜头放大后还是能看得出贴图之间并非是严丝合缝的，毕竟采样已经不连续了，算是一个不大不小的缺陷吧。<br>　　而纹理数组则是个PS4时代以来的新玩意，在Unity<a href="https://docs.unity.cn/cn/2019.4/Manual/class-Texture2DArray.html" target="_blank" rel="external">官方文档</a>中明确了支持的平台，可见一般手机设备对此不见得能够支持。但我们做的是PC端便无所谓了，用起来用起来！<br>　　纹理数组的原理很简单：一次性把多张贴图打包成新的数据，与一般贴图用法无异，只是采样的API有所不同，需要指定index。这么一来可就我可就不困了呀，拿先前的Shader改造下对比：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">half4 Frag(Varyings input) : SV_Target</div><div class="line">&#123;</div><div class="line">    half4 mask = SAMPLE_TEXTURE2D(_MaskMap, sampler_MaskMap, input.uv);</div><div class="line">    half4 color1 = SAMPLE_TEXTURE2D_ARRAY(_BaseMap, sampler_BaseMap, input.uv, 0) * mask.r;</div><div class="line">    half4 color2 = SAMPLE_TEXTURE2D_ARRAY(_BaseMap, sampler_BaseMap, input.uv, 1) * mask.g;</div><div class="line">    half4 color = color1 + color2;</div><div class="line"></div><div class="line">    return color;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　较之图集那花里胡哨的采样方式真是爽快多了，而且还没有合缝问题。美中不足在于Unity并<strong>没有提供直接的创建纹理数组的方法</strong>，需要自己撸一个，限于篇幅便不再列出，给个<a href="http://dracoooo.com/2019/08/28/知识漏洞/Texture2DArray的细节与坑/" target="_blank" rel="external">参考</a>便可。</p>
+<h3 id="传统UV-OR-世界坐标"><a href="#传统UV-OR-世界坐标" class="headerlink" title="传统UV OR 世界坐标"></a>传统UV OR 世界坐标</h3><p>　　从图集的采样算法可以看出是不便使用模型本身的uv的，而是要用世界坐标作为驱动代替。但现在决定使用纹理数组，那么这便成了个问题。使用传统UV采样在多数情况下并没有什么问题，但是在这种情况下便暴露了：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/6.png" alt="6"><br>　　如图所示，山峰出现了很夸张的拉伸现象，这是UV划分精度不足导致的（整个山峰的面采样了一张贴图），对此可以通过划分UV解决，但规模一旦上去后，这会给美术带来不小的负担。那么来对比下世界坐标的情况：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/7.png" alt="7"><br>　　虽然在采样上有点小瑕疵，但的确是好多了。由于<strong>世界坐标是三维的，而纹理采样是二维的</strong>。若是只按某两个维度进行采样，在某些面必然会发生问题：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/8.png" alt="8"><br>　　于是我们可以根据法线判定面的朝向以决定使用世界坐标的哪两个轴，但在某些斜面下实际上需要用到两个平面维度的结果混合。于是干脆一步到底，<strong>根据法线三个轴的值决定三个平面维度（zy、xz、xy）的混合度</strong>，是为<strong>三向贴图（Tri-planar Mapping）</strong>：  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">half4 Frag(Varyings input) : SV_Target</div><div class="line">&#123;</div><div class="line">    half3 weight = pow(abs(input.normal), _BlendSharpness); // _BlendSharpness可增大混合效果</div><div class="line">    weight = weight / (weight.x + weight.y + weight.z); // 质量守恒</div><div class="line">    </div><div class="line">    half4 color = 0;</div><div class="line">    color += SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.position.zy) * weight.x;</div><div class="line">    color += SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.position.xz) * weight.y;</div><div class="line">    color += SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.position.xy) * weight.z;</div><div class="line"></div><div class="line">    return color;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　但由上图也看得出来，在某些情况下它并非是完美的（或者没必要）。且性能消耗大，采样次数翻了三倍。由此可见两者皆有其使用场合，故决定通过分支开关控制两者的切换。当然最理想的情况自然是让美术好好分UV（  </p>
+<h3 id="界限突破"><a href="#界限突破" class="headerlink" title="界限突破"></a>界限突破</h3><p>　　讨论了以上两个问题后，还有一个很明显的问题：若是使用RGBA四个通道代表四种地形贴图的透明度，那么首先可使用的地形贴图数量就太少了，并且需要同时对这四张贴图进行采样，若是加上三向贴图更是达到了恐怖的<strong>12次采样</strong>！这绝对是不可接受的，仔细想来，实际上多数情况只会有两种贴图混合，加上Demo的像素风格更是不会发生太多的混合现象。那么便可以改成<strong>同一像素最多采样两种地形贴图</strong>的方案了：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">half4 Frag(Varyings input) : SV_Target</div><div class="line">&#123;</div><div class="line">    half4 mask = SAMPLE_TEXTURE2D(_MaskMap, sampler_MaskMap, input.uv);</div><div class="line">    half4 color1 = SAMPLE_TEXTURE2D_ARRAY(_BaseMap, sampler_BaseMap, input.uv, mask.r);</div><div class="line">    half4 color2 = SAMPLE_TEXTURE2D_ARRAY(_BaseMap, sampler_BaseMap, input.uv, mask.g);</div><div class="line">    half4 color = lerp(color1, color2, mask.b);</div><div class="line"></div><div class="line">    return color;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如上所示，新方案下<strong>RG通道代表地形贴图的索引值，B通道作为两者颜色的混合度</strong>（255则完全显示color1，反之亦然），如此便可只用到三个通道的前提下支持多种地形贴图，同时只采样2次，哪怕加上三向贴图也算在可以接受的程度了。  </p>
+<h3 id="在Blender的战斗"><a href="#在Blender的战斗" class="headerlink" title="在Blender的战斗"></a>在Blender的战斗</h3><p>　　以上Shader看着简单，到了Blender这边的Shader开发那麻烦可大了。由于可视化的因素，我们需要用特定颜色代表对应的索引值，且要选择<strong>通道明确</strong>的颜色，也就是：<em>黑（RGB）、红（R）、绿（G）、蓝（B）、黄（RG）、紫（RB）、青（GB）</em>。鉴于黑色的特性，将之作为地形的默认底色。其余颜色根据深浅与黑色进行混合。其中的关键便是<strong>如何识别单/双通道颜色</strong>的有效性，对此我选择<strong>双通道颜色值必须相差小于10才有效，反之则是值大的通道有效</strong>。<br>　　这看着也不算很复杂，可恶的是Blender的新版渲染引擎<code>Cycles</code>并不支持代码形式的Shader（OGL），只支持连连看。而老板渲染引擎<code>Eevee</code>只支持在渲染模式下看到结果，这样便达不到实时修改预览的效果了。于是乎化身为毛线团战士：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/9.png" alt="9"><br><img src="https://musoucrow.github.io/images/lbbn_terrain/10.png" alt="10"><br><img src="https://musoucrow.github.io/images/lbbn_terrain/11.png" alt="11"><br>　　主要Blender内置的节点并不支持分支判断，于是只能老老实实把每种颜色的处理都弄上去加一块，使用比较节点取得0值来屏蔽不该显示的部分。除此之外便是贴图资源不能作为参数值存在，只能老老实实创建贴图节点在外头进行填写，可由于三向贴图的加入，每种贴图还得手动填三次，算上总和一共是21种了……<br><img src="https://musoucrow.github.io/images/lbbn_terrain/12.png" alt="12"><br>　　不过所幸效果还是不错的，以后再有这样也许可以考虑看看源码了……<br><img src="https://musoucrow.github.io/images/lbbn_terrain/13.png" alt="13">  </p>
+<h3 id="脚本转换"><a href="#脚本转换" class="headerlink" title="脚本转换"></a>脚本转换</h3><p>　　在Blender绘制的贴图还无法直接用于游戏，毕竟游戏可顶不住这样的Shader写法。于是便需要一Python脚本将之转换为游戏Shader可直接食用的贴图。实现大致思路与Blender Shader无差，只是在CPU端便可暴力条件判断了，爽歪歪：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">convert_index</span><span class="params">(color)</span>:</span></div><div class="line">    a = get_max_channel(color)</div><div class="line">    b = get_mid_channel(color)</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> a == <span class="number">0</span>:</div><div class="line">        <span class="keyword">return</span> INDEX_MAP[<span class="string">'black'</span>], <span class="number">0</span>, <span class="keyword">None</span>, <span class="keyword">None</span> <span class="comment"># Black</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> a - b &lt; <span class="number">10</span>:</div><div class="line">        v = a + b</div><div class="line">        alpha = (a + b) // <span class="number">2</span></div><div class="line"></div><div class="line">        <span class="keyword">if</span> v == color[<span class="number">0</span>] + color[<span class="number">1</span>]:</div><div class="line">            <span class="keyword">return</span> INDEX_MAP[<span class="string">'yellow'</span>], alpha, <span class="number">0</span>, <span class="number">1</span> <span class="comment"># Yellow</span></div><div class="line">        <span class="keyword">elif</span> v == color[<span class="number">0</span>] + color[<span class="number">2</span>]:</div><div class="line">            <span class="keyword">return</span> INDEX_MAP[<span class="string">'purple'</span>], alpha, <span class="number">0</span>, <span class="number">2</span> <span class="comment"># Purple</span></div><div class="line">        <span class="keyword">elif</span> v == color[<span class="number">1</span>] + color[<span class="number">2</span>]:</div><div class="line">            <span class="keyword">return</span> INDEX_MAP[<span class="string">'azure'</span>], alpha, <span class="number">1</span>, <span class="number">2</span> <span class="comment"># Azure</span></div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">if</span> a == color[<span class="number">0</span>]:</div><div class="line">            <span class="keyword">return</span> INDEX_MAP[<span class="string">'red'</span>], a, <span class="number">0</span>, <span class="keyword">None</span> <span class="comment"># Red</span></div><div class="line">        <span class="keyword">elif</span> a == color[<span class="number">1</span>]:</div><div class="line">            <span class="keyword">return</span> INDEX_MAP[<span class="string">'green'</span>], a, <span class="number">1</span>, <span class="keyword">None</span> <span class="comment"># Green</span></div><div class="line">        <span class="keyword">elif</span> a == color[<span class="number">2</span>]:</div><div class="line">            <span class="keyword">return</span> INDEX_MAP[<span class="string">'blue'</span>], a, <span class="number">2</span>, <span class="keyword">None</span> <span class="comment"># Blue</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> INDEX_MAP[<span class="string">'black'</span>], <span class="number">0</span>, <span class="keyword">None</span>, <span class="keyword">None</span> <span class="comment"># Black</span></div></pre></td></tr></table></figure>
+<p>　　当然为了图片的可视化，索引不会按照原值输出，而是<code>return math.floor(index * 255 / 6)</code>，自然游戏Shader那边也要做相应解码处理。<br>　　除此之外，由于索引贴图的设计因素无法达到传统素材做法的线性采样效果，只能如二图那般马赛克：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/14.png" alt="14"><br><img src="https://musoucrow.github.io/images/lbbn_terrain/15.png" alt="15"><br>　　为了减少这种马赛克的感觉，便使用脚本<strong>判断像素周边有多少不相同索引的像素</strong>，以此按比例减少透明度：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/16.png" alt="16"><br>　　另外诸如<strong>设置图片输出宽高，指定颜色对应的索引值</strong>等功能限于篇幅在此便不展开了。</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>　　本篇的内容有点超乎我想象，也到了收获的时候了，最后来看看成果吧：<br><img src="https://musoucrow.github.io/images/lbbn_terrain/17.png" alt="17"><br>　　在本次地形系统的调研中断断续续挣扎了一个半月，可谓把各种坑都踩了一遍。属实离谱，当然也与最近项目较忙有关。目前看来效果与先前并无太大差距，主要在创作模式多了新的道路，相关美术效果仍会持续优化，期待由此开端最终会演进到怎样的程度呢？</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Graphics/" rel="tag"># Graphics</a>
+          
+            <a href="/tags/Blender/" rel="tag"># Blender</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/10/08/veg/" rel="next" title="Visual Effect Graph魔改录">
+                <i class="fa fa-chevron-left"></i> Visual Effect Graph魔改录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/12/31/summary_2020/" rel="prev" title="2020年度总结">
+                2020年度总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2020/12/14/llbn_terrain/"
+     data-title="地形系统挣扎录——从Blender到Unity"
+     data-content=""
+     data-url="https://musoucrow.github.io/2020/12/14/llbn_terrain/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/12/14/llbn_terrain/"
+           data-title="地形系统挣扎录——从Blender到Unity" data-url="https://musoucrow.github.io/2020/12/14/llbn_terrain/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#牛刀小试"><span class="nav-number">2.</span> <span class="nav-text">牛刀小试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#图集-OR-纹理数组"><span class="nav-number">3.</span> <span class="nav-text">图集 OR 纹理数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#传统UV-OR-世界坐标"><span class="nav-number">4.</span> <span class="nav-text">传统UV OR 世界坐标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#界限突破"><span class="nav-number">5.</span> <span class="nav-text">界限突破</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在Blender的战斗"><span class="nav-number">6.</span> <span class="nav-text">在Blender的战斗</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本转换"><span class="nav-number">7.</span> <span class="nav-text">脚本转换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">8.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

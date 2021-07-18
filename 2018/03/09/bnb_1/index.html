@@ -1,0 +1,1087 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Development,NetworkSync,Brick&Ball," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　辗转反侧三个月，《Brick &amp;amp; Ball》（下称BNB）的开发工作总算告一段落了，游戏也顺利地在TapTap上架以及在Github开源了。接下来将会对帧锁定同步、服务端、游戏性三方面进行开发的总结，预计会用三篇完成，敬请关注。　　由TapTap上的介绍可知，BNB是拥有联机对战模式的，而联机对战的重点自然在于同步，本文便对同步的实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Brick & Ball》开发总结（一）——帧锁定同步">
+<meta property="og:url" content="https://musoucrow.github.io/2018/03/09/bnb_1/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　辗转反侧三个月，《Brick &amp;amp; Ball》（下称BNB）的开发工作总算告一段落了，游戏也顺利地在TapTap上架以及在Github开源了。接下来将会对帧锁定同步、服务端、游戏性三方面进行开发的总结，预计会用三篇完成，敬请关注。　　由TapTap上的介绍可知，BNB是拥有联机对战模式的，而联机对战的重点自然在于同步，本文便对同步的实现">
+<meta property="og:image" content="http://www.skywind.me/blog/wp-content/uploads/2011/04/framelock1.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.490Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Brick & Ball》开发总结（一）——帧锁定同步">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　辗转反侧三个月，《Brick &amp;amp; Ball》（下称BNB）的开发工作总算告一段落了，游戏也顺利地在TapTap上架以及在Github开源了。接下来将会对帧锁定同步、服务端、游戏性三方面进行开发的总结，预计会用三篇完成，敬请关注。　　由TapTap上的介绍可知，BNB是拥有联机对战模式的，而联机对战的重点自然在于同步，本文便对同步的实现">
+<meta name="twitter:image" content="http://www.skywind.me/blog/wp-content/uploads/2011/04/framelock1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2018/03/09/bnb_1/"/>
+
+
+
+
+
+  <title> 《Brick & Ball》开发总结（一）——帧锁定同步 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/03/09/bnb_1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                《Brick & Ball》开发总结（一）——帧锁定同步
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-09T19:11:55+08:00">
+                2018-03-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/09/bnb_1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/09/bnb_1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/09/bnb_1/" class="leancloud_visitors" data-flag-title="《Brick & Ball》开发总结（一）——帧锁定同步">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　辗转反侧三个月，《Brick &amp; Ball》（下称BNB）的开发工作总算告一段落了，游戏也顺利地在<a href="https://www.taptap.com/app/81845" target="_blank" rel="external">TapTap</a>上架以及在<a href="https://github.com/MusouCrow/BrickAndBall.git" target="_blank" rel="external">Github</a>开源了。接下来将会对帧锁定同步、服务端、游戏性三方面进行开发的总结，预计会用三篇完成，敬请关注。<br>　　由TapTap上的介绍可知，BNB是拥有联机对战模式的，而联机对战的重点自然在于同步，本文便对同步的实现的相关问题做个总结。</p>
+<h2 id="实现思路"><a href="#实现思路" class="headerlink" title="实现思路"></a>实现思路</h2><p>　　在阅读此文之前，你需要对<a href="http://www.skywind.me/blog/archives/131" target="_blank" rel="external">帧锁定同步</a>有个大致的了解，关注我的博客应该知道在去年我已经对此做了个<a href="https://musoucrow.github.io/2017/08/26/frame_sync/">初步的探究</a>。从现在来看当时的实现还不够好，于是很有必要重新梳理一遍。<br>　　若是有尝试过实现帧锁定同步的朋友相信对于传统的帧锁定同步（Lockstep，所有玩家的延迟都是延迟最差的那位）实现还好说，但对于“乐观帧锁定（不会等待延迟高的玩家）”的实现，则是各说纷纭。除了上文所说的那种方式（服务端主动每隔一段时间广播，客户端输入数据随时上传），还有一种<a href="http://gad.qq.com/article/detail/16108" target="_blank" rel="external">《Warcraft III》的实现</a>（在采用传统帧锁定同步的基础上，服务端设定等待时长，超时则继续），个人认为这种实现更为靠谱，也通过这次实践证明了其可行性。</p>
+<h2 id="帧锁定"><a href="#帧锁定" class="headerlink" title="帧锁定"></a>帧锁定</h2><p>　　顾名思义，帧锁定同步分为帧锁定与同步两大部分。所谓帧锁定，个人认为便是将Update部分严格管控起来，以此<strong>修正了玩家之间帧率不一致的问题以及收到多个输入包时的快进处理</strong>。接下来看看其具体实现：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.updateTimer += Mathf.CeilToInt(Time.deltaTime * <span class="number">1000</span>);</div><div class="line"></div><div class="line">    <span class="comment">//DT = 17</span></div><div class="line">    <span class="keyword">while</span> (<span class="keyword">this</span>.updateTimer &gt;= DT) &#123;</div><div class="line">        <span class="keyword">this</span>.client.Update(); <span class="comment">//Receive packet</span></div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.playDataList.Count &gt; <span class="number">1</span>) &#123;</div><div class="line">            <span class="keyword">var</span> lateFrame = <span class="keyword">this</span>.frame;</div><div class="line">            <span class="keyword">this</span>.sendInLoop = <span class="literal">true</span>;</div><div class="line"></div><div class="line">            <span class="keyword">do</span> &#123;</div><div class="line">                <span class="keyword">this</span>.client.Update(); <span class="comment">//Receive packet</span></div><div class="line">                <span class="keyword">this</span>.LockUpdate(<span class="literal">true</span>);</div><div class="line">            &#125; <span class="keyword">while</span>(<span class="keyword">this</span>.playDataList.Count == <span class="number">1</span> &amp;&amp; <span class="keyword">this</span>.frame == lateFrame);</div><div class="line">            <span class="comment">//Go to latest process</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">this</span>.LockUpdate();</div><div class="line">        <span class="keyword">this</span>.updateTimer -= DT;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　帧锁定的核心便在于此，在每次Update进行时间累积，只有累积到了额度（DT）后会进行真正的更新（LockUpdate），且每次更新后会扣除额度，以求最精确，这里对计时进行毫秒化也是为此。这种手段在Unity被称为FixedUpdate，当然我们的需求不仅于此，因此并没有使用它。<br>　　除此之外，便是收到多个输入包进行快进的处理了。这里的<code>this.frame</code>代表当前进度下的帧号，每当进入下一个进度后便会清0。于是我们只要快进到最新进度下的当前帧即可，随后再进行一次正常的LockUpdate。当然不要忘记快进时也有必要进行接收数据包，因为在快进时仍可能有后续输入包的到来。</p>
+<h2 id="LockUpdate"><a href="#LockUpdate" class="headerlink" title="LockUpdate"></a>LockUpdate</h2><p>　　接下来便来看看LockUpdate的具体实现：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">LockUpdate</span>(<span class="params"><span class="keyword">bool</span> inLoop=<span class="literal">false</span></span>) </span>&#123;</div><div class="line">    <span class="comment">//WAITTING_INTERVAL = 5</span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.online &amp;&amp; <span class="keyword">this</span>.frame + <span class="number">1</span> == WAITTING_INTERVAL &amp;&amp; <span class="keyword">this</span>.playDataList.Count == <span class="number">0</span>) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.online) &#123;</div><div class="line">        <span class="keyword">this</span>.frame++;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.frame == WAITTING_INTERVAL) &#123;</div><div class="line">            <span class="keyword">var</span> data = <span class="keyword">this</span>.playDataList[<span class="number">0</span>];</div><div class="line">            <span class="keyword">this</span>.playDataList.RemoveAt(<span class="number">0</span>);</div><div class="line">            </div><div class="line">            <span class="keyword">if</span> (Judge.IsRunning &amp;&amp; data.addrs != <span class="literal">null</span>) &#123;</div><div class="line">                <span class="comment">//Apply later input</span></div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; data.addrs.Length; i++) &#123;</div><div class="line">                    Judge.Input(data.addrs[i], data.inputs[i]);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">this</span>.playFrame++;</div><div class="line">            <span class="keyword">this</span>.frame = <span class="number">0</span>;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (!inLoop || (inLoop &amp;&amp; <span class="keyword">this</span>.sendInLoop)) &#123;</div><div class="line">                <span class="comment">//Send now input</span></div><div class="line">                <span class="keyword">var</span> input = <span class="keyword">new</span> Datas.Input() &#123;</div><div class="line">                    data = <span class="keyword">new</span> InputData() &#123;</div><div class="line">                        movingValue = Networkmgr.MovingValue,</div><div class="line">                        willElaste = Networkmgr.WillElaste</div><div class="line">                    &#125;,</div><div class="line">                    frame = <span class="keyword">this</span>.playFrame</div><div class="line">                &#125;;</div><div class="line"></div><div class="line">                <span class="keyword">this</span>.sendInLoop = <span class="literal">false</span>;</div><div class="line">                Networkmgr.WillElaste = <span class="literal">false</span>;</div><div class="line">                <span class="keyword">this</span>.client.Send(EventCode.Input, input);</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">            <span class="comment">//Send comparison data</span></div><div class="line">            <span class="keyword">var</span> comparison = <span class="keyword">new</span> Datas.Comparison() &#123;</div><div class="line">                playFrame = <span class="keyword">this</span>.playFrame,</div><div class="line">                content = Judge.Comparison</div><div class="line">            &#125;;</div><div class="line"></div><div class="line">            <span class="keyword">this</span>.client.Send(EventCode.Comparison, comparison);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">//Game world update</span></div><div class="line">    Networkmgr.UpdateEvent();</div><div class="line">    Networkmgr.LateUpdateEvent();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　LockUpdate主要做的事情为每隔一定帧数（WAITTING_INTERVAL）上传当前的操作输入，以及应用上次的操作输入（来自服务端），如果到了关键帧时上次的操作输入包仍未抵达，则会陷入等待。也就是说，帧锁定同步其实就是一种每隔几帧的回合制而已。具体的流程图可参考Skywind的提供：<br><img src="http://www.skywind.me/blog/wp-content/uploads/2011/04/framelock1.png" alt="framelock"></p>
+<p>　　当然这里还有个细节要注意：在处于快进的时候，上传输入只会在初次进行，因为在快进下实际上能响应到玩家的操作其实一开始就定下了，后续进行的上传也只会是相同的，所以没有意义。</p>
+<h2 id="LockBehaviour"><a href="#LockBehaviour" class="headerlink" title="LockBehaviour"></a>LockBehaviour</h2><p>　　由LockUpdate可知两行代码<code>Networkmgr.UpdateEvent();</code>和<code>Networkmgr.LateUpdateEvent();</code>，它们是两个<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/event" target="_blank" rel="external">event</a>，负责绑定执行整个游戏涉及到帧锁定的Update，毕竟Unity并不存在主宰一切的主Update，所以只好用这种方式实现。为此专门涉及了LockBehaviour：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">LockBehaviour</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> OrderType &#123;</div><div class="line">        Normal,</div><div class="line">        Late</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    [SerializeField]</div><div class="line">    <span class="keyword">protected</span> OrderType orderType = OrderType.Normal;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.orderType == OrderType.Normal) &#123;</div><div class="line">            Networkmgr.UpdateEvent += <span class="keyword">this</span>.LockUpdateWrap;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> &#123;</div><div class="line">            Networkmgr.LateUpdateEvent += <span class="keyword">this</span>.LockUpdateWrap;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">OnDestroy</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.orderType == OrderType.Normal) &#123;</div><div class="line">            Networkmgr.UpdateEvent -= <span class="keyword">this</span>.LockUpdateWrap;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">else</span> &#123;</div><div class="line">            Networkmgr.LateUpdateEvent -= <span class="keyword">this</span>.LockUpdateWrap;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">LockUpdateWrap</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.isActiveAndEnabled) &#123;</div><div class="line">            <span class="keyword">this</span>.LockUpdate();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">LockUpdate</span>(<span class="params"></span>) </span>&#123;&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　LockBehaviour继承于MonoBehaviour，且设立了LockUpdate函数，启动后便会对UpdateEvent进行注册，同理销毁后便会去除。如此一来涉及到帧同步的组件只要继承LockBehaviour并将业务写在LockUpdate便可。当然由此可以看出，Unity官方实现的组件并不吃这套，所以为此我专门引入了一款第三方物理引擎——<a href="https://github.com/mattleibow/jitterphysics.git" target="_blank" rel="external">Jitter</a>。</p>
+<h2 id="同步优化"><a href="#同步优化" class="headerlink" title="同步优化"></a>同步优化</h2><p>　　由于BNB的操作方式并非点击鼠标、按下键盘这种间歇性操作，而是最为不适合用于联机的<strong>拖动</strong>。所以在正常情况下的表现效果很差（每隔5帧瞬移一下，形成顿顿的感觉），于是PVP模式下采取了与PVE不同的拖动表现：赋予拖动表现为流畅变速的运动，当然在那短短的时间里是不可能做出流畅的运动表现的，所以选择运动的时间基准其实更长（0.25秒）。当收到新的输入时便会直接完成运动（直接到目的坐标）且继续新的运动。使用这种方式达到了相对不错的效果，当然代价便是砖块的运动相应并非实时性的，变相增加了操作难度。这也是无奈之举，好在这实际上是公平的（双方皆如此）。<br>　　除此之外便是为向上拖动做了缓存处理，只要你曾进行了此行为，便会标记你做了该行为，在下一个进度时生效。这样比之到了关键帧时才响应操作要好多了，增加了操作的命中率。</p>
+<h2 id="浮点数处理"><a href="#浮点数处理" class="headerlink" title="浮点数处理"></a>浮点数处理</h2><p>　　帧锁定同步的一大心病便是不同设备下浮点数的处理结果不一致导致的不同步，著名的解决方案有定点数和尾数截断。而BNB采用的方式为尾数截断，其实现方式为：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">float</span> <span class="title">ToFixed</span>(<span class="params"><span class="keyword">this</span> <span class="keyword">float</span> <span class="keyword">value</span></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> Mathf.Floor(Mathf.Abs(<span class="keyword">value</span> * <span class="number">1000</span>)) * <span class="number">0.001</span>f * <span class="keyword">value</span>.ToDirection();</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">ToDirection</span>(<span class="params"><span class="keyword">this</span> <span class="keyword">float</span> <span class="keyword">value</span></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">value</span> &gt;= <span class="number">0</span> ? <span class="number">1</span> : <span class="number">-1</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　这种尾数截断的方式便是主动限制小数点范围，以减少精度的方式阻止错误的发生。如此运用在各种涉及到同步方面的浮点数进行处理即可。而在这方面最大的敌人便是物理引擎了，众所周知物理引擎拥有自己的生态环境，牵涉内容甚多，经过一番艰苦尝试后最终选择了放弃修改其内核，而是改为自己实现物理运动。毕竟物理引擎的两大组成为运动和判定，如此只使用其判定即可。<br>　　当然这浮点数的处理总体而言仍是涉及甚广，所以需要进行专门的监控调试。LockUpdate里的comparison即是为此，其涉及属性<code>Judge.Comparison</code>内容为：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">string</span> Comparison &#123;</div><div class="line">    <span class="keyword">get</span> &#123;</div><div class="line">        <span class="keyword">var</span> sb = <span class="keyword">new</span> StringBuilder();</div><div class="line">        <span class="keyword">var</span> pos = Ball.Position;</div><div class="line">        <span class="keyword">var</span> vel = Ball.Velocity;</div><div class="line"></div><div class="line">        sb.Append(pos.x + <span class="string">","</span>);</div><div class="line">        sb.Append(pos.y + <span class="string">","</span>);</div><div class="line">        sb.Append(pos.z + <span class="string">","</span>);</div><div class="line">        sb.Append(vel.x + <span class="string">","</span>);</div><div class="line">        sb.Append(vel.y + <span class="string">","</span>);</div><div class="line">        sb.Append(vel.z + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamA.brick.transform.localScale.x + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamA.brick.transform.position.x + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamA.brick.transform.position.z + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamB.brick.transform.localScale.x + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamB.brick.transform.position.x + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamB.brick.transform.position.z + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamA.wall.transform.position.z + <span class="string">","</span>);</div><div class="line">        sb.Append(INSTANCE.teamB.wall.transform.position.z + <span class="string">","</span>);</div><div class="line"></div><div class="line">        <span class="keyword">return</span> sb.ToString();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　是的，很粗暴的处理方式，将游戏影响同步的相关数据进行文本化，在每个关键帧都将其上传令服务器进行匹配，当然也可以选择做成MD5码，当然这样便无法知晓具体哪个部分出了问题，故直接上传。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　总体来说帧锁定同步涉及的内容还是挺多的，另外还有诸如防作弊之类的问题没有探讨，因为我认为BNB没有做反作弊的必要（小游戏）。具体许多细节还是要亲力亲为去实践一遍方可出真知。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Development/" rel="tag"># Development</a>
+          
+            <a href="/tags/NetworkSync/" rel="tag"># NetworkSync</a>
+          
+            <a href="/tags/Brick-Ball/" rel="tag"># Brick&Ball</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/18/weak_event_csharp/" rel="next" title="C#之弱事件（Weak Event）的实现">
+                <i class="fa fa-chevron-left"></i> C#之弱事件（Weak Event）的实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/11/for_loop/" rel="prev" title="一次移植代码时关于For循环的发现">
+                一次移植代码时关于For循环的发现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2018/03/09/bnb_1/"
+     data-title="《Brick & Ball》开发总结（一）——帧锁定同步"
+     data-content=""
+     data-url="https://musoucrow.github.io/2018/03/09/bnb_1/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/03/09/bnb_1/"
+           data-title="《Brick & Ball》开发总结（一）——帧锁定同步" data-url="https://musoucrow.github.io/2018/03/09/bnb_1/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现思路"><span class="nav-number">2.</span> <span class="nav-text">实现思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#帧锁定"><span class="nav-number">3.</span> <span class="nav-text">帧锁定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LockUpdate"><span class="nav-number">4.</span> <span class="nav-text">LockUpdate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LockBehaviour"><span class="nav-number">5.</span> <span class="nav-text">LockBehaviour</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步优化"><span class="nav-number">6.</span> <span class="nav-text">同步优化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浮点数处理"><span class="nav-number">7.</span> <span class="nav-text">浮点数处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">8.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

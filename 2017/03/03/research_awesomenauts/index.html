@@ -1,0 +1,1350 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Awesomenauts," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。
+前言　　出于项目的需要，需要对市面上的横版MOBA动作游戏进行研究，特撰此文，以便记录和交流。本文将对《王牌英雄》分为几个部分进行研究并以章节的形式体现，文中观点仅为本人一家之言，仅供参考。
+介绍　　《王牌英雄》是一款由Ronimo Games制作，DTP Entertainment发行于2012年的2D横版动作游戏。游戏平台繁多，包括Windows、macOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="王牌英雄(Awesomenauts)研究报告">
+<meta property="og:url" content="https://musoucrow.github.io/2017/03/03/research_awesomenauts/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。
+前言　　出于项目的需要，需要对市面上的横版MOBA动作游戏进行研究，特撰此文，以便记录和交流。本文将对《王牌英雄》分为几个部分进行研究并以章节的形式体现，文中观点仅为本人一家之言，仅供参考。
+介绍　　《王牌英雄》是一款由Ronimo Games制作，DTP Entertainment发行于2012年的2D横版动作游戏。游戏平台繁多，包括Windows、macOS">
+<meta property="og:image" content="http://vignette1.wikia.nocookie.net/awesomenauts/images/4/4b/Ribbit_IV.jpg">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/shop.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/main_tower.png">
+<meta property="og:image" content="http://vignette4.wikia.nocookie.net/awesomenauts/images/b/b3/Energy_Wall.jpg">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/factory.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/tower.png">
+<meta property="og:image" content="http://vignette3.wikia.nocookie.net/awesomenauts/images/e/e1/Sawblade_Droid.png">
+<meta property="og:image" content="http://vignette1.wikia.nocookie.net/awesomenauts/images/5/54/Super_Droid.png">
+<meta property="og:image" content="http://vignette3.wikia.nocookie.net/awesomenauts/images/0/0b/Small_Beast_Creep.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/pad.png">
+<meta property="og:image" content="http://vignette4.wikia.nocookie.net/awesomenauts/images/e/e7/Hidearea.png">
+<meta property="og:image" content="http://vignette2.wikia.nocookie.net/awesomenauts/images/3/3a/Healthpack.png">
+<meta property="og:image" content="http://vignette1.wikia.nocookie.net/awesomenauts/images/2/29/Item_5_solar.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/skill1.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/skill2.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/normalatk.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/jump.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/skillup.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/research_awesomenauts/debuff.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.493Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="王牌英雄(Awesomenauts)研究报告">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。
+前言　　出于项目的需要，需要对市面上的横版MOBA动作游戏进行研究，特撰此文，以便记录和交流。本文将对《王牌英雄》分为几个部分进行研究并以章节的形式体现，文中观点仅为本人一家之言，仅供参考。
+介绍　　《王牌英雄》是一款由Ronimo Games制作，DTP Entertainment发行于2012年的2D横版动作游戏。游戏平台繁多，包括Windows、macOS">
+<meta name="twitter:image" content="http://vignette1.wikia.nocookie.net/awesomenauts/images/4/4b/Ribbit_IV.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2017/03/03/research_awesomenauts/"/>
+
+
+
+
+
+  <title> 王牌英雄(Awesomenauts)研究报告 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/03/03/research_awesomenauts/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                王牌英雄(Awesomenauts)研究报告
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-03T20:13:40+08:00">
+                2017-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Research/" itemprop="url" rel="index">
+                    <span itemprop="name">Research</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/03/03/research_awesomenauts/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/03/research_awesomenauts/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/03/03/research_awesomenauts/" class="leancloud_visitors" data-flag-title="王牌英雄(Awesomenauts)研究报告">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　出于项目的需要，需要对市面上的<strong>横版MOBA动作游戏</strong>进行研究，特撰此文，以便记录和交流。本文将对《王牌英雄》分为几个部分进行研究并以章节的形式体现，文中观点仅为本人一家之言，仅供参考。</p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>　　《王牌英雄》是一款由Ronimo Games制作，DTP Entertainment发行于2012年的2D横版动作游戏。游戏平台繁多，包括Windows、macOS、Linux、PS3、PS4、Xbox360、Xbox One。玩家可于Steam、PSN和XBLA进行购买下载。<br>　　游戏虽然是2D横版动作游戏，但其实他更讲究玩家间的对抗，属于MOBA游戏，而且武器、职业和招式的种类也繁多非常值得多人一起游戏。<br>　　《王牌英雄》主要讲述了星系间的领土争夺战争，巨型机器人、外星人等都会成为出战角色。<br>　　与众多的MOBA游戏类似，《王牌英雄》也是以与队友（<strong>3V3</strong>）合作，摧毁敌方的基地为胜利目标。一场游戏的时间大致在<strong>10-15分钟</strong>，拥有PVE/PVP两种模式，可进行各种设置以增添游戏特色。</p>
+<h2 id="地图"><a href="#地图" class="headerlink" title="地图"></a>地图</h2><h3 id="前言-1"><a href="#前言-1" class="headerlink" title="前言"></a>前言</h3><p>　　地图分为上下两路，需要利用跳跃到踏板上进行Y轴移动。拥有多张地图，但皆大同小异。总体结构如下图：<img src="http://vignette1.wikia.nocookie.net/awesomenauts/images/4/4b/Ribbit_IV.jpg" alt="Ribbit_IV"></p>
+<h3 id="要素"><a href="#要素" class="headerlink" title="要素"></a>要素</h3><ul>
+<li>商店<ul>
+<li>商店是英雄支付太阳能以强化技能的地方，并提供了恢复功能。</li>
+<li>商店属于阵营设施，位于阵营的最深处，可视为传统MOBA的泉水。</li>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/shop.png" alt="shop"></li>
+</ul>
+</li>
+<li>基地<ul>
+<li>基地属于阵营设施，可摧毁，位于商店之前，是阵营的核心，若基地被摧毁，则视为游戏失败。</li>
+<li>基地不会攻击，不会自我恢复，敌人不可通过。</li>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/main_tower.png" alt="main_tower"></li>
+</ul>
+</li>
+<li>屏障<ul>
+<li>屏障属于阵营设施，位于地图各处，敌人不可通过。</li>
+<li><img src="http://vignette4.wikia.nocookie.net/awesomenauts/images/b/b3/Energy_Wall.jpg" alt="Energy_Wall"></li>
+</ul>
+</li>
+<li>工厂<ul>
+<li>工厂属于阵营设施，位于基地下方，负责生成士兵。</li>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/factory.png" alt="factory"></li>
+</ul>
+</li>
+<li>塔<ul>
+<li>塔属于阵营设施，可摧毁，位于上下二路，每路各有两座。</li>
+<li>负责攻击附近的敌人，敌人不可通过。</li>
+<li>攻击方式为多角度子弹，且只会锁定并伤害一个单位（单一伤害）。</li>
+<li>在建筑本身还有一个群体伤害判定，强行通过时会触发。</li>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/tower.png" alt="tower"></li>
+</ul>
+</li>
+<li>士兵<ul>
+<li>士兵属于阵营单位，可摧毁，敌人不可通过（会将士兵推后），从工厂诞生，前往上下二路。（前往上路需要跳跃/飞行等方式）目标为攻击敌人，拥有两种类型。</li>
+<li>士兵分为三个等级，每隔<strong>6分钟</strong>升级一次。升级后士兵的属性将会得到提升。（用于推进游戏节奏）</li>
+<li>种类<ul>
+<li>近战兵<ul>
+<li>最基础的种类，每隔20秒诞生2个。</li>
+<li>攻击方式为齿轮切割，属于单一伤害。和塔一样，强行通过时会被连带攻击。</li>
+<li><img src="http://vignette3.wikia.nocookie.net/awesomenauts/images/e/e1/Sawblade_Droid.png" alt="Sawblade_Droid"></li>
+</ul>
+</li>
+<li>超级兵<ul>
+<li>当摧毁敌方线上的1座塔后，便会诞生1个。</li>
+<li>攻击方式为发射炮弹，碰到第一个敌人后爆炸，属于群体伤害。</li>
+<li><img src="http://vignette1.wikia.nocookie.net/awesomenauts/images/5/54/Super_Droid.png" alt="Super_Droid"></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>英雄<ul>
+<li>英雄属于阵营单位，可摧毁，敌人不可通过，从基地诞生，由玩家控制。</li>
+<li>英雄死亡后隔一段时间后便会从基地复活，随着游戏时间的增长，复活时间也会增长。</li>
+</ul>
+</li>
+<li>野怪<ul>
+<li>野怪属于公共单位，可摧毁，位于地图中间的几个固定点，目标为攻击进犯者，在不同地图上拥有不同类型，每隔一段时间刷新。</li>
+<li>英雄可通过击杀之获得太阳能和恢复。</li>
+<li><img src="http://vignette3.wikia.nocookie.net/awesomenauts/images/0/0b/Small_Beast_Creep.png" alt="Small_Beast_Creep"></li>
+</ul>
+</li>
+<li>踏板<ul>
+<li>踏板属于公共设施，位于地图各处，可供单位立足，且玩家可通过↓+Space穿透踏板进行下降。</li>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/pad.png" alt="pad"></li>
+</ul>
+</li>
+<li>隐藏区域<ul>
+<li>隐藏区域属于公共设施，位于地图各处，一般会搭配踏板使用，外界无法看到隐藏区域里面的情况。</li>
+<li><img src="http://vignette4.wikia.nocookie.net/awesomenauts/images/e/e7/Hidearea.png" alt="Hidearea"></li>
+</ul>
+</li>
+<li>补给球<ul>
+<li>补给球属于公共设施，位于地图各处，受伤时的英雄触碰后可恢复，然后补给球消失，每隔一段时间刷新。</li>
+<li><img src="http://vignette2.wikia.nocookie.net/awesomenauts/images/3/3a/Healthpack.png" alt="Healthpack"></li>
+</ul>
+</li>
+<li>太阳能结晶<ul>
+<li>太阳能结晶属于公共设施，位于地图各处，诞生自士兵死亡后，英雄触碰后可获得太阳能。</li>
+<li>太阳能分为两种：灰色和黄色，灰色可获得1点太阳能，黄色为5点。</li>
+<li><img src="http://vignette1.wikia.nocookie.net/awesomenauts/images/2/29/Item_5_solar.png" alt="solar"></li>
+</ul>
+</li>
+</ul>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>　　总体来说，《王牌英雄》的地图设计视图让玩家频繁的使用跳跃，利用踏板借助跳跃来增加游戏的操作性，弥补非深度横版的躲招问题。意图不错，不过反倒增加了操作难度，若要考虑移植到手机平台的话，这将是个问题。<br>　　地图中间的野怪设计，可以视为玩家发生冲突时随手杀死野怪以获得恢复的手段。不过结合游戏时间来看，野区其实可以设计一些加剧玩家冲突与游戏节奏的元素。<br>　　士兵的作用非常明显，在英雄单独对抗士兵时，会付出一定程度的代价。不过超级兵的诞生频率太低，几乎没有存在感，作用也相对有限了。</p>
+<h2 id="英雄"><a href="#英雄" class="headerlink" title="英雄"></a>英雄</h2><h3 id="前言-2"><a href="#前言-2" class="headerlink" title="前言"></a>前言</h3><p>　　英雄即玩家参与游戏时扮演的角色，《王牌英雄》的英雄数量繁多，至今发展到几十个左右。</p>
+<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><p>　　《王牌英雄》将英雄做了不同特性的划分，每个英雄可能包括多个特性，以下是特性一览：</p>
+<ul>
+<li>刺客<ul>
+<li>入门角色</li>
+<li>Gank好手</li>
+<li>低生命值</li>
+<li>高机动性</li>
+<li>拥有爆发或高持续的伤害</li>
+<li>拥有逃跑手段</li>
+</ul>
+</li>
+<li>斗士<ul>
+<li>堵路机制</li>
+<li>追逐好手</li>
+<li>擅长近距离战斗</li>
+<li>拥有控制手段</li>
+<li>拥有高持续的伤害</li>
+</ul>
+</li>
+<li>护卫<ul>
+<li>能有效地防御来自敌方的攻击</li>
+<li>能力都集中在撤退和阻挠进攻的方法，而非直接作战。</li>
+</ul>
+</li>
+<li>狙击手<ul>
+<li>长距离攻击，短冷却时间</li>
+<li>善于放风筝</li>
+<li>不善于近战</li>
+<li>有加速手段</li>
+</ul>
+</li>
+<li>开团手<ul>
+<li>擅长打团，不擅长独战</li>
+<li>拥有高风险高回报的特性</li>
+<li>拥有非常强大的控制手段</li>
+</ul>
+</li>
+<li>医师<ul>
+<li>有限的攻击力</li>
+<li>无逃生手段</li>
+<li>需要被保护</li>
+<li>拥有治疗能力</li>
+</ul>
+</li>
+<li>毒师<ul>
+<li>拆塔好手</li>
+<li>拥有能够立即杀死多个目标的能力，通常冷却时间较短</li>
+</ul>
+</li>
+<li>辅助<ul>
+<li>不适合直接战斗</li>
+<li>万金油</li>
+<li>需要被保护</li>
+<li>拥有改变团队的能力</li>
+</ul>
+</li>
+<li>坦克<ul>
+<li>高生命值</li>
+<li>减伤好手</li>
+<li>适合打头阵</li>
+<li>不善于追逐</li>
+</ul>
+</li>
+</ul>
+<h3 id="技能"><a href="#技能" class="headerlink" title="技能"></a>技能</h3><p>　　在《王牌英雄》，每个英雄拥有四个技能，它们分别是：<strong>主动技能1、主动技能2、普通攻击、跳跃</strong>。我们接下来便以<em>谢里夫·龙星</em>为示范：</p>
+<ul>
+<li>主动技能1<ul>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/skill1.png" alt="skill1"></li>
+</ul>
+</li>
+<li>主动技能2<ul>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/skill2.png" alt="skill2"></li>
+</ul>
+</li>
+<li>普通攻击<ul>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/normalatk.png" alt="normalatk"></li>
+</ul>
+</li>
+<li>跳跃<ul>
+<li><img src="https://musoucrow.github.io/images/research_awesomenauts/jump.png" alt="jump"></li>
+</ul>
+</li>
+</ul>
+<p>　　技能还可以在商店支付太阳能进行强化，如下图：<img src="https://musoucrow.github.io/images/research_awesomenauts/skillup.png" alt="skillup"></p>
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>　　在《王牌英雄》，属性和一般游戏不同：它明确分为<strong>自身属性和技能属性</strong>。自身属性即单位本身常驻的属性，而技能属性则为描述技能作用的参数。<br>　　自身属性一般来说都是隐藏的，每个英雄的自身属性都是事先决定，这意味着这并不是一款需要属性养成的游戏，你并不需要太关注属性方面的事情，但你仍可在商店里进行一些强化。<br>　　以下是属性一览：</p>
+<ul>
+<li>自身属性<ul>
+<li>生命值<ul>
+<li>生命值是指死亡前可以采取的伤害量。换言之，到了0就会死。</li>
+</ul>
+</li>
+<li>质量<ul>
+<li>质量是指单元推动或被另一单元推动的能力，例如近战兵的质量就很低（可以被推后）。</li>
+</ul>
+</li>
+<li>移动速度<ul>
+<li>移动速度即单位移动时的速度。</li>
+</ul>
+</li>
+<li>太阳能获取<ul>
+<li>每段时间获取太阳能的数额。</li>
+</ul>
+</li>
+<li>太阳能<ul>
+<li>用于商店购买强化技能。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>技能属性<ul>
+<li>攻击速度<ul>
+<li>攻击速度决定每次攻击之间的时间间隔，一般存在于普通攻击。</li>
+<li>攻击速度以一个数值的形式体现，结算到具体的时间需要/60。</li>
+</ul>
+</li>
+<li>攻击范围<ul>
+<li>攻击范围指子弹的行进距离。</li>
+<li>攻击范围对非发射子弹类技能无效。</li>
+</ul>
+</li>
+<li>技能范围<ul>
+<li>俗称AOE，泛指那些覆盖一个区域的技能效果。</li>
+</ul>
+</li>
+<li>冷却时间<ul>
+<li>冷却时间是指技能可以再次使用之前必须经过的时间段。</li>
+<li>每个技能都有自己的冷却时间，普通攻击和跳跃不存在冷却时间。</li>
+</ul>
+</li>
+<li>控制时间<ul>
+<li>控制时间是指使敌方停止/阻碍行动的时间段。</li>
+<li>控制的表现手法多样。</li>
+</ul>
+</li>
+<li>持续伤害<ul>
+<li>俗称DOT，泛指随时间慢慢伤害目标的效果。</li>
+</ul>
+</li>
+<li>飞行<ul>
+<li>飞行是无限跳跃或能够永远留在空中的能力。</li>
+</ul>
+</li>
+<li>治疗<ul>
+<li>治疗是指恢复目标生命值的能力。</li>
+</ul>
+</li>
+<li>隐形<ul>
+<li>隐形是使目标完全不可见的状态效应。当隐形的单位使用能力或自动攻击时，或者在一段时间后，隐形会消失。</li>
+</ul>
+</li>
+<li>生命偷取<ul>
+<li>生命偷取是一种特殊的伤害，它在击中敌人后生效。</li>
+<li>生命偷取可以是基于百分比或固定量。</li>
+</ul>
+</li>
+<li>护盾<ul>
+<li>护盾是给予英雄保护的能力，在存在护盾时，受到攻击后会优先磨损护盾。</li>
+</ul>
+</li>
+<li>反射<ul>
+<li>反射是一种使敌人子弹反射回攻击者的机制。同时因为反射了，所以英雄不会受伤。</li>
+</ul>
+</li>
+<li>加速<ul>
+<li>一段时间内获得移动速度。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="后记-1"><a href="#后记-1" class="headerlink" title="后记"></a>后记</h3><p>　　《王牌英雄》英雄的特性分类值得思考，技能属性的设计更是优秀，运用这种思路，制作技能将会简单很多。<br>　　但是在技能设计和人设方面就不太合我胃口，尤其是技能方面，由于技能数量和深度不足的原因便显得比较单调，就算拥有强化途径但也感觉稍逊一筹，也许在这方面应该可以做得更好。</p>
+<h2 id="战斗"><a href="#战斗" class="headerlink" title="战斗"></a>战斗</h2><h3 id="前言-3"><a href="#前言-3" class="headerlink" title="前言"></a>前言</h3><p>　　《王牌英雄》在战斗上拥有不少细节值得研究，而有些东西不方便插入到其他章节中，便集中到本章讨论。</p>
+<h3 id="攻击类型"><a href="#攻击类型" class="headerlink" title="攻击类型"></a>攻击类型</h3><p>　　《王牌英雄》的攻击方式分为两种：单一攻击和群体攻击。单一攻击表现为击中一个敌人后便会结束，忽略其他敌人。而群体攻击则不然，会攻击范围内所有敌人。</p>
+<h3 id="打击特征"><a href="#打击特征" class="headerlink" title="打击特征"></a>打击特征</h3><p>　　《王牌英雄》属于轻动作游戏，它不是那种击中敌人后敌人便会陷入硬直，以连招为乐的动作游戏。它似乎连硬直和浮空动作也不具备，尽管会有类似的效果表现。就连打击特效，也仅仅是近战角色才有。平常的打击特征为被击者出现黄色遮罩，以及配合伤害数字来确定被击中，更别提Hit Stop了。因此使得《王牌英雄》的动作性并不高，它主要以不断跳跃位置的游击战为特色。<br>　　幸运的是，《王牌英雄》还是具备了基本的战斗音效，所以总体来说还是不成问题的，只是缺乏了点动作性而已。</p>
+<h3 id="BUFF"><a href="#BUFF" class="headerlink" title="BUFF"></a>BUFF</h3><p>　　《王牌英雄》虽然存在BUFF系统，但并没有展示BUFF的UI，只存在BUFF特效和触发提示，如图：<img src="https://musoucrow.github.io/images/research_awesomenauts/debuff.png" alt="skillup"></p>
+<h3 id="障碍"><a href="#障碍" class="headerlink" title="障碍"></a>障碍</h3><p>　　《王牌英雄》的障碍形式区域制，只要单位能过跨越障碍就能通过，如通过跳跃穿过敌方士兵，但若同时撞上在空中的地方英雄则会无法继续前行，被迫降落。<br>　　至于降落点本身就有障碍该如何处理，这一点<strong>尚不明确</strong>。</p>
+<h3 id="后记-2"><a href="#后记-2" class="headerlink" title="后记"></a>后记</h3><p>　　《王牌英雄》的战斗系统在我看来并不讨喜，主要原因为总体攻击距离太短，加上依赖跳跃的地形，使得直接触发战斗的成本提高，当然好这口的人估计会很喜欢。<br>　　能够在跳跃中使用大部分技能的设计还是很不错的，给人一种空战的感觉。类似的设计还有多角度攻击，不过这个是远程英雄的专利，对于近战英雄并不友好，我认为这个设计已经影响到了平衡性，因为本身能够快速接近敌人手段并不多。</p>
+<h2 id="后记-3"><a href="#后记-3" class="headerlink" title="后记"></a>后记</h2><p>　　《王牌英雄》从游戏的角度上让我评分的话，10分里面只能打个4分：它不是我的菜，无论从战斗、技能、还是人设来看，都是如此。<br>　　但它对我而言的意义在于：提供了一款横版MOBA动作游戏的示范，它还是一款成熟的横版MOBA模型，使我得到了不少启发，也使我明白哪些部分应该加以改善。本次《王牌英雄》的研究报告，就此结束。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Awesomenauts/" rel="tag"># Awesomenauts</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/26/build_bolg/" rel="next" title="在Mac平台使用GitHub和Hexo搭建博客">
+                <i class="fa fa-chevron-left"></i> 在Mac平台使用GitHub和Hexo搭建博客
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/29/brew_changing/" rel="prev" title="更换Homebrew的更新源">
+                更换Homebrew的更新源 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2017/03/03/research_awesomenauts/"
+     data-title="王牌英雄(Awesomenauts)研究报告"
+     data-content=""
+     data-url="https://musoucrow.github.io/2017/03/03/research_awesomenauts/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/03/03/research_awesomenauts/"
+           data-title="王牌英雄(Awesomenauts)研究报告" data-url="https://musoucrow.github.io/2017/03/03/research_awesomenauts/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">2.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#地图"><span class="nav-number">3.</span> <span class="nav-text">地图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-1"><span class="nav-number">3.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#要素"><span class="nav-number">3.2.</span> <span class="nav-text">要素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">3.3.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#英雄"><span class="nav-number">4.</span> <span class="nav-text">英雄</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-2"><span class="nav-number">4.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特性"><span class="nav-number">4.2.</span> <span class="nav-text">特性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#技能"><span class="nav-number">4.3.</span> <span class="nav-text">技能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#属性"><span class="nav-number">4.4.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记-1"><span class="nav-number">4.5.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#战斗"><span class="nav-number">5.</span> <span class="nav-text">战斗</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-3"><span class="nav-number">5.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#攻击类型"><span class="nav-number">5.2.</span> <span class="nav-text">攻击类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#打击特征"><span class="nav-number">5.3.</span> <span class="nav-text">打击特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BUFF"><span class="nav-number">5.4.</span> <span class="nav-text">BUFF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#障碍"><span class="nav-number">5.5.</span> <span class="nav-text">障碍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记-2"><span class="nav-number">5.6.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记-3"><span class="nav-number">6.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

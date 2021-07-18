@@ -1,0 +1,1089 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Animation," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　恰逢假期，在家继续推进Demo，骨骼动画相关的调研算是告一段落了，遂以本文记录相关要点。　　首先要明确一点，本文所说的骨骼动画皆是3D模型的骨骼动画，与2D精灵的骨骼动画无关，虽然原理大致相通。
+网格、骨骼、绑定　　了解过3D相关知识的都知道，模型(Model)是由一个个三角形组成的，而这种三角形的学名则是网格(Mesh)。当然在DCC软件里">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity骨骼动画的总结">
+<meta property="og:url" content="https://musoucrow.github.io/2020/02/01/animation_guide/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　恰逢假期，在家继续推进Demo，骨骼动画相关的调研算是告一段落了，遂以本文记录相关要点。　　首先要明确一点，本文所说的骨骼动画皆是3D模型的骨骼动画，与2D精灵的骨骼动画无关，虽然原理大致相通。
+网格、骨骼、绑定　　了解过3D相关知识的都知道，模型(Model)是由一个个三角形组成的，而这种三角形的学名则是网格(Mesh)。当然在DCC软件里">
+<meta property="og:image" content="https://musoucrow.github.io/images/animation_guide/0.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/animation_guide/1.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/animation_guide/2.png">
+<meta property="og:image" content="https://docs.unity3d.com/uploads/Main/classAvatar-Inspector.png">
+<meta property="og:image" content="https://docs.unity3d.com/uploads/Main/MecanimHowItFitsTogether.jpg">
+<meta property="og:image" content="https://musoucrow.github.io/images/animation_guide/3.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/animation_guide/4.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/animation_guide/5.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/animation_guide/6.gif">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.490Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unity骨骼动画的总结">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　恰逢假期，在家继续推进Demo，骨骼动画相关的调研算是告一段落了，遂以本文记录相关要点。　　首先要明确一点，本文所说的骨骼动画皆是3D模型的骨骼动画，与2D精灵的骨骼动画无关，虽然原理大致相通。
+网格、骨骼、绑定　　了解过3D相关知识的都知道，模型(Model)是由一个个三角形组成的，而这种三角形的学名则是网格(Mesh)。当然在DCC软件里">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/animation_guide/0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2020/02/01/animation_guide/"/>
+
+
+
+
+
+  <title> Unity骨骼动画的总结 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/02/01/animation_guide/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Unity骨骼动画的总结
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-02-01T18:03:46+08:00">
+                2020-02-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/02/01/animation_guide/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/02/01/animation_guide/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/02/01/animation_guide/" class="leancloud_visitors" data-flag-title="Unity骨骼动画的总结">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　恰逢假期，在家继续推进Demo，骨骼动画相关的调研算是告一段落了，遂以本文记录相关要点。<br>　　首先要明确一点，本文所说的骨骼动画皆是3D模型的骨骼动画，与2D精灵的骨骼动画无关，虽然原理大致相通。</p>
+<h2 id="网格、骨骼、绑定"><a href="#网格、骨骼、绑定" class="headerlink" title="网格、骨骼、绑定"></a>网格、骨骼、绑定</h2><p>　　了解过3D相关知识的都知道，模型(Model)是由一个个三角形组成的，而这种三角形的学名则是网格(Mesh)。当然在DCC软件里为了方便创作，会用2个三角形组成四边形作为网格：<br><img src="https://musoucrow.github.io/images/animation_guide/0.png" alt="0"><br>　　然后便是骨骼(Skeleton)了，它是驱动模型运动的根本，如下图所示，这是一种彼此之间有父子关系连接在一起的长条状玩意：<br><img src="https://musoucrow.github.io/images/animation_guide/1.png" alt="1"><br>　　最后便是让模型跟着骨骼一起运动了，这个骨肉融合的过程称为<strong>绑定</strong>，具体要做的事便是将某节骨骼与相关的网格建立关系：<br><img src="https://musoucrow.github.io/images/animation_guide/2.png" alt="2"><br>　　如上图所示，模型上有着不同的颜色，这表示该节骨骼所影响到的网格权重值（蓝色为0，红色为1），所以绑定也俗称“刷权重”。权重值越高，该节骨骼对相应网格的影响便越大（存在多节骨骼对相同网格存在影响，此时便要通过权重值来决定优先级了）。<br>　　随着时代的发展，现代DCC软件基本配备自动刷权重的功能了。做好模型部件的划分（每个部件拥有独立的骨骼，通过各骨骼之间建立关系来联系模型），减少每个模型的权重复杂度，如此通过自动刷权重基本可以应对一般情况了。</p>
+<h2 id="模型与动画"><a href="#模型与动画" class="headerlink" title="模型与动画"></a>模型与动画</h2><p>　　生成给Unity使用的模型与动画我选择FBX格式，毕竟这算是最流行的3D格式了。对于动画，我选择一个动画一个FBX文件的形式（业界也有全部做到一个文件里，在Unity内分割的行为），动画FBX文件里只有骨骼与动画信息，不含模型。<br>　　说到这里，便有一个绕不开的点：多个模型复用<strong>相同</strong>的动画，这里涉及到Unity里的两种骨骼动画模式：<strong>Generic与Humanoid</strong>。<br>　　Generic如其名般：一般的动画，在这种动画模式下实现复用的思想很朴素：只要模型的骨骼与动画的骨骼要素相同，那么复用便是水到渠成的事了。这也表示必须同类模型与动画的骨骼结构是<strong>一致</strong>的。这也表示难以使用外界的第三方资源，对于一些以拼凑、同人、大乱斗为特色的民间项目，或是想直接使用某游戏提取出来的动画，那便捉急了。<br>　　Humanoid则不然，这是一种专为人形设计的动画模式。如下图所示，它定义了人体通用的若干个关节点，将模型对应的骨骼填进去即可：<br><img src="https://docs.unity3d.com/uploads/Main/classAvatar-Inspector.png" alt="avatar"><br>　　事实上Humanoid便是做了一层中间层转换，让各自的人形模型的骨骼信息统一抽象为上图这套体系，并且还做了关节运动幅度的可控，如此便可实现复用了。且Unity实现了自动识别填充，使用起来还算方便。<br>　　但事实上我<strong>放弃</strong>了这种做法，选择了Generic模式。原因如下：</p>
+<ul>
+<li>Humanoid模式为了兼容不同体型下的情况，禁用了具有缩放行为的骨骼动画。</li>
+<li>Humanoid模式只是为人形考虑，但实际上需要动画复用不只是人形。</li>
+<li>由于Demo模型选用的是小泥人，并没多少合适的第三方动画选择（已尝试过）。</li>
+<li>哪怕是人形，事实上也会有一些Humanoid无法顾及到的部件（如头发）。</li>
+<li>既然不用第三方动画，那么骨骼结构的稳定性自然有保证。</li>
+</ul>
+<p>　　以上原因不是说用Humanoid模式就完全无法解决，But simple is good，Generic就完事了。</p>
+<h2 id="Animator-切换、分层、混合树"><a href="#Animator-切换、分层、混合树" class="headerlink" title="Animator: 切换、分层、混合树"></a>Animator: 切换、分层、混合树</h2><p>　　时值2020年，<a href="https://docs.unity3d.com/Manual/class-Animator.html" target="_blank" rel="external">Animator</a>自然是动画组件的不二之选了。如下图所示般，构建动画状态机，实现一个有机的动画播放环境：<br><img src="https://docs.unity3d.com/uploads/Main/MecanimHowItFitsTogether.jpg" alt="animator"><br>　　首先要注意的是，<strong>不推荐将动画状态机当成单位业务的状态机使用</strong>，虽然动画状态机有提供挂载脚本的形式，但事实上单位的状态<strong>并不是与某个动画绑死的</strong>，应该由状态去播放动画，而非是动画下绑定专门的业务。让动画的归动画，状态的归状态吧！<br>　　在动画切换控制方面，我使用了Animator自带的<a href="https://docs.unity3d.com/Manual/AnimationParameters.html" target="_blank" rel="external">变量机制(Parameters)</a>，结合条件切换、动画状态脚本、代码控制等方式，实现动画的高可控切换。<br>　　如前文提到的动画复用问题，实际上哪怕骨骼主体相同，但仍会有各自的特殊部件，这时候便要用上Animator的<a href="https://docs.unity3d.com/Manual/AnimationLayers.html" target="_blank" rel="external">分层机制(Layers)</a>了。通过定义多个不同的层次，在层次中使用<a href="https://docs.unity3d.com/Manual/AnimationMaskOnImportedClips.html" target="_blank" rel="external">Avatar Mask</a>确定影响的骨骼部位，在层次中定义各个动画状态下对应的部件动画。可以为层次定义独立的动画状态机体系，也可以在设置中选中<em>Sync</em>启用以主体层为准的体系。个人更推荐后者，除非与本体动画无关。<br>　　最后是业界不少人士喜欢用的<a href="https://docs.unity3d.com/Manual/class-BlendTree.html" target="_blank" rel="external">混合树(Blend Trees)</a>，分为多种类型（不同的维度乃至于机制），原理为定义若干个动画，确定每个动画在变量组合的特定值下权重最大（播放优先级最高），如此通过操纵变量即可灵活混合相关动画（每个动画的元素都有一定的权重，最终混合成独特的动画）。本人暂时还没用到，主要是追求更明确的动画，而非那种融合的感觉。</p>
+<h2 id="补间与帧动画"><a href="#补间与帧动画" class="headerlink" title="补间与帧动画"></a>补间与帧动画</h2><p>　　骨骼动画的本质，便是在不同的时间点为某节骨骼定义了特定的位置、缩放、旋转。动画的运作便是根据两个时间点之间的骨骼数据做数值变化，这种行为称之为<strong>补间(Tweens)</strong>，同理骨骼动画也就是一种补间动画。与补间动画相对应的概念是<strong>帧动画</strong>，帧动画只会在特定的时间点发生变化，时间点之间的运动途中是不变的，在许多经典的2D游戏动画便是这种做法。<br>　　为何我会提及到这点呢？一个很明显的区别：较之帧动画，补间动画显得实在是<strong>太流畅了</strong>，毕竟理论上游戏运作的每一帧它都在改变。但是流畅不是很好么？这一直是电子游戏的追求才对啊！在大多数情况下也许没错，但有时太过流畅，反而会失去「力量感」，说的再通俗点，就是<strong>没2D游戏内味了</strong>。我想这也是不少一般3D动作游戏做的不好的一点。<br>　　这种现象在日本动画业界运用3D时早有发现：由于2D手绘帧的标准是24帧每秒，而如果3D动画按照视频播放帧进行输出，就会显得两者仿佛根本不在一个世界般。故后来都选择了按照2D手绘帧的帧率进行抽帧，以此达到同步。当然哪怕如此，3D动画也是无法还原出2D手绘帧那股味的，一者在于手绘帧的每帧内容都是人为创作的，具有独特的节奏感。另者在于2D手绘帧的运动帧为了表达动感，往往会画成糊成一团的样子：<br><img src="https://musoucrow.github.io/images/animation_guide/3.gif" alt="3"><br>　　这种效果在3D动画基本上是难以实现的，所以往往会盖一层特效解决：<br><img src="https://musoucrow.github.io/images/animation_guide/4.gif" alt="4"><br>　　当然《塞尔达传说：荒野之息》对此的处理已经算是上乘了，特意选择了与武器本体颜色相近的特效，在形状上也与2D运动帧接近。个人认为可以在此基础上为武器加入短时间内夸张的形变，使之更有张力。这在《守望先锋》里也有相关运用，留待后日实践验证了。<br>　　言归正传，鉴于补间动画过于流畅的特性，为此我也类似日本动画业界的做法一般，按照24帧每秒的形式对动画播放进行了抽帧。实现思想也很简单：平时将Animator暂停，使用一个定时器，在特定时间点让Animator一次性把暂停的时间差更新补上。如下图对照所示（图1抽帧，图2没有）：<br><img src="https://musoucrow.github.io/images/animation_guide/5.gif" alt="5"><br><img src="https://musoucrow.github.io/images/animation_guide/6.gif" alt="6"><br>　　当然这种方式并不完美：真正的2D帧动画每一帧的持续时间都是人为确定的，而这样只是粗暴的抽帧罢了。当然人为确定帧时间的方式势必带来更高的人力成本，具体如何仍需取舍。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　关于「补间与帧动画」一节纯属个人看法，在正统3D派看来也许属于邪道也说不定（笑。骨骼动画涉及的相关种种实际远不止如此，如换装、部位组合动画等，限于篇幅，就不展开了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Animation/" rel="tag"># Animation</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/12/light_guide/" rel="next" title="Unity光照模式的总结">
+                <i class="fa fa-chevron-left"></i> Unity光照模式的总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/08/shader_graph/" rel="prev" title="Shader Graph踩坑实录">
+                Shader Graph踩坑实录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2020/02/01/animation_guide/"
+     data-title="Unity骨骼动画的总结"
+     data-content=""
+     data-url="https://musoucrow.github.io/2020/02/01/animation_guide/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/02/01/animation_guide/"
+           data-title="Unity骨骼动画的总结" data-url="https://musoucrow.github.io/2020/02/01/animation_guide/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网格、骨骼、绑定"><span class="nav-number">2.</span> <span class="nav-text">网格、骨骼、绑定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模型与动画"><span class="nav-number">3.</span> <span class="nav-text">模型与动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Animator-切换、分层、混合树"><span class="nav-number">4.</span> <span class="nav-text">Animator: 切换、分层、混合树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#补间与帧动画"><span class="nav-number">5.</span> <span class="nav-text">补间与帧动画</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">6.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

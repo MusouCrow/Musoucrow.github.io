@@ -1,0 +1,1103 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Development,DFQ," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　在游戏开发的领域里，游戏资源的管理可谓一个很重要的基础功能，在一些强大的游戏引擎会为其配备一套解决方案。而LÖVE很不幸的再次没有提供，好在即使没有也起码做好了内存管理的工作，那么即便自己动手做一套也不是什么困难的事了，本文便记录其中心得。　　资源管理模块本质上只做了两件事：
+
+生命周期管理：保证多次加载时资源的复用，在无需该资源时进行销毁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《DFQ》开发随录——资源管理">
+<meta property="og:url" content="https://musoucrow.github.io/2018/07/27/dfq_res/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　在游戏开发的领域里，游戏资源的管理可谓一个很重要的基础功能，在一些强大的游戏引擎会为其配备一套解决方案。而LÖVE很不幸的再次没有提供，好在即使没有也起码做好了内存管理的工作，那么即便自己动手做一套也不是什么困难的事了，本文便记录其中心得。　　资源管理模块本质上只做了两件事：
+
+生命周期管理：保证多次加载时资源的复用，在无需该资源时进行销毁">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.492Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《DFQ》开发随录——资源管理">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　在游戏开发的领域里，游戏资源的管理可谓一个很重要的基础功能，在一些强大的游戏引擎会为其配备一套解决方案。而LÖVE很不幸的再次没有提供，好在即使没有也起码做好了内存管理的工作，那么即便自己动手做一套也不是什么困难的事了，本文便记录其中心得。　　资源管理模块本质上只做了两件事：
+
+生命周期管理：保证多次加载时资源的复用，在无需该资源时进行销毁">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2018/07/27/dfq_res/"/>
+
+
+
+
+
+  <title> 《DFQ》开发随录——资源管理 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/07/27/dfq_res/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                《DFQ》开发随录——资源管理
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-07-27T16:41:33+08:00">
+                2018-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/07/27/dfq_res/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/07/27/dfq_res/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/07/27/dfq_res/" class="leancloud_visitors" data-flag-title="《DFQ》开发随录——资源管理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　在游戏开发的领域里，游戏资源的管理可谓一个很重要的基础功能，在一些强大的游戏引擎会为其配备一套解决方案。而<a href="http://love2d.org" target="_blank" rel="external">LÖVE</a>很不幸的再次没有提供，好在即使没有也起码做好了内存管理的工作，那么即便自己动手做一套也不是什么困难的事了，本文便记录其中心得。<br>　　资源管理模块本质上只做了两件事：</p>
+<ul>
+<li>生命周期管理：保证多次加载时资源的复用，在无需该资源时进行销毁。</li>
+<li>配置接口：提供加载资源的API，以及外部化的资源配置。  </li>
+</ul>
+<p>　　接下来便围绕以上两点展开说明其中的要点。</p>
+<h2 id="生命周期管理"><a href="#生命周期管理" class="headerlink" title="生命周期管理"></a>生命周期管理</h2><p>　　如上文所言，生命周期管理要做的事即：保证多次加载时资源的复用，在无需该资源时进行销毁。资源复用的实现思路非常的简单，使用哈希表将资源以路径-对象为映射关系进行存储即可，然后每次加载资源时进行一次检查，若存在表内则直接获取，否则再进行读取。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> poor = &#123;&#125;</div><div class="line"></div><div class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">GetResource</span><span class="params">(path)</span></span></div><div class="line">    <span class="keyword">if</span> (poor[path]) <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span> poor[path]</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> res = open(path)</div><div class="line">    <span class="comment">--... load resource.</span></div><div class="line">    poor[path] = res</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> res</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　接下来是第二个问题：在无需该资源时进行销毁。说得具体点便是：当外部没有对象引用该资源时，将其从资源池里移除。如此只需要使用弱引用即可，在Lua里即是建立<a href="http://www.lua.org/manual/5.3/manual.html#2.5.2" target="_blank" rel="external">弱表（weak table）</a>。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> poor = &#123;&#125;</div><div class="line"><span class="built_in">setmetatable</span>(poor, &#123;__mode = <span class="string">'v'</span>&#125;)</div></pre></td></tr></table></figure>
+<p>　　如此当poor内存在外部无引用的对象时，在垃圾回收时便会将其移除。如此资源的生命周期管理便算完成了。</p>
+<h2 id="配置接口"><a href="#配置接口" class="headerlink" title="配置接口"></a>配置接口</h2><p>　　资源文件按照性质可以划分为两种：数据文件（二进制为主，如图片、声音等），配置文件（可编辑、可序列化的变量对象）。对于配置文件，Lua可以很方便地直接使用本体：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    x = <span class="number">1</span>,</div><div class="line">    y = <span class="number">2</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　只要将其读取后使用<code>loadstring(text)()</code>函数便可将其序列化，在其他引擎也有自定义配置格式以编辑器加持的形式解决，如Unity。现实情况中，一般数据文件会通过配置文件进行加载，即在配置文件提供对应资源的路径，然后由代码进行加载处理。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    image = <span class="string">"glow"</span>,</div><div class="line">    ox = <span class="number">5</span>,</div><div class="line">    oy = <span class="number">5</span>,</div><div class="line">    color = &#123;</div><div class="line">        r = <span class="number">255</span>,</div><div class="line">        g = <span class="number">255</span>,</div><div class="line">        b = <span class="number">255</span>,</div><div class="line">        a = <span class="number">127</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如上配置所示，此配置的image项将会由代码根据配置提供的路径<code>glow</code>进行读取对应目录下的<code>image/glow.png</code>文件。如此便可看出，资源与资源之间存在很强的联动性，它们就像是一棵树，节节相扣。对于那些较上层的配置文件而言，往往会从上到下牵涉巨多资源。这么做是很棒的，一加载便将所有相关的资源都加载了，只要在恰当的场合进行资源加载（如切换地图），核心游戏过程中则几乎不会涉及到加载了。</p>
+<h2 id="配置的健壮性"><a href="#配置的健壮性" class="headerlink" title="配置的健壮性"></a>配置的健壮性</h2><p>　　在没有编辑器加持的情况下，单纯的配置文件健壮性是有限的，最突出的两个需求便是：</p>
+<ul>
+<li>快捷定位路径：如位于<code>sprite/test/1.cfg</code>的配置文件想要读取位于同路径、不同分类下的<code>image/test/1.png</code>文件，如果没有一些辅助手段，那么只能傻傻的输入全路径，十分愚蠢。</li>
+<li>参数注入：倘若存在一些大体相似，少部分不同的配置需求，若没有参数注入，那么只好傻傻的批量复制修改，也是十分的愚蠢。</li>
+</ul>
+<p>　　当然以上两点若是存在编辑器，自然可以无视并通过自动化手段之类达到相同的效果。但目前项目暂无编辑器，于是采用了替换文本的方案。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">---sprite/test/1.cfg</span></div><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    image = <span class="string">"$A"</span>,</div><div class="line">    sx = $<span class="number">1</span>,</div><div class="line">    sy = $<span class="number">2</span>,</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如上配置所示，<code>$A</code>便是代表当前资源分类下的路径，即替换为<code>test/1</code>，如此便可快速定位至<code>image/test/1.png</code>，算是一种语法糖吧。至于<code>$1 $2</code>则代表第1、第2个注入的参数，在调用的API的时候会以<code>{1.2, 1}</code>的形式作为参数填入。如此便会将<code>$1</code>替换为<code>1.2</code>，同理<code>$2</code>替换为<code>1</code>。当然这种注入了参数的配置在资源池的key是不能使用路径的（不是标准的），会在其后加入参数值成为：<code>test/1|1.2|1</code>。</p>
+<h2 id="配置的只读性"><a href="#配置的只读性" class="headerlink" title="配置的只读性"></a>配置的只读性</h2><p>　　由于资源对象往往都是独一一份，到处引用，倘若哪处不小心对其进行了修改，那么便会引起连锁反应影响全局。所以有必要考虑将资源对象设置为只读的：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> _PrivateTips<span class="params">()</span></span></div><div class="line">	<span class="built_in">assert</span>(<span class="keyword">nil</span>, <span class="string">"The table is const."</span>)</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> _TABLE.NewConst<span class="params">(tab)</span></span></div><div class="line">	<span class="keyword">local</span> tabMt = <span class="built_in">getmetatable</span>(tab)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (<span class="keyword">not</span> tabMt) <span class="keyword">then</span></div><div class="line">		tabMt = &#123;&#125;</div><div class="line">		<span class="built_in">setmetatable</span>(tab, tabMt)</div><div class="line">	<span class="keyword">end</span></div><div class="line"></div><div class="line">	<span class="keyword">local</span> const = tabMt.__const</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (<span class="keyword">not</span> const) <span class="keyword">then</span></div><div class="line">		const = &#123;&#125;</div><div class="line">		tabMt.__const = const</div><div class="line"></div><div class="line">		<span class="keyword">local</span> constMt = &#123;</div><div class="line">			__index = tab,</div><div class="line">			__newindex = _PrivateTips,</div><div class="line">			__const = const</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="built_in">setmetatable</span>(const, constMt)</div><div class="line">	<span class="keyword">end</span></div><div class="line"></div><div class="line">	<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(tab) <span class="keyword">do</span></div><div class="line">		<span class="keyword">if</span> (<span class="built_in">type</span>(v) == <span class="string">"table"</span>) <span class="keyword">then</span></div><div class="line">			tab[k] = _TABLE.NewConst(v)</div><div class="line">		<span class="keyword">end</span></div><div class="line">	<span class="keyword">end</span></div><div class="line"></div><div class="line">	<span class="keyword">return</span> const</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　只要将对象拿去处理后，试图修改该对象时将会报错。当然这样做是有代价的：<code>pairs()</code>和<code>table.getn</code>函数将会变得无法直接使用，需要取出其元表方可使用。所以需要配备专门函数：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _TABLE.Len<span class="params">(tab)</span></span></div><div class="line">	<span class="keyword">local</span> meta = <span class="built_in">getmetatable</span>(tab)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (meta <span class="keyword">and</span> meta.__index) <span class="keyword">then</span></div><div class="line">		<span class="keyword">return</span> #meta.__index</div><div class="line">	<span class="keyword">else</span></div><div class="line">		<span class="keyword">return</span> #tab</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> _TABLE.Pairs<span class="params">(tab)</span></span></div><div class="line">	<span class="keyword">local</span> meta = <span class="built_in">getmetatable</span>(tab)</div><div class="line"></div><div class="line">	<span class="keyword">if</span> (meta <span class="keyword">and</span> meta.__index) <span class="keyword">then</span></div><div class="line">		<span class="keyword">return</span> <span class="built_in">pairs</span>(meta.__index)</div><div class="line">	<span class="keyword">else</span></div><div class="line">		<span class="keyword">return</span> <span class="built_in">pairs</span>(tab)</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　这样子使用起来虽然麻烦了点，不过的确将资源对象和一般对象作出了明显的区分。另外只读处理的时机也需要考量的，一般得在整个资源对象处理完毕后才进行。</p>
+<h2 id="配置的个性化"><a href="#配置的个性化" class="headerlink" title="配置的个性化"></a>配置的个性化</h2><p>　　对于一些普遍的资源文件（图片、声音、精灵、动画等），一般配备专属的处理函数即可。但是到了业务层面情况往往会繁杂许多，将会存在许多个性化的配置格式。这时候便需要将业务对象和资源对象进行绑定：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    script = <span class="string">"$A"</span>,</div><div class="line">    tagMap = &#123;</div><div class="line">        attack = <span class="keyword">true</span>,</div><div class="line">        attackRate = <span class="keyword">true</span>,</div><div class="line">        autoPlay = <span class="keyword">true</span></div><div class="line">    &#125;,</div><div class="line">    stopTime = <span class="number">200</span>,</div><div class="line">    endTime = <span class="number">300</span>,</div><div class="line">    nextState = <span class="string">"stay"</span>,</div><div class="line">    frameaniPath = <span class="string">"$0attack1"</span>,</div><div class="line">    actor = <span class="string">"bullet/throwstone"</span>,</div><div class="line">    bulletPos = &#123;</div><div class="line">        x = <span class="number">20</span>,</div><div class="line">        y = <span class="number">0</span>,</div><div class="line">        z = <span class="number">-60</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如上配置所示，这是一个哥布林的投掷状态，这里的配置便需要提供子弹资源以及发射坐标了。关于这些个性化的配置项，将会如此解决：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> _NewStateData<span class="params">(path, keys)</span></span></div><div class="line">    <span class="keyword">local</span> data, path = _RESOURCE.ReadConfig(path, <span class="string">"config/actor/state/%s.cfg"</span>, keys)</div><div class="line"></div><div class="line">    data.class = <span class="built_in">require</span>(<span class="string">"actor/state/"</span> .. data.script)</div><div class="line">    data.script = <span class="keyword">nil</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (data.class.HandleData) <span class="keyword">then</span></div><div class="line">        data.class.HandleData(data)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> data</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　可以看到，通过配置的script项找到对应的脚本业务对象，然后调用其对象的HandleData函数进行解析。如此便解决了个性化的问题。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　还是如上篇一般，这个问题对于流行的大引擎而言已经提供了成熟的解决方案。上了贼船呀，只能走到黑了。不过造造轮子也是有益技术的提升的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Development/" rel="tag"># Development</a>
+          
+            <a href="/tags/DFQ/" rel="tag"># DFQ</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/23/dfq_sheet/" rel="next" title="《DFQ》开发随录——图集">
+                <i class="fa fa-chevron-left"></i> 《DFQ》开发随录——图集
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/24/build_love_android/" rel="prev" title="在macOS搭建LÖVE for Android平台">
+                在macOS搭建LÖVE for Android平台 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2018/07/27/dfq_res/"
+     data-title="《DFQ》开发随录——资源管理"
+     data-content=""
+     data-url="https://musoucrow.github.io/2018/07/27/dfq_res/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/07/27/dfq_res/"
+           data-title="《DFQ》开发随录——资源管理" data-url="https://musoucrow.github.io/2018/07/27/dfq_res/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期管理"><span class="nav-number">2.</span> <span class="nav-text">生命周期管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置接口"><span class="nav-number">3.</span> <span class="nav-text">配置接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置的健壮性"><span class="nav-number">4.</span> <span class="nav-text">配置的健壮性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置的只读性"><span class="nav-number">5.</span> <span class="nav-text">配置的只读性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置的个性化"><span class="nav-number">6.</span> <span class="nav-text">配置的个性化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">7.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

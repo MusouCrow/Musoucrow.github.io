@@ -1,0 +1,1101 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Graphics," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。     
+前言　　Demo目前的实时光影虽已完成，但考虑到不同的配置设备，还是得做出不同档次的光影方案。那么烘焙光照（Lightmapping）与光照探针（Light Probes）就免不了了。本文将结合项目实际需求，讲述遇到的问题及解决方案。项目引擎版本为2019.4，渲染管线为URP。
+初步的烘焙　　首先要做的自然是对Shader增加光照烘焙与探针的支持，照">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Demo实装光照烘焙与探针">
+<meta property="og:url" content="https://musoucrow.github.io/2020/08/02/lbbn_baked/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。     
+前言　　Demo目前的实时光影虽已完成，但考虑到不同的配置设备，还是得做出不同档次的光影方案。那么烘焙光照（Lightmapping）与光照探针（Light Probes）就免不了了。本文将结合项目实际需求，讲述遇到的问题及解决方案。项目引擎版本为2019.4，渲染管线为URP。
+初步的烘焙　　首先要做的自然是对Shader增加光照烘焙与探针的支持，照">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/0.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/1.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/2.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/3.jpg">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/4.jpg">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/5.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/6.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/12.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/13.jpg">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/7.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/8.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/9.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/10.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/11.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_baked/14.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.492Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Demo实装光照烘焙与探针">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。     
+前言　　Demo目前的实时光影虽已完成，但考虑到不同的配置设备，还是得做出不同档次的光影方案。那么烘焙光照（Lightmapping）与光照探针（Light Probes）就免不了了。本文将结合项目实际需求，讲述遇到的问题及解决方案。项目引擎版本为2019.4，渲染管线为URP。
+初步的烘焙　　首先要做的自然是对Shader增加光照烘焙与探针的支持，照">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/lbbn_baked/0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2020/08/02/lbbn_baked/"/>
+
+
+
+
+
+  <title> 在Demo实装光照烘焙与探针 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/08/02/lbbn_baked/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                在Demo实装光照烘焙与探针
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-08-02T21:04:33+08:00">
+                2020-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/02/lbbn_baked/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/08/02/lbbn_baked/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/08/02/lbbn_baked/" class="leancloud_visitors" data-flag-title="在Demo实装光照烘焙与探针">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>     </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　Demo目前的实时光影虽已完成，但考虑到不同的配置设备，还是得做出不同档次的光影方案。那么烘焙光照（<a href="https://docs.unity3d.com/Manual/Lightmappers.html" target="_blank" rel="external">Lightmapping</a>）与光照探针（<a href="https://docs.unity3d.com/Manual/LightProbes.html" target="_blank" rel="external">Light Probes</a>）就免不了了。本文将结合项目实际需求，讲述遇到的问题及解决方案。项目引擎版本为2019.4，渲染管线为URP。</p>
+<h2 id="初步的烘焙"><a href="#初步的烘焙" class="headerlink" title="初步的烘焙"></a>初步的烘焙</h2><p>　　首先要做的自然是对Shader增加光照烘焙与探针的支持，照抄URP的SimpleLit Shader即可。大致要点如下：</p>
+<ul>
+<li>Shader添加multi_compile：<code>LIGHTMAP_ON</code>与<code>_MIXED_LIGHTING_SUBTRACTIVE</code>，这表示Shader会参与光照贴图与混合光照</li>
+<li>顶点着色器参数添加<code>half2 lightmapUV : TEXCOORD1;</code>，这是光照贴图的UV</li>
+<li>片元着色器参数添加<code>DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 1);</code>，这是URP自带的宏，根据LIGHTMAP_ON决定配置光照烘焙或探针的参数（lightmapUV or vertexSH），最后的参数<code>1</code>决定是第几个TEXCOORD</li>
+<li>在顶点着色器调用<code>OUTPUT_LIGHTMAP_UV(lightmapUV, lightmapScaleOffset, OUT)</code>与<code>OUTPUT_SH(normalWS, OUT)</code>宏，它们将根据情况配置lightmapUV与vertexSH</li>
+<li>在片元着色器对光照贴图或探针进行取色（<code>SAMPLE_GI(lmName, shName, normalWSName)</code>），最后将之加入到着色环节即可</li>
+<li>若是想要烘焙模式下也能接受实时阴影，记得调用<code>MixRealtimeAndBakedGI</code>函数</li>
+</ul>
+<p>　　总的来说都封装好了，照着拼凑而已。那么事不宜迟，直接按照默认的烘焙配置整个看看，记得要将GameObject的Static里的<code>Contribute GI</code>勾选方可参与烘焙：<br><img src="https://musoucrow.github.io/images/lbbn_baked/0.png" alt="0"><br>　　看着似乎还不错，那么对比下实时看看吧：<br><img src="https://musoucrow.github.io/images/lbbn_baked/1.png" alt="1"><br>　　这么一看还是有不少差距的，必须要让烘焙与实时的效果高度接近才行呐——</p>
+<h2 id="ShadowMask"><a href="#ShadowMask" class="headerlink" title="ShadowMask"></a>ShadowMask</h2><p>　　经过与烘焙设置一番斗智斗勇后，我发现我要的仅仅是让<strong>阴影烘焙</strong>，以节省阴影的运算罢了。什么全局光照、烘焙自带的着色等等都是不需要的。为此我尝试过不少骚操作：生成光照贴图后进行二值化处理、直接在Shader对烘焙色进行处理等……可惜这些方案都只是治标不治本，要么在流程上繁琐，要么性能不佳，要么无法应对所有情况。最终我把目光放在了烘焙三模式之一的<strong>ShadowMask</strong>，它将单独生成阴影贴图，那么若是我只用它，抛弃光照贴图，便可达到目的了。<br>　　不幸的是，URP并没有支持ShadowMask，官网显示仍处于In research状态。幸好网上有其他人做了<a href="https://catlikecoding.com/unity/tutorials/custom-srp/shadow-masks/" target="_blank" rel="external">实现ShadowMask的教程</a>，顺便也学习了一波可编程渲染管线（SRP）的基础知识。经过研究发现，ShadowMask的添加并不复杂，甚至可以说是URP主动将之关闭了（<em>严重怀疑是故意拖到后面做，显得有活干</em>）。当然这么干了之后就表示需要维护自己的URP版本了，顺便将之<a href="https://github.com/MusouCrow/MyURP" target="_blank" rel="external">开源</a>了。<br>　　SRP本质上是开放了一个可供用户定制的表层，多数核心功能还是封装好的。ShadowMask也不例外，其生成附属于烘焙模块。我们要做的只是添加一些设置，以及相应的Shader支持罢了：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 添加Shadowmask字段以让界面开启选项</span></div><div class="line">mixedLightingModes = SupportedRenderingFeatures.LightmapMixedBakeModes.Subtractive | SupportedRenderingFeatures.LightmapMixedBakeModes.IndirectOnly | SupportedRenderingFeatures.LightmapMixedBakeModes.Shadowmask</div><div class="line"></div><div class="line"><span class="comment">// 添加Shader关键字，以决定是否启用功能</span></div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">readonly</span> <span class="keyword">string</span> MixedLightingShadowmask = <span class="string">"SHADOWS_SHADOWMASK"</span>;</div><div class="line"></div><div class="line"><span class="comment">// 根据条件设置相应的Shader关键字</span></div><div class="line">CoreUtils.SetKeyword(cmd, ShaderKeywordStrings.MixedLightingShadowmask, renderingData.lightData.supportsMixedLighting &amp;&amp;m_MixedLightingSetup == MixedLightingSetup.ShadowMask);</div></pre></td></tr></table></figure>
+<p>　　Shader方面要做的调整也不多，URP本身自带ShadowMask的贴图变量<code>TEXTURE2D(unity_ShadowMask);</code>，其UV与光照贴图一致，复用即可。记得在Shader添加multi_compile <code>SHADOWS_SHADOWMASK</code>以判别是否处于ShadowMask模式下。  </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">if</span> defined(SHADOWS_SHADOWMASK) &amp;&amp; defined(LIGHTMAP_ON)</span></div><div class="line">    <span class="comment">// ShadowMask贴图只有R通道</span></div><div class="line">    half shadowMask = SAMPLE_TEXTURE2D(unity_ShadowMask, samplerunity_ShadowMask, lightmapUV).r;</div><div class="line"></div><div class="line">    <span class="comment">// 不超过光照Strength值</span></div><div class="line">    shadowMask = LerpWhiteTo(shadowMask, GetMainLightShadowStrength());</div><div class="line"></div><div class="line">    <span class="comment">// 加入到阴影着色中</span></div><div class="line">    light.shadowAttenuation = min(light.shadowAttenuation, shadowMask);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div></pre></td></tr></table></figure>
+<p>　　大致要做的事情就这么多，烘焙设置除阴影方面外，能怎么快就怎么设置（反正也用不上光照贴图了），一般来说需要注意的有<code>Bounces</code>要设为1，不然阴影会不完整。<code>Flitering</code>将对阴影贴图做边缘柔和处理，<code>Lightmap Resolution</code>与<code>Lightmap Size</code>决定阴影质量，参考如下：<br><img src="https://musoucrow.github.io/images/lbbn_baked/2.png" alt="2"><br>　　另外需要注意的是，阴影精度很大程度上取决于模型的大小，因为<strong>一个模型只能有一张光照/阴影贴图</strong>，在贴图大小定死上限的前提下，模型越大贴图的解析度自然越低。那么来看看效果吧，<strong>图一为实时，图二为烘焙</strong>：<br><img src="https://musoucrow.github.io/images/lbbn_baked/3.jpg" alt="3"><br><img src="https://musoucrow.github.io/images/lbbn_baked/4.jpg" alt="4"><br>　　效果可以说是高度接近了，干掉了光照贴图后着色变得完全一致，阴影贴图在合理的设置下也达到了高度接近实时的效果。坡肥！</p>
+<h2 id="光照探针"><a href="#光照探针" class="headerlink" title="光照探针"></a>光照探针</h2><p>　　现在虽然实现了高度接近实时的阴影烘焙，但显而易见，当人物走向阴影处便会是这样的结果：<br><img src="https://musoucrow.github.io/images/lbbn_baked/5.png" alt="5"><br>　　在某些游戏也许不太理会这种现象，但这也太捞了，光照探针便是为了解决这个问题而生的。通过在场景布置探针，将会根据动态对象附近的探针取色决定明暗度：<br><img src="https://musoucrow.github.io/images/lbbn_baked/6.gif" alt="6"><br>　　光照探针如果要手动布置那实在是太麻烦了，于是我使用了这个<a href="https://github.com/laurenth-personal/LightingTools.LightProbesVolumes" target="_blank" rel="external">插件</a>，通过简单的设置暴力的去平铺一波：<br><img src="https://musoucrow.github.io/images/lbbn_baked/12.png" alt="12"><br>　　根据官方文档说法，探针数量与性能成反比（但越多越精确）。但此插件平铺并不会把探针置于模型内部，以及对比了下《使命召唤手游》的光照探针，感觉还行：<br><img src="https://musoucrow.github.io/images/lbbn_baked/13.jpg" alt="13"><br>　　Shader方面没什么要改的，在URP获取光照函数<code>GetMainLight()</code>本身自带了对光照探针的着色处理（附加在<code>light.distanceAttenuation</code>中），由于不需要用到全局光照，之前的<code>OUTPUT_SH</code>之类的都可以删了。当然有个现象需要注意下：<br><img src="https://musoucrow.github.io/images/lbbn_baked/7.gif" alt="7"><br>　　可以看到在暗处时实在是太黑了（也许是放弃了全局光照导致），于是我们加个约束，将暗值约束在光照Strength到1：  </p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">if</span> !defined(LIGHTMAP_ON) &amp;&amp; defined(_MIXED_LIGHTING_SUBTRACTIVE)</span></div><div class="line">    mainLight.distanceAttenuation = lerp(GetMainLightShadowStrength(), <span class="number">1</span>, saturate(mainLight.distanceAttenuation));</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_baked/8.gif" alt="8"><br>　　很好，这下可以说是大功告成了！</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　最后演示下不同光影品质下的差别吧，分别为低、中、高：<br><img src="https://musoucrow.github.io/images/lbbn_baked/9.gif" alt="9"><br><img src="https://musoucrow.github.io/images/lbbn_baked/10.gif" alt="10"><br><img src="https://musoucrow.github.io/images/lbbn_baked/11.gif" alt="11"><br>　　话虽如此，可我发现目前直接把高品质光影扔到iPhone8下居然稳定59帧，太强了……<br><img src="https://musoucrow.github.io/images/lbbn_baked/14.png" alt="14"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Graphics/" rel="tag"># Graphics</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/05/urp_outline/" rel="next" title="在URP实现局部后处理描边">
+                <i class="fa fa-chevron-left"></i> 在URP实现局部后处理描边
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/06/lbbn_water/" rel="prev" title="在URP实现水面效果">
+                在URP实现水面效果 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2020/08/02/lbbn_baked/"
+     data-title="在Demo实装光照烘焙与探针"
+     data-content=""
+     data-url="https://musoucrow.github.io/2020/08/02/lbbn_baked/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/08/02/lbbn_baked/"
+           data-title="在Demo实装光照烘焙与探针" data-url="https://musoucrow.github.io/2020/08/02/lbbn_baked/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初步的烘焙"><span class="nav-number">2.</span> <span class="nav-text">初步的烘焙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ShadowMask"><span class="nav-number">3.</span> <span class="nav-text">ShadowMask</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#光照探针"><span class="nav-number">4.</span> <span class="nav-text">光照探针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">5.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

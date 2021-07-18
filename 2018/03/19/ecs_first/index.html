@@ -1,0 +1,1094 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ProgramDesign,ECS," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。
+前言　　在阅读这篇文章之前，你需要了解一下何为ECS框架。关于ECS框架，其实近年来一直想去尝试，终于在近日有所体悟，遂有此文。
+详解　　ECS框架的存在实际上很早就出现了（我记得最初在2003年），近年随着《守望先锋》架构设计与网络同步一文出现后瞬间成了炙手可热的新星。　　ECS框架与帧同步锁定类似，皆只是拥有一个概念，但无确切的实现标准。但事实上已经不少现成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ECS框架的初步探究">
+<meta property="og:url" content="https://musoucrow.github.io/2018/03/19/ecs_first/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。
+前言　　在阅读这篇文章之前，你需要了解一下何为ECS框架。关于ECS框架，其实近年来一直想去尝试，终于在近日有所体悟，遂有此文。
+详解　　ECS框架的存在实际上很早就出现了（我记得最初在2003年），近年随着《守望先锋》架构设计与网络同步一文出现后瞬间成了炙手可热的新星。　　ECS框架与帧同步锁定类似，皆只是拥有一个概念，但无确切的实现标准。但事实上已经不少现成">
+<meta property="og:image" content="https://musoucrow.github.io/images/ecs_first/food.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/ecs_first/system.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.492Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ECS框架的初步探究">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。
+前言　　在阅读这篇文章之前，你需要了解一下何为ECS框架。关于ECS框架，其实近年来一直想去尝试，终于在近日有所体悟，遂有此文。
+详解　　ECS框架的存在实际上很早就出现了（我记得最初在2003年），近年随着《守望先锋》架构设计与网络同步一文出现后瞬间成了炙手可热的新星。　　ECS框架与帧同步锁定类似，皆只是拥有一个概念，但无确切的实现标准。但事实上已经不少现成">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/ecs_first/food.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2018/03/19/ecs_first/"/>
+
+
+
+
+
+  <title> ECS框架的初步探究 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/03/19/ecs_first/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                ECS框架的初步探究
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-19T17:01:33+08:00">
+                2018-03-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ProgramDesign/" itemprop="url" rel="index">
+                    <span itemprop="name">ProgramDesign</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/19/ecs_first/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/19/ecs_first/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/19/ecs_first/" class="leancloud_visitors" data-flag-title="ECS框架的初步探究">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　在阅读这篇文章之前，你需要了解一下何为<a href="https://en.wikipedia.org/wiki/Entity–component–system" target="_blank" rel="external">ECS框架</a>。关于ECS框架，其实近年来一直想去尝试，终于在近日有所体悟，遂有此文。</p>
+<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　ECS框架的存在实际上很早就出现了（我记得最初在2003年），近年随着<a href="http://gad.qq.com/article/detail/28682" target="_blank" rel="external">《守望先锋》架构设计与网络同步</a>一文出现后瞬间成了炙手可热的新星。<br>　　ECS框架与帧同步锁定类似，皆只是拥有一个概念，但无确切的实现标准。但事实上已经不少现成的实现（如<a href="https://github.com/sschmid/Entitas-CSharp" target="_blank" rel="external">Entitas</a>），不过我觉得Entitas在与Unity的结合上不符合我的审美，于是自己动手造了个轮子。<br>　　ECS框架的概念其实相当直观：Entity-Component-System三件套。  </p>
+<ul>
+<li>Entity即实体，作为Component的经纪人，可拥有多个Component。</li>
+<li>Component即组件，作为数据存储的容器，原则上只包含内部数据自处理的函数。Component以Entity作为标识，以此判断所属。</li>
+<li>System即系统，作为业务函数的集合，会与Component对接实现业务运行（System处理Component）。</li>
+</ul>
+<p>　　以上三点可谓看过相关文章的都懂，只是落实到具体实现上仍会有不少不明不白之处（Entity是作为容器还是标识符？Component可否嵌套Component？System之间可否相互调用？）。以上问题并没有确切的答案，只能是落实实现时根据需求而定。  </p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>　　所谓实践出真知，在此之前我写了个<a href="https://github.com/MusouCrow/Snake" target="_blank" rel="external">贪吃蛇</a>，这是个不错的素材，于是便将其<a href="https://github.com/MusouCrow/Sanke_ECS" target="_blank" rel="external">ECS化</a>。这下也可将两者进行对比，品味其中区别。  </p>
+<h3 id="Entity"><a href="#Entity" class="headerlink" title="Entity"></a>Entity</h3><p>　　由于这款游戏是使用Unity制作的，那么自然最好与Unity本身相结合。我首先考虑到的便是与Unity本身的GameObject-Behavior（其实是Component，为防误解，特此改称）框架结合（业务环境下有调用它们的需求），于是选择将Entity做成一个Behavior：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> System;</div><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="keyword">namespace</span> <span class="title">Game.Core</span> &#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Entity</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">event</span> Action&lt;Entity&gt; NewTickEvent;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">event</span> Action&lt;Entity&gt; DestroyTickEvent;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (Entity.NewTickEvent != <span class="literal">null</span>) &#123;</div><div class="line">                Entity.NewTickEvent(<span class="keyword">this</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">OnDestroy</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (Entity.DestroyTickEvent != <span class="literal">null</span>) &#123;</div><div class="line">                Entity.DestroyTickEvent(<span class="keyword">this</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　可以看出，Entity的生命周期也与GameObject进行了捆绑，并且设置了两个event令System可以进行监控。<br>　　再来看看Entity的具体实例：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="keyword">namespace</span> <span class="title">Game.Entitys</span> &#123;</div><div class="line">    <span class="keyword">using</span> Core;</div><div class="line">    <span class="keyword">using</span> Components;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Food</span> : <span class="title">Entity</span> &#123;</div><div class="line">        <span class="keyword">public</span> Position position = <span class="keyword">new</span> Position();</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">this</span>.position.Init(<span class="keyword">this</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">protected</span> new <span class="keyword">void</span> <span class="title">OnDestroy</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">base</span>.OnDestroy();</div><div class="line"></div><div class="line">            <span class="keyword">this</span>.position.Destroy();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/ecs_first/food.png" alt="food"></p>
+<p>　　可以看出Food实体创建了一个Position组件，托Unity编辑器的服，我们可以清晰地看到Position的数据构成，并可方便地进行编辑（包括运行时）。当然可以看得出这里Component的创建方式相当别扭（实例化后仍需Init），这是为了对接Unity的序列化功能，若不这么做的话，某些数据将会序列化失败（如Collision Slot）。</p>
+<h3 id="Component"><a href="#Component" class="headerlink" title="Component"></a>Component</h3><p>　　Component的初始实现便很简单了，只需要对接Entity以及预留Init与Destroy接口即可：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> System;</div><div class="line"></div><div class="line"><span class="keyword">namespace</span> <span class="title">Game.Core</span> &#123;</div><div class="line">    [Serializable]</div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Component</span> &#123;</div><div class="line">        [NonSerialized]</div><div class="line">        <span class="keyword">public</span> Entity entity;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Init</span>(<span class="params">Entity entity</span>) </span>&#123;</div><div class="line">            <span class="keyword">this</span>.entity = entity;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Destroy</span>(<span class="params"></span>) </span>&#123;&#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　这里令Component拥有entity是为了便于识别身份，<code>[Serializable]</code>标识表示该对象可序列化（与编辑器交互），<code>[NonSerialized]</code>标识表示不让该变量序列化（没有显示在编辑器的需求）。接下来看看Position组件的具体实现：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> System;</div><div class="line"><span class="keyword">using</span> System.Collections.Generic;</div><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="keyword">namespace</span> <span class="title">Game.Components</span> &#123;</div><div class="line">    <span class="keyword">using</span> Core;</div><div class="line">    <span class="keyword">using</span> Solts;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Position</span> : <span class="title">Component</span> &#123;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> Dictionary&lt;Entity, Position&gt; Map = <span class="keyword">new</span> Dictionary&lt;Entity, Position&gt;();</div><div class="line">        <span class="keyword">public</span> <span class="keyword">static</span> List&lt;Position&gt; List = <span class="keyword">new</span> List&lt;Position&gt;();</div><div class="line"></div><div class="line">        <span class="keyword">public</span> Vector2Int <span class="keyword">value</span>;</div><div class="line">        <span class="keyword">public</span> Collision collsionSlot;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Init</span>(<span class="params">Entity entity</span>) </span>&#123;</div><div class="line">            <span class="keyword">base</span>.Init(entity);</div><div class="line"></div><div class="line">            Position.Map.Add(entity, <span class="keyword">this</span>);</div><div class="line">            Position.List.Add(<span class="keyword">this</span>);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Destroy</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            Position.Map.Remove(<span class="keyword">this</span>.entity);</div><div class="line">            Position.List.Remove(<span class="keyword">this</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　关于ECS框架有一个很普遍的问题：在System要如何获取到Component？我的解决方法便是为有获取需求的Component设立存储容器，当然这种写法有点死板，应该专门设立容器管理类进行自动化处理，这是个可改善的方向。</p>
+<h3 id="System"><a href="#System" class="headerlink" title="System"></a>System</h3><p>　　System纯粹来看便是个函数集，在Entitas的实现是专门设立Behavior装载System以运行。而我选择分离：System即Behavior，两者倒没什么根本上的区别，全凭个人喜好罢了。在以Behavior的实现下并不需要System基类，以下以涉及到坐标与碰撞的Field系统为例：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> System.Collections.Generic;</div><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="keyword">namespace</span> <span class="title">Game.Systems</span> &#123;</div><div class="line">    <span class="keyword">using</span> Core;</div><div class="line">    <span class="keyword">using</span> Components;</div><div class="line">    <span class="keyword">using</span> Entitys;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Field</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">float</span> SIZE = <span class="number">0.32</span>f;</div><div class="line"></div><div class="line">        <span class="keyword">private</span> <span class="keyword">static</span> List&lt;Entity&gt; SyncList = <span class="keyword">new</span> List&lt;Entity&gt;();</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Vector2 <span class="title">ToPosition</span>(<span class="params"><span class="keyword">int</span> x, <span class="keyword">int</span> y</span>) </span>&#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Vector2(x * SIZE + SIZE * <span class="number">0.5</span>f, y * SIZE + SIZE * <span class="number">0.5</span>f);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">AdjustPosition</span>(<span class="params">Position position, Transform transform=<span class="literal">null</span></span>) </span>&#123;</div><div class="line">            transform = transform == <span class="literal">null</span> ? position.entity.transform : transform;</div><div class="line">            transform.position = Field.ToPosition(position.<span class="keyword">value</span>.x, position.<span class="keyword">value</span>.y);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Collide</span>(<span class="params">Position a, Position b</span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (a.<span class="keyword">value</span> == b.<span class="keyword">value</span>) &#123;</div><div class="line">                <span class="keyword">if</span> (a.collsionSlot != <span class="literal">null</span>) &#123;</div><div class="line">                    a.collsionSlot.Run(a.entity, b.entity);</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="keyword">if</span> (b.collsionSlot != <span class="literal">null</span>) &#123;</div><div class="line">                    b.collsionSlot.Run(b.entity, a.entity);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Sync</span>(<span class="params">Position position, Joint joint</span>) </span>&#123;</div><div class="line">            joint.laterPos = position.<span class="keyword">value</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            Entity.NewTickEvent += <span class="keyword">this</span>.NewTick;</div><div class="line">            Entity.DestroyTickEvent += <span class="keyword">this</span>.DestroyTick;</div><div class="line">            Director.UpdateTickEvent += <span class="keyword">this</span>.UpdateTick;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">NewTick</span>(<span class="params">Entity entity</span>) </span>&#123;</div><div class="line">            <span class="keyword">bool</span> hasPos = Position.Map.ContainsKey(entity);</div><div class="line">            <span class="keyword">bool</span> hasJoi = Joint.Map.ContainsKey(entity);</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (hasPos) &#123;</div><div class="line">                Field.AdjustPosition(Position.Map[entity]);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (hasPos &amp;&amp; hasJoi) &#123;</div><div class="line">                Field.SyncList.Add(entity);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">UpdateTick</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; Position.List.Count; i++) &#123;</div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; Position.List.Count; j++) &#123;</div><div class="line">                    Field.Collide(Position.List[i], Position.List[j]);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">foreach</span> (<span class="keyword">var</span> entity <span class="keyword">in</span> Field.SyncList) &#123;</div><div class="line">                Field.Sync(Position.Map[entity], Joint.Map[entity]);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">DestroyTick</span>(<span class="params">Entity entity</span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (Field.SyncList.Contains(entity)) &#123;</div><div class="line">                Field.SyncList.Remove(entity);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　可以看出，继承Behavior的System可以很方便地使用自带的各种回调函数（如Awake），业务函数也变得清晰无比，只需要提供相应Component即可（如AdjustPosition）。对于一些需要复合组件的业务（如Sync），则会专门设立容器（SyncList）进行存储，对Entity的NewTickEvent与DestroyTickEvent进行监控便可筛选出合适的对象，且所有组件可通过Entity从组件容器进行获取，十分方便。<br>　　当然也不要忘记与编辑器结合的优势，System也可以将变量序列化与编辑器交互：<br><img src="https://musoucrow.github.io/images/ecs_first/system.png" alt="system"><br>　　当然Unity可进行序列化的部分只有实例变量，所以需要作此处理：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Test Instance;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">Get</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> Instance.<span class="keyword">value</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> <span class="keyword">value</span>;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        Food.Instance = <span class="keyword">this</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　因为System是单例Behavior，所以这么做是安全的。如此便可操作实例对象了。  </p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　总的而言，ECS框架主要是一种对OOP思想的反思，甚至可以说是一种复古（函数式编程风格）。也是一种彻底的组件模式实现，彻底地奉行数据-逻辑分离。它使得我们更容易地去抽象、描述游戏事物。当然我认为它在某种程度上是反直觉的、抽象的（某些只会属于某个对象所属的业务却要分开写，并且用组件去涵盖）。所以我认为它更适用于某些场景下，如动作游戏里的地图单位，分为多种样式（物件、道具、战斗单位、NPC、飞行道具等），这种时候使用传统的继承+子对象写法确实不如ECS来得好了。再比如UI方面，我认为还是MVC框架更为王道。所以切忌教条主义，一切跟着实际需求走。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ProgramDesign/" rel="tag"># ProgramDesign</a>
+          
+            <a href="/tags/ECS/" rel="tag"># ECS</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/12/bnb_3/" rel="next" title="《Brick & Ball》开发总结（三）——游戏性">
+                <i class="fa fa-chevron-left"></i> 《Brick & Ball》开发总结（三）——游戏性
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/17/lua_local/" rel="prev" title="Lua的local变量探究">
+                Lua的local变量探究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2018/03/19/ecs_first/"
+     data-title="ECS框架的初步探究"
+     data-content=""
+     data-url="https://musoucrow.github.io/2018/03/19/ecs_first/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/03/19/ecs_first/"
+           data-title="ECS框架的初步探究" data-url="https://musoucrow.github.io/2018/03/19/ecs_first/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#详解"><span class="nav-number">2.</span> <span class="nav-text">详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Entity"><span class="nav-number">3.1.</span> <span class="nav-text">Entity</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Component"><span class="nav-number">3.2.</span> <span class="nav-text">Component</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#System"><span class="nav-number">3.3.</span> <span class="nav-text">System</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">4.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1107 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Graphics," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。     
+前言　　本篇文章按理来说在三月便该发布了，因为插队原因延宕至今，不过好饭不怕晚，干就完了奥利给！阅读本文最好拥有一定的图形学知识，当然看个热闹也是好的。　　游戏画面的风格是一开始便要定下的大事，这在古法2D主要通过素材本身及后期调色决定，没有太多文章可作。而在现代游戏（尤其是3D）则会通过Shader在原本的元素上进行加料，如通过基于物理的渲染（PBR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Demo的卡通渲染方案">
+<meta property="og:url" content="https://musoucrow.github.io/2020/05/10/lbbn_shading/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。     
+前言　　本篇文章按理来说在三月便该发布了，因为插队原因延宕至今，不过好饭不怕晚，干就完了奥利给！阅读本文最好拥有一定的图形学知识，当然看个热闹也是好的。　　游戏画面的风格是一开始便要定下的大事，这在古法2D主要通过素材本身及后期调色决定，没有太多文章可作。而在现代游戏（尤其是3D）则会通过Shader在原本的元素上进行加料，如通过基于物理的渲染（PBR">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/0.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/1.jpeg">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/2.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/3.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/4.jpeg">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/5.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/6.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/7.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/8.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/9.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/10.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/11.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/12.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/13.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/14.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/15.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/16.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/17.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/lbbn_shading/18.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.492Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Demo的卡通渲染方案">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。     
+前言　　本篇文章按理来说在三月便该发布了，因为插队原因延宕至今，不过好饭不怕晚，干就完了奥利给！阅读本文最好拥有一定的图形学知识，当然看个热闹也是好的。　　游戏画面的风格是一开始便要定下的大事，这在古法2D主要通过素材本身及后期调色决定，没有太多文章可作。而在现代游戏（尤其是3D）则会通过Shader在原本的元素上进行加料，如通过基于物理的渲染（PBR">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/lbbn_shading/0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2020/05/10/lbbn_shading/"/>
+
+
+
+
+
+  <title> Demo的卡通渲染方案 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/05/10/lbbn_shading/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Demo的卡通渲染方案
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-05-10T10:01:34+08:00">
+                2020-05-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/05/10/lbbn_shading/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/05/10/lbbn_shading/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/05/10/lbbn_shading/" class="leancloud_visitors" data-flag-title="Demo的卡通渲染方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>     </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　本篇文章按理来说在三月便该发布了，因为插队原因延宕至今，不过好饭不怕晚，干就完了奥利给！阅读本文最好拥有一定的图形学知识，当然看个热闹也是好的。<br>　　游戏画面的风格是一开始便要定下的大事，这在古法2D主要通过素材本身及后期调色决定，没有太多文章可作。而在现代游戏（尤其是3D）则会通过Shader在原本的元素上进行加料，如通过<strong>基于物理的渲染（PBR）</strong>将模型凸显出金属、石头、布料等材质倾向。而在早期为了凸显3D模型的立体感，一般会采用经验总结出来的<strong>冯氏光照模型(Blinn-Phong)</strong>，这也是许多3D软件的默认方案，那将会让我们的模型长成这样：<br><img src="https://musoucrow.github.io/images/lbbn_shading/0.png" alt="0"><br>　　嗯，这有够雕塑风的，让我想起了当初名震一时的猴赛雷，有着异曲同工之妙：<br><img src="https://musoucrow.github.io/images/lbbn_shading/1.jpeg" alt="1"><br>　　由此可见，对于讲究卡通风格的游戏，这种通用的光照模型肯定得枪毙，于是本文才会诞生。对于这类<strong>非写实方向</strong>的渲染方案，业界称之为<em>NPR</em>。而往下细分则是日式卡通渲染，其中佼佼者当属《罪恶装备》系列，而《崩坏3rd》也是不少人在这方面的启蒙者。当然美术这一块没有绝对的风格一致，渲染也不例外，所以Demo里的卡通渲染方案乃是个人的方案，不代表业界的标准实现与效果。<br>　　Demo基于Unity2019.3开发，渲染管线为URP7.3.1，采用直接编写Shader的方式（HLSL），将一一介绍其中要点。本文所谓的卡通效果以<strong>日式2D赛璐璐风格</strong>为准，不论厚涂之类的风格。  </p>
+<h2 id="着色"><a href="#着色" class="headerlink" title="着色"></a>着色</h2><p>　　首先我们先抛开一切：冯氏光照不好那咱们就是了。直接把贴图显示了，什么料都不要加。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 根据uv坐标获取对应贴图上的颜色</span></div><div class="line"></div><div class="line">half4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv);</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/2.png" alt="2"><br>　　嗯，虽然很原始，但好歹没那股恶心感了，把投影也加上：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 根据渲染管线提供的shadowCoord获取光照信息，并计算出投影颜色</span></div><div class="line"></div><div class="line">Light mainLight = GetMainLight(shadowCoord);</div><div class="line">color *= mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/3.png" alt="3"><br>　　哎呀，有了投影瞬间立体起来了，开始有《塞尔达传说：风之杖》内味了：<br><img src="https://musoucrow.github.io/images/lbbn_shading/4.jpeg" alt="4"><br>　　要加投影记得添加Pass：ShadowCaster，并且获取光照信息也需要开启一定的宏，这些并非本文重点，详情请查阅URP的Shader实现。<br>　　但只是如此还不够：颜色太鲜艳了，看久了会累。那么有两种方案：调色与着色，调色则是进行总体的颜色调节，使之不要这么鲜艳，着色则是<strong>根据模型面对光的吸收度</strong>决定明暗。这里还是选择着色：它将会增强模型的立体感。<br>　　这里说的着色其实就是冯氏光照中的<strong>漫反射（Diffuse）</strong>：当光照射到非平面的物体上，将根据与光的夹角决定吸收度（越是与光垂直的面越亮）。而在3D模型中，每个模型面都会往上发射一条射线，也就事实上构成了一条垂直于平面向量，这在数学中称之为<strong>法线（Normal）</strong>。我们可以使用<strong>向量点积(Dot)</strong>获取法线与光照方向之间的夹角，以此决定模型面的光亮程度。<br><img src="https://musoucrow.github.io/images/lbbn_shading/5.png" alt="5">  </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">half NDotL = dot(normal, lightDir); <span class="comment">// 计算法线与光照方向的夹角系数</span></div><div class="line">NDotL = saturate(NDotL); <span class="comment">// 保证系数在0-1</span></div><div class="line">color *= NDotL;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/6.png" alt="6"><br>　　啊这，这不是跟一开始差不多么？这是当然的，因为一开始便是冯氏光照的方案。其漫反射的思想其实并无问题，但原罪在于<strong>过渡太丰富了</strong>，每个模型面与光的夹角都不同，导致颜色都不同。整个模型看起来就过于立体，以至于产生了雕塑感。<br>　　而在日式2D卡通的世界里（尤其是赛璐璐），着色并不会有太详细的过渡，只是到了某个角度统一涂暗，反之为亮，最多在两者之间加点过渡而已。那么便基于此思想进行改造即可：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">half NDotL = dot(normal, lightDir); <span class="comment">// 计算法线与光照方向的夹角系数</span></div><div class="line"></div><div class="line"><span class="comment">// 根据_DiffuseRange约束系数，输出0-1的值</span></div><div class="line"><span class="comment">// 由于使用了smoothstep，在接近_DiffuseRange上下限时会做柔滑处理，使之产生过渡感</span></div><div class="line"><span class="comment">// _DiffuseRange的参考值为0.5, 0.7</span></div><div class="line">half v = smoothstep(_DiffuseRange[<span class="number">0</span>], _DiffuseRange[<span class="number">1</span>], NDotL);</div><div class="line"></div><div class="line"><span class="comment">// 根据根据v的值决定输出_LightRange范围内的值</span></div><div class="line"><span class="comment">// _LightRange的参考值为0.9, 1</span></div><div class="line">v = lerp(_LightRange[<span class="number">0</span>], _LightRange[<span class="number">1</span>], v);</div><div class="line"></div><div class="line">color *= v;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/7.png" alt="7"><br>　　还不错，这下便为模型划分了明暗，并在两者之间做了过渡，这种方式称之为<strong>二值化</strong>。着色并没有采用很明显的暗色，只是想凸显一点立体感，以及让画面更柔和，不那么刺眼罢了。当然目前可以说是非常不明显了，这是有原因的，且待后续调色。</p>
+<h2 id="描边"><a href="#描边" class="headerlink" title="描边"></a>描边</h2><p>　　接下来需要补上日式2D卡通不可或缺的一部分：<strong>描边（Outline）</strong>，描边有助于划分物体，明确空间上的层次，并提供一定的风味。<br>　　关于描边的实现方式，业界主要有<strong>模型多画一遍并将边缘外扩</strong>以及<strong>屏幕后处理</strong>的方案。前者方案在日式游戏较为流行，优点在于实现简单，性能也还算过得去，缺点是必须开抗锯齿不然没眼看。后者实现方式多样，并且根据实现方式能达到不一样的效果（如一定程度的内描边），但有些更适合搭配<strong>延迟渲染（Deferred Rendering）</strong>，而这代表着对显卡带宽与光照方案有要求。<br>　　另外在显示方案上也有区别，有追求任何缩放下描边大小不变的，也有自然派的。有让描边纯色的，也有要让描边根据贴图颜色决定的。本人采用的是<em>模型外扩、自然缩放、根据贴图颜色决定</em>的描边方案。<br>　　多显示一遍模型在Unity增加一个Pass即可，并且开启正面剔除（只显示背面，不然会干扰到正常模型）。并且在顶点着色器对模型顶点进行外扩，外扩的方向由所在模型面的法线决定。而颜色方面则在片元着色器根据贴图颜色进行置暗显示即可：  </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 顶点着色器</span></div><div class="line"></div><div class="line">half4 viewPos = mul(UNITY_MATRIX_MV, input.positionOS); <span class="comment">// 将顶点从模型空间转为观察空间</span></div><div class="line">half3 normal = mul((float3x3)UNITY_MATRIX_IT_MV, input.normalOS); <span class="comment">// 同上，将法线转为观察空间</span></div><div class="line">viewPos += float4(normalize(normal), <span class="number">0</span>) * <span class="number">0.0075</span>; <span class="comment">// 顶点沿法线外扩</span></div><div class="line">output.positionCS = mul(UNITY_MATRIX_P, viewPos); <span class="comment">// 将顶点从观察空间转为裁剪空间</span></div><div class="line"></div><div class="line">output.uv = TRANSFORM_TEX(input.texcoord, _BaseMap); <span class="comment">// 提取uv</span></div><div class="line"></div><div class="line"><span class="keyword">return</span> output;</div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 片源着色器</span></div><div class="line">color *= SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv); <span class="comment">// 提取贴图颜色</span></div><div class="line"></div><div class="line"><span class="keyword">return</span> color * <span class="number">0.3</span>; <span class="comment">// 压暗</span></div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/8.png" alt="8">  </p>
+<p>　　果不其然，没有抗锯齿的话就很搓，跟早期的跑跑卡丁车似的。安排一波MSAA8x：<br><img src="https://musoucrow.github.io/images/lbbn_shading/9.png" alt="9"><br>　　哎，这就舒服多了，当然实际上由于小泥人的关系，4x和8x实际上看不出区别，而2x也算可以接受的效果，这么看来能耗也还好。当然关于描边实际上还有内描边这个大题，但小泥人不需要这么丰富的细节，这就很舒服。</p>
+<h2 id="发光"><a href="#发光" class="headerlink" title="发光"></a>发光</h2><p>　　目前模型的显示还欠缺一些发光的元素，如一般头发和武器会有一些高光效果。这在冯氏光照称之为<strong>镜面光照（Specular）</strong>：本质上与漫反射一样，只是由视角方向与光照方向相加，并与法线做点积获得两者的夹角系数，如此便可实现根据摄像机与光照运动结合决定模型高光的位置。<br>　　当然仅此而已是不够的，显而易见仅此而已的话将会如漫反射一般范围很大，而高光实际上只需要一点即可。实际上会将之范围缩小：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">half3 halfVec = normalize(lightDir + viewDir); <span class="comment">// 将摄像头方向与光照方向相加</span></div><div class="line">half NdotH = dot(normal, halfVec); <span class="comment">// 与法线点积，获取夹角系数</span></div><div class="line">NdotH = saturate(NdotH); <span class="comment">// 保证在0-1</span></div><div class="line"></div><div class="line">half v = <span class="built_in">pow</span>(NdotH, _Smoothness); <span class="comment">// 缩小夹角系数的值，由于NdotH在0-1，所以pow后会变得更小，_Smoothness参考值为8-64</span></div><div class="line">color += color * v; <span class="comment">// 在原有颜色的基础上叠加</span></div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/10.png" alt="10"><br>　　与之前一样，这样的高光过渡太强了，不够卡通，将之二值化：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">half v = <span class="built_in">pow</span>(NdotH, _Smoothness); <span class="comment">// 缩小夹角系数的值，由于NdotH在0-1，所以pow后会变得更小，_Smoothness参考值为8-64</span></div><div class="line">v = step(_SpecularRamp, v); <span class="comment">// 小于_SpecularRamp的值将为0，反之为1</span></div><div class="line">v = v * _SpecularStrength; <span class="comment">// 定义高光强度，参考值为0.2</span></div><div class="line"></div><div class="line">color += color * v; <span class="comment">// 在原有颜色的基础上叠加</span></div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/11.png" alt="11"><br>　　这样的高光就更有手绘的感觉了，牛屎一块。但很显然对于头发而言光是一块牛屎高光是不够的，让美术自由的进行创作显然是更好的方案。于是引入了<strong>发光贴图（Emission）</strong>，其本身很简单：就是在最后把发光贴图的内容显示出来即可。而之所以要单独划分贴图而不是画死在原贴图，在于要自由的控制透明度甚至曝光，以及让发光参与单独的光照运算（与高光类似的方法，摄像机视角与光照方向相加后与法线点积）。<br><img src="https://musoucrow.github.io/images/lbbn_shading/12.png" alt="12">  </p>
+<p>　　到了目前仍缺一个日式2D卡通的一个特性：<strong>边缘光（Rim）</strong>，一般为了表达物体处于光亮的环境下，属于光溢出的一种表达，有助于提升画面的层次感。实现原理也很简单：视角方向与法线点积，根据夹角系数取得当前视角下的模型边缘部分，为之加光即可。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">half VDotN = dot(viewDir, normal); <span class="comment">// 视角方向与法线点积，获取夹角系数</span></div><div class="line">VDotN = <span class="number">1</span> - saturate(VDotN); <span class="comment">// 取反，方便计算</span></div><div class="line"></div><div class="line">half v = smoothstep(_RimRange[<span class="number">0</span>], _RimRange[<span class="number">1</span>], VDotN); <span class="comment">// 与漫反射部分类似，做二值化，参考值为0.4-1</span></div><div class="line">v = step(<span class="number">0.5</span>, v); <span class="comment">// 小于0.5的部分都不要了</span></div><div class="line">v = v * _RimStrength; <span class="comment">// 设定边缘光强度，参考值为0.1</span></div><div class="line"></div><div class="line">color += color * v; <span class="comment">// 叠加</span></div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn_shading/13.png" alt="13"><br>　　发光的构成大致如此，目前也许看起来不够明显，实是尚未调色所致，且看下文。</p>
+<h2 id="调色"><a href="#调色" class="headerlink" title="调色"></a>调色</h2><p>　　先来看看目前的效果：<br><img src="https://musoucrow.github.io/images/lbbn_shading/14.png" alt="14"><br>　　首先是整体颜色风格不符合主题，这个场景属于有着岩浆的密室，应该符合昏暗以及灼热的色调，使用Split Toning进行调色：<br><img src="https://musoucrow.github.io/images/lbbn_shading/15.png" alt="15"><br>　　嗯，至少色调上像样了，但还是缺乏灼热的感觉，上Bloom看看：<br><img src="https://musoucrow.github.io/images/lbbn_shading/16.png" alt="16"><br>　　哎呀，看着只是稍微亮了点的样子，那是因为Bloom需要配合HDR使用，将颜色突破0-1的限制下进行运算，才能做到光溢出的效果：<br><img src="https://musoucrow.github.io/images/lbbn_shading/17.png" alt="17"><br>　　唔……这溢出的实在是有限，因为目前还处于Linear颜色空间，显示器对于颜色会进行处理，使得颜色之间的区间变小（明暗不明显），需要转成Gamma才能抵消之：<br><img src="https://musoucrow.github.io/images/lbbn_shading/18.png" alt="18"><br>　　成了，如此便得出了昏暗且灼热的场景风格，高对比度（亮者更亮、暗者更暗）的画面。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　这算是本人进入图形渲染的一个里程碑，感觉这的确是个美术活。技术不过是让你能进入赛道罢了，真正决定效果的还得看美术的理念。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Graphics/" rel="tag"># Graphics</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/07/snake_cpp/" rel="next" title="移植贪吃蛇——从C#到C++">
+                <i class="fa fa-chevron-left"></i> 移植贪吃蛇——从C#到C++
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/06/07/lbbn_tile/" rel="prev" title="3D瓦片地图采坑录">
+                3D瓦片地图采坑录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2020/05/10/lbbn_shading/"
+     data-title="Demo的卡通渲染方案"
+     data-content=""
+     data-url="https://musoucrow.github.io/2020/05/10/lbbn_shading/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/05/10/lbbn_shading/"
+           data-title="Demo的卡通渲染方案" data-url="https://musoucrow.github.io/2020/05/10/lbbn_shading/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#着色"><span class="nav-number">2.</span> <span class="nav-text">着色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#描边"><span class="nav-number">3.</span> <span class="nav-text">描边</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发光"><span class="nav-number">4.</span> <span class="nav-text">发光</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调色"><span class="nav-number">5.</span> <span class="nav-text">调色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">6.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1107 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Graphics," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　Demo也到了做渲染的时候了，经过一番鏖战后，算是大体完成了。但随着后续需求的到来，发现这套纯代码的Shader方案对于扩展、复用等方面有着诸多不便。于是便打起了Shader Graph的主意……经过一番纠缠，于是有了本篇踩坑实录。另附源码地址，但本篇并不会对其做讲解。基于Unity2020.1.0a20，渲染管线为URP7.18。
+优劣">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Shader Graph踩坑实录">
+<meta property="og:url" content="https://musoucrow.github.io/2020/03/08/shader_graph/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　Demo也到了做渲染的时候了，经过一番鏖战后，算是大体完成了。但随着后续需求的到来，发现这套纯代码的Shader方案对于扩展、复用等方面有着诸多不便。于是便打起了Shader Graph的主意……经过一番纠缠，于是有了本篇踩坑实录。另附源码地址，但本篇并不会对其做讲解。基于Unity2020.1.0a20，渲染管线为URP7.18。
+优劣">
+<meta property="og:image" content="https://musoucrow.github.io/images/shader_graph/0.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/shader_graph/1.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/shader_graph/2.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/shader_graph/3.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/shader_graph/4.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/shader_graph/5.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.493Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Shader Graph踩坑实录">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　Demo也到了做渲染的时候了，经过一番鏖战后，算是大体完成了。但随着后续需求的到来，发现这套纯代码的Shader方案对于扩展、复用等方面有着诸多不便。于是便打起了Shader Graph的主意……经过一番纠缠，于是有了本篇踩坑实录。另附源码地址，但本篇并不会对其做讲解。基于Unity2020.1.0a20，渲染管线为URP7.18。
+优劣">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/shader_graph/0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2020/03/08/shader_graph/"/>
+
+
+
+
+
+  <title> Shader Graph踩坑实录 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/03/08/shader_graph/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                Shader Graph踩坑实录
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-08T17:41:18+08:00">
+                2020-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/03/08/shader_graph/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/03/08/shader_graph/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/03/08/shader_graph/" class="leancloud_visitors" data-flag-title="Shader Graph踩坑实录">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　Demo也到了做渲染的时候了，经过一番鏖战后，算是大体完成了。但随着后续需求的到来，发现这套纯代码的Shader方案对于扩展、复用等方面有着诸多不便。于是便打起了<a href="https://unity.com/shader-graph" target="_blank" rel="external">Shader Graph</a>的主意……经过一番纠缠，于是有了本篇踩坑实录。另附<a href="https://github.com/MusouCrow/CustomShaderGraph" target="_blank" rel="external">源码地址</a>，但本篇并不会对其做讲解。基于Unity2020.1.0a20，渲染管线为URP7.18。</p>
+<h2 id="优劣"><a href="#优劣" class="headerlink" title="优劣"></a>优劣</h2><p>　　首先要明确的是：Shader Graph不支持Builtin渲染管线，且尚未处于彻底成熟的阶段，哪怕是最新版本尚有不少缺陷。但瑕不掩瑜，且说其优劣：</p>
+<ul>
+<li>优点<ul>
+<li>由于节点化与Sub Graph的存在，Shader的组装将变得相当容易，极大提升了模块化水平。</li>
+<li>调整Property与Keyword变得相当方便，纯代码下将需要多些工序。</li>
+<li>内置各种节点，降低了美术参与创作的门槛。</li>
+<li>能够实时预览每个节点造成的变化预览，虽然对我而言没啥用。</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>编辑器尚不够稳定，经常会出现整个程序崩溃的情况。</li>
+<li>生成的代码不够优化，比较暴力，存在各种分支判断、重复函数（也许最终会优化？）</li>
+<li>由于Slot机制的原因，可能会出现很多运算集中在片元着色器中。</li>
+<li>对于创建Pass并不友好，需要修改源码。</li>
+</ul>
+</li>
+</ul>
+<h2 id="来龙"><a href="#来龙" class="headerlink" title="来龙"></a>来龙</h2><p>　　其实一般的浅度Shader Graph使用者并不会如我这般踩这么多坑：直接使用内置的Graph模板进行创作即可。不幸的是，如前文所言：对于创建Pass并不友好，需要修改源码。于是便开始了踩坑之旅……<br>　　在默认情况下，Unity的Package将保存在工程的Library/PackageCache目录下，这样子是不能直接修改源码的（Library目录下的东西属于可再生物，随时会被覆盖），需将之搬迁至工程的Packages目录下。<br>　　对于考虑到日后Shader Graph的版本升级情况，所以尽可能的<strong>不要修改原工程的内容</strong>，而是尽量新建文件。但考虑到Shader Graph源码下存在不少inner元素，直接在外面写自己的内容也并非彻底可行。只能直接在Shader Graph包下进行添加文件的方式了，这也是要将之移至Packages目录的原因。<br>　　我要做的事情相当明确：<strong>新建一个自定义的Graph类型</strong>。在URP下已经自带Unlit与PBR两种类型了，于是本人便基于Unlit Graph并结合先前实现的Shader的特性进行新类型的创作。  </p>
+<h2 id="去脉"><a href="#去脉" class="headerlink" title="去脉"></a>去脉</h2><p>　　我们能接触到Unlit Graph创建的起点便是Project区下右键菜单的<code>Create-&gt;Shader-&gt;Unlit Graph</code>了，直接在Shader Graph源码包下全局搜索<code>Create/Shader/Unlit Graph</code>即可找到：<br><img src="https://musoucrow.github.io/images/shader_graph/0.png" alt="0"><br>　　照葫芦画瓢在同目录下弄个新文件实现相同功能即可，这下我们便知道Unlit Graph的正主了：<code>UnlitMasterNode</code>。经过研究发现，它决定了在编辑器下Unlit Master Node的样式：<br><img src="https://musoucrow.github.io/images/shader_graph/1.png" alt="1"><br><img src="https://musoucrow.github.io/images/shader_graph/2.png" alt="2"><br>　　但这只是个壳子罢了，根据代码中的<code>IUnlitSubShader</code>为引，找到了其核心：<br><img src="https://musoucrow.github.io/images/shader_graph/3.png" alt="3"><br>　　这个<code>UniversalUnlitSubShader</code>的作用相当简单：根据编辑器的设置<strong>生成Shader代码</strong>。如上图便可看出定义Pass数据结构的行为，这也是诱使我来改源码的直接原因。在里面你将见到形如这般的代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> unlitMasterNode = masterNode <span class="keyword">as</span> UnlitMasterNode;</div><div class="line"><span class="keyword">var</span> subShader = <span class="keyword">new</span> ShaderGenerator();</div><div class="line"></div><div class="line">subShader.AddShaderChunk(<span class="string">"SubShader"</span>, <span class="literal">true</span>);</div><div class="line">subShader.AddShaderChunk(<span class="string">"&#123;"</span>, <span class="literal">true</span>);</div><div class="line">subShader.Indent();</div><div class="line">&#123;</div><div class="line">    <span class="keyword">var</span> surfaceTags = ShaderGenerator.BuildMaterialTags(unlitMasterNode.surfaceType);</div><div class="line">    <span class="keyword">var</span> tagsBuilder = <span class="keyword">new</span> ShaderStringBuilder(<span class="number">0</span>);</div><div class="line">    surfaceTags.GetTags(tagsBuilder, <span class="string">"UniversalPipeline"</span>);</div><div class="line">    subShader.AddShaderChunk(tagsBuilder.ToString());</div><div class="line">    </div><div class="line">    GenerateShaderPass(unlitMasterNode, m_UnlitPass, mode, subShader, sourceAssetDependencyPaths);</div><div class="line">    GenerateShaderPass(unlitMasterNode, m_ShadowCasterPass, mode, subShader, sourceAssetDependencyPaths);</div><div class="line">    GenerateShaderPass(unlitMasterNode, m_DepthOnlyPass, mode, subShader, sourceAssetDependencyPaths);   </div><div class="line">&#125;</div><div class="line">subShader.Deindent();</div><div class="line">subShader.AddShaderChunk(<span class="string">"&#125;"</span>, <span class="literal">true</span>);</div></pre></td></tr></table></figure>
+<p>　　如此情况便变得相当清晰了，只要清楚<strong>你想生成怎样的</strong>Shader代码，在摸熟了生成代码的API，便可自由地进行创作了。通过右键节点可以随时查看生成的代码情况：<br><img src="https://musoucrow.github.io/images/shader_graph/4.png" alt="4">  </p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>　　也许看似还算简单，但其中坑点还是有不少的：  </p>
+<ul>
+<li>不要尝试采用继承的形式去新建新类型，其本身代码就没打算让你这么做，必然会碰壁，除非改源码（如此便违反原则了）</li>
+<li>做出了修改后，要到对应的Graph文件进行Save操作触发检测。</li>
+<li>也许是检测的原因，有时候HLSL代码做出了修改后不会被识别到，需要换下行。</li>
+<li>Shader Graph生成的着色器参数有着自己的一套处理方式，务必参考自带的代码。</li>
+<li>Unlit Graph的主Pass并没有LightMode，想做背面Pass的时候要注意下。</li>
+<li>Unlit Graph将渲染模式、混合模式、剔除做成节点设置并不是一个好选择（无法让材质修改），推荐按照URP的方式做成材质属性。<img src="https://musoucrow.github.io/images/shader_graph/5.png" alt="5"></li>
+<li>Shader Graph对于生成的Shader代码存在分支数限制，需要到<code>Preference-&gt;Shader Graph</code>进行修改上限。值得一提的是，全局Keyword与局部Keyword似乎是分别对待的。</li>
+<li>Shader Graph并不存在完整的环境，它是无法识别到一些渲染管线里的函数的。所以在编写Custom Shader的时候需要加上<code>#if SHADERGRAPH_PREVIEW</code>分支判定以处理在编辑模式下的情况：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">MainLight_float</span><span class="params">(float3 WorldPos, out float3 Direction, out float3 Color, out <span class="keyword">float</span> DistanceAtten, out <span class="keyword">float</span> ShadowAtten)</span></span></div><div class="line">&#123;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SHADERGRAPH_PREVIEW</span></div><div class="line">    Direction = float3(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0</span>);</div><div class="line">    Color = <span class="number">1</span>;</div><div class="line">    DistanceAtten = <span class="number">1</span>;</div><div class="line">    ShadowAtten = <span class="number">1</span>;</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SHADOWS_SCREEN</span></div><div class="line">    float4 clipPos = TransformWorldToHClip(WorldPos);</div><div class="line">    float4 shadowCoord = ComputeScreenPos(clipPos);</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line">    float4 shadowCoord = TransformWorldToShadowCoord(WorldPos);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    Light mainLight = GetMainLight(shadowCoord);</div><div class="line">    Direction = mainLight.direction;</div><div class="line">    Color = mainLight.color;</div><div class="line">    DistanceAtten = mainLight.distanceAttenuation;</div><div class="line">    ShadowAtten = mainLight.shadowAttenuation;</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　现在感觉游戏开发的未来方向就是连连看了，从这点来说UE4的确算是时代前沿。在编辑器里加入逻辑控制元素，让更多人能加入创作，尽可能地解放生产力，的确是游戏开发所需要的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Graphics/" rel="tag"># Graphics</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/02/01/animation_guide/" rel="next" title="Unity骨骼动画的总结">
+                <i class="fa fa-chevron-left"></i> Unity骨骼动画的总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/07/snake_cpp/" rel="prev" title="移植贪吃蛇——从C#到C++">
+                移植贪吃蛇——从C#到C++ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2020/03/08/shader_graph/"
+     data-title="Shader Graph踩坑实录"
+     data-content=""
+     data-url="https://musoucrow.github.io/2020/03/08/shader_graph/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/03/08/shader_graph/"
+           data-title="Shader Graph踩坑实录" data-url="https://musoucrow.github.io/2020/03/08/shader_graph/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优劣"><span class="nav-number">2.</span> <span class="nav-text">优劣</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#来龙"><span class="nav-number">3.</span> <span class="nav-text">来龙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#去脉"><span class="nav-number">4.</span> <span class="nav-text">去脉</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意事项"><span class="nav-number">5.</span> <span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">6.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

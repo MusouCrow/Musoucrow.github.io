@@ -1,0 +1,1094 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Development,DFQ," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　虽然先前未曾严明，但《DFQ》的全称为《DungeonFighterQuest》，由字面上便可得出，这是一款《DNF》的同人游戏，那么《DFQ》的地图自然向《DNF》看齐了。而《DNF》的地图众所周知，具有一定的复杂度，在以往的作品开发过程中便是采取了手动制作的方式，可谓十分的费时费力。于是在《DFQ》便采用了生成随机地图的方式，与市面上许多">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《DFQ》开发随录——随机地图">
+<meta property="og:url" content="https://musoucrow.github.io/2019/01/30/dfq_map/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　虽然先前未曾严明，但《DFQ》的全称为《DungeonFighterQuest》，由字面上便可得出，这是一款《DNF》的同人游戏，那么《DFQ》的地图自然向《DNF》看齐了。而《DNF》的地图众所周知，具有一定的复杂度，在以往的作品开发过程中便是采取了手动制作的方式，可谓十分的费时费力。于是在《DFQ》便采用了生成随机地图的方式，与市面上许多">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_map/map.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_map/up.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_map/down.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_map/floor.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_map/obstacle.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.491Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《DFQ》开发随录——随机地图">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　虽然先前未曾严明，但《DFQ》的全称为《DungeonFighterQuest》，由字面上便可得出，这是一款《DNF》的同人游戏，那么《DFQ》的地图自然向《DNF》看齐了。而《DNF》的地图众所周知，具有一定的复杂度，在以往的作品开发过程中便是采取了手动制作的方式，可谓十分的费时费力。于是在《DFQ》便采用了生成随机地图的方式，与市面上许多">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/dfq_map/map.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2019/01/30/dfq_map/"/>
+
+
+
+
+
+  <title> 《DFQ》开发随录——随机地图 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2019/01/30/dfq_map/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                《DFQ》开发随录——随机地图
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-01-30T18:38:24+08:00">
+                2019-01-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/01/30/dfq_map/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/01/30/dfq_map/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/01/30/dfq_map/" class="leancloud_visitors" data-flag-title="《DFQ》开发随录——随机地图">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　虽然先前未曾严明，但《DFQ》的全称为《DungeonFighterQuest》，由字面上便可得出，这是一款<a href="https://dnf.qq.com" target="_blank" rel="external">《DNF》</a>的同人游戏，那么《DFQ》的地图自然向《DNF》看齐了。而《DNF》的地图众所周知，具有一定的复杂度，在以往的作品开发过程中便是采取了手动制作的方式，可谓十分的费时费力。于是在《DFQ》便采用了生成随机地图的方式，与市面上许多独立游戏的做法不谋而合，毕竟手动做地图实在是太辛苦了（汗）。本文便记录其中心得。</p>
+<h2 id="地图结构"><a href="#地图结构" class="headerlink" title="地图结构"></a>地图结构</h2><p><img src="https://musoucrow.github.io/images/dfq_map/map.png" alt="map"></p>
+<p>　　如上图所示，这便是一张随机生成的地图，它拥有以下组成：</p>
+<ul>
+<li>远景层：地图最底的背景，图中表现为山水。</li>
+<li>近景层：地图较近的背景，图中表现为树林。</li>
+<li>边上层：地图的上边界，拥有若干地图物件。</li>
+<li>地表层：地图的地板，图中表现为草地。</li>
+<li>边下层：地图的下边界，拥有若干地图物件。</li>
+<li>活动层：地图的主体，拥有若干活动的地图物件。</li>
+</ul>
+<p>　　在配置中以这种形式组成：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    info = &#123;</div><div class="line">        width = &#123;<span class="number">1440</span>, <span class="number">1280</span>, <span class="number">1024</span>&#125;, <span class="comment">-- 宽度随机选择</span></div><div class="line">        height = &#123;<span class="number">600</span>, <span class="number">736</span>&#125;, <span class="comment">-- 高度随机选择</span></div><div class="line">        theme = <span class="string">"lorien"</span>, <span class="comment">-- 地图主体</span></div><div class="line">        <span class="built_in">type</span> = <span class="string">"dungeon"</span>, <span class="comment">-- 地图类型</span></div><div class="line">        bgm = <span class="string">"lorien"</span>, <span class="comment">-- 背景音乐</span></div><div class="line">        bgs = <span class="string">"forest1"</span>, <span class="comment">-- 背景音效</span></div><div class="line">        name = &#123;</div><div class="line">            cn = <span class="string">"洛兰"</span>,</div><div class="line">            kr = <span class="string">"로리엔"</span>,</div><div class="line">            jp = <span class="string">"ロリエン"</span>,</div><div class="line">            en = <span class="string">"Lorien"</span></div><div class="line">        &#125; <span class="comment">-- 用于显示的地图名称，拥有中日韩英四语</span></div><div class="line">    &#125;,</div><div class="line">    floorHorizon = <span class="number">327</span>, <span class="comment">-- 地表层起始Y坐标</span></div><div class="line">    scope = &#123;</div><div class="line">        x = <span class="number">16</span>,</div><div class="line">        y = <span class="number">368</span></div><div class="line">    &#125;, <span class="comment">-- 可行走区域起始坐标</span></div><div class="line">    far = <span class="string">"$A/far"</span>, <span class="comment">-- 远景层</span></div><div class="line">    near = <span class="string">"$A/near"</span>, <span class="comment">-- 近景层</span></div><div class="line">    floor = &#123;</div><div class="line">        left = <span class="string">"$A/tile/0"</span>,</div><div class="line">        middle = <span class="string">"$A/tile/2"</span>,</div><div class="line">        right = <span class="string">"$A/tile/1"</span>,</div><div class="line">        bottom = <span class="string">"$A/tile/3"</span></div><div class="line">    &#125;, <span class="comment">-- 地表层</span></div><div class="line">    sprite = &#123; <span class="comment">-- 图片</span></div><div class="line">        up = &#123;</div><div class="line">            <span class="string">"$A/flower/0"</span></div><div class="line">            ...</div><div class="line">        &#125;, <span class="comment">-- 边上层</span></div><div class="line">        floor = &#123;</div><div class="line">            <span class="string">"$A/grass/0"</span>,</div><div class="line">            ...</div><div class="line">        &#125; <span class="comment">-- 地表层物件</span></div><div class="line">    &#125;,</div><div class="line">    actor = &#123; <span class="comment">-- 活动对象</span></div><div class="line">        down = &#123;</div><div class="line">            <span class="string">"$A/tree/0"</span>,</div><div class="line">            ...</div><div class="line">        &#125;, <span class="comment">-- 边下层</span></div><div class="line">        article = &#123;</div><div class="line">            <span class="string">"$A/tree/1"</span>,</div><div class="line">            ...</div><div class="line">        &#125; <span class="comment">-- 活动层</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　接下来将对逐层进行分析。</p>
+<h2 id="远-近景层"><a href="#远-近景层" class="headerlink" title="远/近景层"></a>远/近景层</h2><p>　　远景层与近景层的机制完全一致，所以可以拿来一起说明。当然之所以会分为两个层次而非合并，是因为远景与近景关于摄像机移动时的相对移动速度不一样，以此形成<strong>纵深感</strong>。但在地图生成这一块，它们的机制是一致的：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">far = <span class="string">"$A/far"</span>, <span class="comment">-- 远景层</span></div><div class="line">near = <span class="string">"$A/near"</span>, <span class="comment">-- 近景层</span></div></pre></td></tr></table></figure></p>
+<p>　　它们都是加载一张图片，然后根据地图的宽度进行<strong>平铺</strong>操作即可。在最后阶段会<strong>渲染成一张成品长图</strong>，这是一种优化方法。</p>
+<h2 id="边上层"><a href="#边上层" class="headerlink" title="边上层"></a>边上层</h2><p>　　边上层为地图的上边界，拥有若干地图物件。这里的地图物件与其他层的并不一样，在配置里它的划分是sprite，仅仅是单纯的图片罢了：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">sprite = &#123; <span class="comment">-- 图片</span></div><div class="line">    up = &#123;</div><div class="line">        <span class="string">"$A/flower/0"</span></div><div class="line">        ...</div><div class="line">    &#125;, <span class="comment">-- 边上层</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　因为这些物件不需要与角色产生什么互动，最后也会如远/近景层一般，渲染成大块的成图。<br>　　关于物件的放置，会采取生成<strong>宽高为100的格子</strong>铺满整行，并随机在这些格子上放置物件，如下图所示：<br><img src="https://musoucrow.github.io/images/dfq_map/up.png" alt="up"></p>
+<h2 id="边下层"><a href="#边下层" class="headerlink" title="边下层"></a>边下层</h2><p>　　边下层与边上层类似，但是生成的地图物件为活动对象(actor)：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">actor = &#123; <span class="comment">-- 活动对象</span></div><div class="line">    down = &#123;</div><div class="line">        <span class="string">"$A/tree/0"</span>,</div><div class="line">        ...</div><div class="line">    &#125;, <span class="comment">-- 边下层</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　边下层的地图物件需要作为活动对象主要是因为某些物件会遮挡人物，所以需要采取靠近后透明化的措施。于是不方便作为单纯的图片。<br>　　物件放置方面与边上层一致，这里不再复述，如下图所示：<br><img src="https://musoucrow.github.io/images/dfq_map/down.png" alt="down"></p>
+<h2 id="地表层"><a href="#地表层" class="headerlink" title="地表层"></a>地表层</h2><p>　　地表层即地图的地板，远/近景层类似，也是采取平铺的方针。但是在元素上更为多样：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">floor = &#123;</div><div class="line">    left = <span class="string">"$A/tile/0"</span>,</div><div class="line">    middle = <span class="string">"$A/tile/2"</span>,</div><div class="line">    right = <span class="string">"$A/tile/1"</span>,</div><div class="line">    bottom = <span class="string">"$A/tile/3"</span></div><div class="line">&#125;, <span class="comment">-- 地表层</span></div></pre></td></tr></table></figure></p>
+<p>　　地表层的图片分为左中右下四种，左右两种为于地图边缘进行<strong>随机选择（左/右或中）</strong>，中为默认选择，下为平铺Y方向。<br>　　除此之外，地表层还会拥有一些类似边上层的地图物件：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">sprite = &#123; <span class="comment">-- 图片</span></div><div class="line">    floor = &#123;</div><div class="line">        <span class="string">"$A/grass/0"</span>,</div><div class="line">        ...</div><div class="line">    &#125; <span class="comment">-- 地表层物件</span></div><div class="line">&#125;,</div></pre></td></tr></table></figure></p>
+<p>　　这些物件也是不会与人物有所交互，最终与整个地表层渲染成大图。与边上/边下层类似，地表层物件的放置会<strong>XY平铺宽高为64的格子</strong>，以此放置：<br><img src="https://musoucrow.github.io/images/dfq_map/floor.png" alt="floor"></p>
+<h2 id="活动层"><a href="#活动层" class="headerlink" title="活动层"></a>活动层</h2><p>　　活动层即地图的主体，活动对象的放置层，诸如障碍、宝箱、怪物等皆置于此。放置的规则与地表层物件一致，与地表层物件的不同之处在于，活动层存在一些拥有障碍的物件：<br><img src="https://musoucrow.github.io/images/dfq_map/obstacle.png" alt="obstacle"></p>
+<p>　　如上图所示，《DFQ》采用的障碍方式为传统的格子流，这种形式便于配合类似A星的寻路算法。但如此存在障碍格子与物件素材的匹配问题，这方面都需要手动设置好。以及需要警惕<strong>因障碍范围过大且恰好四周都是障碍物件围住了人物</strong>的情况，好在实际上并不存在这样的物件（障碍并不会很大），并不需要为此做特殊措施。</p>
+<h2 id="随机问题"><a href="#随机问题" class="headerlink" title="随机问题"></a>随机问题</h2><p>　　在处理诸如物件放置的问题时，切忌采用遍历+随机数判断的形式。因为这是不符合概率论的（存在放置数量上限），如此便会导致地图左边的元素多于右边（右边存在轮不到的可能）。所以得采取将格子存储在一个list中，以<code>list[math.random(1, #list)]</code>的方式提取要放置的格子，如此即可保证几率均等了。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　对于一些需要个性添加的元素（地图特效、通行门、BOSS），一般会采取编写专门的处理函数进行添加。对于一些需要固定化的地图，也可以采取生成后输出成文件以加载使用。目前这套很明显的缺点在于无法生成崎岖不一的地形，不过目前暂无需求，且日后再看吧。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Development/" rel="tag"># Development</a>
+          
+            <a href="/tags/DFQ/" rel="tag"># DFQ</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/31/summary_2018/" rel="next" title="2018年度总结">
+                <i class="fa fa-chevron-left"></i> 2018年度总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/01/build_love_ios/" rel="prev" title="在macOS搭建LÖVE for iOS平台">
+                在macOS搭建LÖVE for iOS平台 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2019/01/30/dfq_map/"
+     data-title="《DFQ》开发随录——随机地图"
+     data-content=""
+     data-url="https://musoucrow.github.io/2019/01/30/dfq_map/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2019/01/30/dfq_map/"
+           data-title="《DFQ》开发随录——随机地图" data-url="https://musoucrow.github.io/2019/01/30/dfq_map/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#地图结构"><span class="nav-number">2.</span> <span class="nav-text">地图结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#远-近景层"><span class="nav-number">3.</span> <span class="nav-text">远/近景层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#边上层"><span class="nav-number">4.</span> <span class="nav-text">边上层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#边下层"><span class="nav-number">5.</span> <span class="nav-text">边下层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#地表层"><span class="nav-number">6.</span> <span class="nav-text">地表层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#活动层"><span class="nav-number">7.</span> <span class="nav-text">活动层</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#随机问题"><span class="nav-number">8.</span> <span class="nav-text">随机问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">9.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

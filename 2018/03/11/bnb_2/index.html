@@ -1,0 +1,1101 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Development,Brick&Ball,Skynet,KCP," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　书接上文，这次要讲的是服务端。《Brick &amp;amp; Ball》（下称BNB）所需要的网络功能仅为匹配与联机对战而已，所以在最初对此是轻视的，在尝试了UNet与Photon之后感觉各有硬伤（UNet不支持纯服务端架设、Photon服务端为Windows），遂放弃了这些看似完备的服务端套件，转为使用小有名气的Skynet后，不负所望地顺利完">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《Brick & Ball》开发总结（二）——服务端">
+<meta property="og:url" content="https://musoucrow.github.io/2018/03/11/bnb_2/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　书接上文，这次要讲的是服务端。《Brick &amp;amp; Ball》（下称BNB）所需要的网络功能仅为匹配与联机对战而已，所以在最初对此是轻视的，在尝试了UNet与Photon之后感觉各有硬伤（UNet不支持纯服务端架设、Photon服务端为Windows），遂放弃了这些看似完备的服务端套件，转为使用小有名气的Skynet后，不负所望地顺利完">
+<meta property="og:image" content="https://musoucrow.github.io/images/bnb_2/flow.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.491Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《Brick & Ball》开发总结（二）——服务端">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　书接上文，这次要讲的是服务端。《Brick &amp;amp; Ball》（下称BNB）所需要的网络功能仅为匹配与联机对战而已，所以在最初对此是轻视的，在尝试了UNet与Photon之后感觉各有硬伤（UNet不支持纯服务端架设、Photon服务端为Windows），遂放弃了这些看似完备的服务端套件，转为使用小有名气的Skynet后，不负所望地顺利完">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/bnb_2/flow.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2018/03/11/bnb_2/"/>
+
+
+
+
+
+  <title> 《Brick & Ball》开发总结（二）——服务端 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/03/11/bnb_2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                《Brick & Ball》开发总结（二）——服务端
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-11T20:32:45+08:00">
+                2018-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/11/bnb_2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/11/bnb_2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/11/bnb_2/" class="leancloud_visitors" data-flag-title="《Brick & Ball》开发总结（二）——服务端">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　<a href="https://musoucrow.github.io/2018/03/09/bnb_1/">书接上文</a>，这次要讲的是服务端。《Brick &amp; Ball》（下称BNB）所需要的网络功能仅为匹配与联机对战而已，所以在最初对此是轻视的，在尝试了<a href="https://docs.unity3d.com/Manual/UNet.html" target="_blank" rel="external">UNet</a>与<a href="https://www.photonengine.com/" target="_blank" rel="external">Photon</a>之后感觉各有硬伤（UNet不支持纯服务端架设、Photon服务端为Windows），遂放弃了这些看似完备的服务端套件，转为使用小有名气的<a href="https://github.com/cloudwu/skynet" target="_blank" rel="external">Skynet</a>后，不负所望地顺利完成了，于此做个总结。</p>
+<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>　　在阅读本文之前，你需对Skynet有个大致的了解。Skynet的业务单位称为服务，它是一种<a href="https://en.wikipedia.org/wiki/Actor_model" target="_blank" rel="external">Actor模型</a>的实现。以下是BNB服务端的服务结构：<img src="https://musoucrow.github.io/images/bnb_2/flow.png" alt="flow"></p>
+<ul>
+<li>Gate: 网关服务，负责管理用户（接入、踢出、发信、心跳包）。</li>
+<li>Queue: 队列服务，负责用户的匹配，当有新的用户到来就会进入队列。</li>
+<li>Lobby: 大厅服务，负责Room的管理（创建、关闭），完成匹配的用户就会为他们创建Room。</li>
+<li>Room: 房间服务，负责用户的游戏提供（帧锁定同步）。</li>
+</ul>
+<h2 id="KCP"><a href="#KCP" class="headerlink" title="KCP"></a>KCP</h2><p>　　对于BNB这种高实时性的游戏，自然是不方便使用TCP了（三次握手、非快速重传、滑动窗口），然而直接使用UDP又会有可靠性的问题（丢包、非顺序到达），业界流行的做法一般是在UDP的基础上实现重传保证可靠性，而其中比较著名的实现则是<a href="https://github.com/skywind3000/kcp" target="_blank" rel="external">KCP</a>（再次感谢Skywind！）。KCP虽然是用C语言实现的，但还是有<a href="https://github.com/limpo1989/kcp-csharp" target="_blank" rel="external">C#</a>和<a href="https://github.com/linxiaolong/lua-kcp" target="_blank" rel="external">Lua</a>的移植与封装的版本。</p>
+<h2 id="封包"><a href="#封包" class="headerlink" title="封包"></a>封包</h2><p>　　在封包的设计上我图省事使用了JSON，并在封包的首部使用了1字节作为标志，并未考虑加密（因为觉得没有意义）。C#方面直接使用内置函数解决，Lua则是使用了<a href="https://github.com/mpx/lua-cjson" target="_blank" rel="external">CJSON</a>，字节处理则是使用Lua5.3新增的<code>string.pack</code>与<code>string.unpack</code>函数（非5.3需安装<a href="http://www.inf.puc-rio.br/~roberto/struct/" target="_blank" rel="external">struct</a>）。</p>
+<h2 id="接入用户"><a href="#接入用户" class="headerlink" title="接入用户"></a>接入用户</h2><p>　　按理来说客户端与服务端的初次连接使用TCP更为适合（一个KCP对象只服务一个连接，所以初次连接的客户端在服务端并没有对应的KCP对象），但是为了偷懒我采用了这样的方式：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Check ID of packet is ID.connect</span></div><div class="line"><span class="keyword">if</span> (<span class="keyword">not</span> _agentMap[from] <span class="keyword">and</span> <span class="built_in">string</span>.<span class="built_in">unpack</span>(<span class="string">"b"</span>, data, #data) == _ID.connect) <span class="keyword">then</span></div><div class="line">    <span class="keyword">local</span> addr = _SOCKET.ToAddress(from)</div><div class="line">    _SKYNET.Log(<span class="string">"connect"</span>, addr)</div><div class="line">    _agentMap[from] = _Agent.New(<span class="number">1</span>, from, <span class="function"><span class="keyword">function</span> <span class="params">(_data)</span></span></div><div class="line">        _SOCKET.sendto(_udp, from, _data)</div><div class="line">    <span class="keyword">end</span>)</div><div class="line"></div><div class="line">    _clientCount = _clientCount + <span class="number">1</span></div><div class="line">    _agentMap[from]:Send(_ID.connect, &#123;addr = addr, version = _version, isFull = _clientCount &gt; _maxClient&#125;)</div><div class="line"><span class="keyword">elseif</span> (_agentMap[from]) <span class="keyword">then</span></div><div class="line">    _agentMap[from]:Input(data)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<p>　　对于不在用户列表的来源，则直接判定该包尾部1字节是否等于<code>_ID.connect</code>（KCP会在封包的头部添加信息，所以在没有JSON内容的情况下，该包尾部则是原封包的头部），这种野蛮的方式缺点自然是只能填写标识而不能添加JSON。所以如果客户端还需要一些信息的话还需要收到回执后补充，当然事实上就需要回执：存在着因版本不对、服务器爆满的情况而拒绝连接的情况。所以服务端需要回执后方正式将其接入。</p>
+<h2 id="心跳包"><a href="#心跳包" class="headerlink" title="心跳包"></a>心跳包</h2><p>　　鉴于UDP的无连接特性，是无法判断用户是否掉线的（事实上TCP的机制也非完美）。业界通行的做法是做心跳包，即每隔一段时间进行通信以确定对方仍存活。BNB采用的方式是礼尚往来（客户端每隔一段时间发送心跳包，服务端收到后发送回执），即双端皆有心跳状态：在客户端看来，无论是超时没有收到心跳包、亦或是自身无法发出心跳包，都视为掉线。在服务端看来，只要该客户端超时没有发过心跳包，即踢出之：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Server</span></div><div class="line"><span class="function"><span class="keyword">function</span> _FUNC.Heartbeat<span class="params">()</span></span></div><div class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(_agentMap) <span class="keyword">do</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> v.heartbeat) <span class="keyword">then</span></div><div class="line">            _FUNC.Kick(k)</div><div class="line">        <span class="keyword">else</span></div><div class="line">            v.heartbeat = <span class="keyword">false</span></div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Client</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">HeartbeatTick</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.heartbeat) &#123;</div><div class="line">        <span class="keyword">this</span>.Disconnect();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">this</span>.Send(EventCode.Heartbeat);</div><div class="line">        <span class="keyword">this</span>.heartbeat = <span class="literal">false</span>;</div><div class="line">        <span class="keyword">this</span>.heartbeatTimer.Enter(HEARTBEAT_INTERVAL, <span class="keyword">this</span>.HeartbeatTick);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="匹配队列"><a href="#匹配队列" class="headerlink" title="匹配队列"></a>匹配队列</h2><p>　　BNB的匹配规则就是没有规则，匹配到了两名玩家就开始游戏，所以只需设计一个队列即可。每逢有新用户接入后便会进入队列，如用户离去则从队列消除，若匹配成功则为他们创建一场游戏：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.OnHandshake<span class="params">(id, fd)</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _SKYNET.Call(_gate, <span class="string">"CheckAgent"</span>, fd)) <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _readyFd) <span class="keyword">then</span></div><div class="line">        _readyFd = fd</div><div class="line">    <span class="keyword">else</span></div><div class="line">        _SKYNET.Send(_lobby, <span class="string">"NewRoom"</span>, _readyFd, fd)</div><div class="line">        _readyFd = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> _CMD.OnDisconnect<span class="params">(id, fd)</span></span></div><div class="line">    <span class="keyword">if</span> (_readyFd == fd) <span class="keyword">then</span></div><div class="line">        _readyFd = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<h2 id="创建游戏"><a href="#创建游戏" class="headerlink" title="创建游戏"></a>创建游戏</h2><p>　　在匹配完成后，便会由Lobby服务为一对用户创建房间（Room服务），在此之前会对两名用户是否在线进行检查，若不满足则将两名用户进行踢出，需重新进行连接：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.NewRoom<span class="params">(leftFd, rightFd)</span></span></div><div class="line">    <span class="keyword">local</span> fds = &#123;leftFd, rightFd&#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _SKYNET.Call(_gate, <span class="string">"CheckAgent"</span>, fds)) <span class="keyword">then</span></div><div class="line">        _SKYNET.Send(_gate, <span class="string">"Kick"</span>, fds)</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> deviceModels = _SKYNET.Call(_gate, <span class="string">"GetAgentValue"</span>, fds, <span class="string">"deviceModel"</span>)</div><div class="line"></div><div class="line">    _leftFdMap[leftFd] = rightFd</div><div class="line">    _rightFdMap[rightFd] = leftFd</div><div class="line">    _roomMap[leftFd .. rightFd] = _SKYNET.newservice(<span class="string">"room"</span>)</div><div class="line">    _SKYNET.Send(_roomMap[leftFd .. rightFd], <span class="string">"Start"</span>, leftFd, rightFd, deviceModels[<span class="number">1</span>], deviceModels[<span class="number">2</span>])</div><div class="line"></div><div class="line">    _SKYNET.Log(<span class="string">"start room"</span>, _SOCKET.ToAddress(leftFd), _SOCKET.ToAddress(rightFd))</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　创建房间之后，会为对应的客户端发送开始游戏所需的数据（随机数种子、双方阵营所属）。待客户端初始化完毕后，游戏正式开始：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Server</span></div><div class="line"><span class="function"><span class="keyword">function</span> _CMD.Start<span class="params">(leftFd, rightFd, leftDevice, rightDevice)</span></span></div><div class="line">    _fds = &#123;leftFd, rightFd&#125;</div><div class="line">    _deviceMap[leftFd] = leftDevice</div><div class="line">    _deviceMap[rightFd] = rightDevice</div><div class="line">    _FUNC.Send(_ID.start, &#123;seed = <span class="built_in">os</span>.time(), leftAddr = _SOCKET.ToAddress(leftFd), rightAddr = _SOCKET.ToAddress(rightFd)&#125;)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Client</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnStart</span>(<span class="params"><span class="keyword">byte</span> id, <span class="keyword">string</span> data</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> obj = JsonUtility.FromJson&lt;Datas.Start&gt;(data);</div><div class="line">    Random.InitState(obj.seed);</div><div class="line">    Judge.PlayerType = <span class="keyword">this</span>.addr == obj.leftAddr ? PlayerType.A : PlayerType.B;</div><div class="line">    Judge.SetAddr(obj.leftAddr, obj.rightAddr);</div><div class="line">    <span class="keyword">this</span>.startGameSlot.Run(<span class="keyword">this</span>.gameObject);</div><div class="line">    <span class="keyword">this</span>.online = <span class="literal">true</span>;</div><div class="line">    <span class="keyword">this</span>.updateTimer = <span class="number">0</span>;</div><div class="line">    <span class="keyword">this</span>.frame = <span class="number">0</span>;</div><div class="line">    <span class="keyword">this</span>.playFrame = <span class="number">0</span>;</div><div class="line">    <span class="keyword">this</span>.exitCode = ExitCode.None;</div><div class="line">    <span class="keyword">this</span>.sendInLoop = <span class="literal">false</span>;</div><div class="line">    <span class="keyword">this</span>.playDataList.Clear();</div><div class="line">    <span class="keyword">this</span>.playDataList.Add(<span class="keyword">new</span> PlayData());</div><div class="line">    Networkmgr.MovingValue = <span class="number">0</span>;</div><div class="line">    Networkmgr.WillElaste = <span class="literal">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="帧锁定同步"><a href="#帧锁定同步" class="headerlink" title="帧锁定同步"></a>帧锁定同步</h2><p>　　如<a href="https://musoucrow.github.io/2018/03/09/bnb_1/">上文</a>所言（在采用传统帧锁定同步的基础上，服务端设定等待时长，超时则继续），服务端的业务设计成当接收到一名用户的输入包后，就会开始进行计时（9毫秒，约等于客户端的5帧，即WAITTING_INTERVAL）。若超时或在时间内抵达第二名用户的输入包，则进行结算（广播用户们的输入数据）。用户的输入数据在服务端是作为缓存式的，超时了也会进行记录，作为下一次结算所用，每次结算后输入数据则会清空：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.ReceiveInput<span class="params">(fd, obj)</span></span></div><div class="line">    _inputMap[fd] = obj.data</div><div class="line"></div><div class="line">    <span class="comment">-- Must be current frame, otherwise only save input data.</span></div><div class="line">    <span class="keyword">if</span> (obj.frame == _playFrame) <span class="keyword">then</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> _readyPlay) <span class="keyword">then</span></div><div class="line">            _readyPlay = <span class="keyword">true</span></div><div class="line">            <span class="keyword">local</span> time = _playInterval - (_SKYNET.now() - _timer)</div><div class="line">            time = time &lt; <span class="number">0</span> <span class="keyword">and</span> <span class="number">0</span> <span class="keyword">or</span> time</div><div class="line">            _SKYNET.timeout(time, _FUNC.Play) <span class="comment">-- Server will run _FUNC.Play after the time goes on.</span></div><div class="line">        <span class="keyword">else</span></div><div class="line">            _FUNC.Play()</div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> _FUNC.Play<span class="params">()</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _readyPlay) <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _TABLE.Clear(_playSender.addrs)</div><div class="line">    _TABLE.Clear(_playSender.inputs)</div><div class="line"></div><div class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(_inputMap) <span class="keyword">do</span></div><div class="line">        <span class="built_in">table</span>.insert(_playSender.addrs, _SOCKET.ToAddress(k))</div><div class="line">        <span class="built_in">table</span>.insert(_playSender.inputs, v)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _FUNC.Send(_ID.input, _playSender)</div><div class="line">    _TABLE.Clear(_inputMap)</div><div class="line">    _readyPlay = <span class="keyword">false</span></div><div class="line">    _timer = _SKYNET.now()</div><div class="line">    _playFrame = _playFrame + <span class="number">1</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<h2 id="维护"><a href="#维护" class="headerlink" title="维护"></a>维护</h2><p>　　服务端不同于客户端，发生错误使程序崩溃的代价是很大的，所以有必要建立完善的应对措施。所幸目前发现Skynet发生错误时会影响的仅为<code>Skynet.fork</code>的函数（发生错误后函数会停止运行），并不会导致整个服务崩溃乃至进程崩溃。于是只要利用Lua的<code>pcall(func, ...)</code>函数进行异常处理即可：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _SKYNET.Loop<span class="params">(Func, sleepTime)</span></span></div><div class="line">    <span class="keyword">local</span> LoopFunc = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></div><div class="line">        <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span></div><div class="line">            <span class="keyword">local</span> ret, text = <span class="built_in">pcall</span>(Func)</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (<span class="keyword">not</span> ret) <span class="keyword">then</span></div><div class="line">                _SKYNET.Log(text)</div><div class="line">                _SKYNET.Warn()</div><div class="line">            <span class="keyword">end</span></div><div class="line"></div><div class="line">            _ORIGIN_SKYNET.sleep(sleepTime)</div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _ORIGIN_SKYNET.fork(LoopFunc)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　当然遇到问题仅仅是堵住那只是治标不治本，所以我采用了邮件报警机制。只要在<code>config</code>文件填写<code>mail</code>，然后调用<code>_SKYNET.Warn()</code>即会发送到目标邮箱，且整个进程生命周期内只会发送一次，避免疯狂轰炸的情况：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _SKYNET.Warn<span class="params">()</span></span></div><div class="line">    <span class="keyword">if</span> (_mail <span class="keyword">and</span> <span class="keyword">not</span> _DATA_CENTER.get(<span class="string">"hasWarn"</span>)) <span class="keyword">then</span></div><div class="line">        <span class="built_in">os</span>.execute(<span class="built_in">string</span>.format(<span class="string">"shell/warn.sh %s '%s'"</span>, _mail, _logger))</div><div class="line">        _DATA_CENTER.set(<span class="string">"hasWarn"</span>, <span class="keyword">true</span>)</div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　虽然理论上没有会令Skynet进程崩溃的情况，但以防万一，还是专门做了崩溃重启的措施：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">basepath=$(<span class="built_in">cd</span> `dirname <span class="variable">$0</span>`; <span class="built_in">cd</span> ..; <span class="built_in">pwd</span>)</div><div class="line"><span class="built_in">cd</span> <span class="variable">$basepath</span></div><div class="line"></div><div class="line"><span class="keyword">while</span> <span class="literal">true</span></div><div class="line"><span class="keyword">do</span></div><div class="line">	count=`ps -ef | grep skynet | grep -v <span class="string">"grep"</span> | wc <span class="_">-l</span>`</div><div class="line"></div><div class="line">	<span class="keyword">if</span> [ <span class="variable">$count</span> <span class="_">-gt</span> 0 ]; <span class="keyword">then</span></div><div class="line">	    :</div><div class="line">	<span class="keyword">else</span></div><div class="line">	    <span class="built_in">echo</span> <span class="string">"program has crashed, restarting..."</span></div><div class="line">	    screen shell/run.sh</div><div class="line">	<span class="keyword">fi</span></div><div class="line">	</div><div class="line">	sleep 10</div><div class="line"><span class="keyword">done</span></div></pre></td></tr></table></figure>
+<p>　　还有一点就是，帧锁定同步的浮点数问题并不是那么令人放心的存在。所以有必要对其进行监控（这个在上文也有提到），同理遇到异常情况也会进行邮件报警：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.ReceiveComparison<span class="params">(fd, obj)</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _comparsionHandler[obj.playFrame]) <span class="keyword">then</span></div><div class="line">        _comparsionHandler[obj.playFrame] = &#123;&#125;</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> map = _comparsionHandler[obj.playFrame]</div><div class="line">    map[fd] = obj.content</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (_TABLE.Count(map) == _playerCount) <span class="keyword">then</span></div><div class="line">        <span class="keyword">local</span> lk, lv</div><div class="line"></div><div class="line">        <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(map) <span class="keyword">do</span></div><div class="line">            <span class="keyword">if</span> (lv <span class="keyword">and</span> v ~= lv) <span class="keyword">then</span></div><div class="line">                <span class="comment">-- Output current frame, each device name and comparsion data.</span></div><div class="line">                _SKYNET.Log(obj.playFrame, _deviceMap[k], v, <span class="string">"!="</span>, _deviceMap[lk], lv)</div><div class="line">                _SKYNET.Warn()</div><div class="line">            <span class="keyword">end</span></div><div class="line"></div><div class="line">            lk = k</div><div class="line">            lv = v</div><div class="line">        <span class="keyword">end</span></div><div class="line"></div><div class="line">        _comparsionHandler[obj.playFrame] = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　这次是本人初次进行服务端开发，如有不妥之处但请指教。虽无涉及数据库、反作弊、集群、运维等方面，但也不失为一个匹配-房间-帧锁定同步的好范例。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Development/" rel="tag"># Development</a>
+          
+            <a href="/tags/Brick-Ball/" rel="tag"># Brick&Ball</a>
+          
+            <a href="/tags/Skynet/" rel="tag"># Skynet</a>
+          
+            <a href="/tags/KCP/" rel="tag"># KCP</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/11/for_loop/" rel="next" title="一次移植代码时关于For循环的发现">
+                <i class="fa fa-chevron-left"></i> 一次移植代码时关于For循环的发现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/12/bnb_3/" rel="prev" title="《Brick & Ball》开发总结（三）——游戏性">
+                《Brick & Ball》开发总结（三）——游戏性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2018/03/11/bnb_2/"
+     data-title="《Brick & Ball》开发总结（二）——服务端"
+     data-content=""
+     data-url="https://musoucrow.github.io/2018/03/11/bnb_2/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/03/11/bnb_2/"
+           data-title="《Brick & Ball》开发总结（二）——服务端" data-url="https://musoucrow.github.io/2018/03/11/bnb_2/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结构"><span class="nav-number">2.</span> <span class="nav-text">结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KCP"><span class="nav-number">3.</span> <span class="nav-text">KCP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#封包"><span class="nav-number">4.</span> <span class="nav-text">封包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接入用户"><span class="nav-number">5.</span> <span class="nav-text">接入用户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#心跳包"><span class="nav-number">6.</span> <span class="nav-text">心跳包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#匹配队列"><span class="nav-number">7.</span> <span class="nav-text">匹配队列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建游戏"><span class="nav-number">8.</span> <span class="nav-text">创建游戏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#帧锁定同步"><span class="nav-number">9.</span> <span class="nav-text">帧锁定同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#维护"><span class="nav-number">10.</span> <span class="nav-text">维护</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">11.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

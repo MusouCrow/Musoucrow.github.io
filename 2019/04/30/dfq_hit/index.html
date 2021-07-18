@@ -1,0 +1,1093 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Development,DFQ," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　对于动作游戏（本文所谓的动作游戏具体指由FTG衍生而来的「超人系ACT」，如鬼泣、猎天使魔女等）而言，打击感自然是重中之重，本篇就来讲讲DFQ的打击感实现思路吧。　　首先要明确打击感的定义，本人将之定义为：攻击命中时产生的反馈。就这点而言，打击感并非是动作游戏的专属，凡是涉及到攻击交互的游戏都有。而动作游戏与之不同在于会对在攻击中附加控制效果">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《DFQ》开发随录——打击感">
+<meta property="og:url" content="https://musoucrow.github.io/2019/04/30/dfq_hit/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　对于动作游戏（本文所谓的动作游戏具体指由FTG衍生而来的「超人系ACT」，如鬼泣、猎天使魔女等）而言，打击感自然是重中之重，本篇就来讲讲DFQ的打击感实现思路吧。　　首先要明确打击感的定义，本人将之定义为：攻击命中时产生的反馈。就这点而言，打击感并非是动作游戏的专属，凡是涉及到攻击交互的游戏都有。而动作游戏与之不同在于会对在攻击中附加控制效果">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_hit/collider.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_hit/coordinate.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_hit/stun.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_hit/flight1.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_hit/flight2.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_hit/effect.gif">
+<meta property="og:image" content="https://musoucrow.github.io/images/dfq_hit/battle.gif">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.491Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《DFQ》开发随录——打击感">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　对于动作游戏（本文所谓的动作游戏具体指由FTG衍生而来的「超人系ACT」，如鬼泣、猎天使魔女等）而言，打击感自然是重中之重，本篇就来讲讲DFQ的打击感实现思路吧。　　首先要明确打击感的定义，本人将之定义为：攻击命中时产生的反馈。就这点而言，打击感并非是动作游戏的专属，凡是涉及到攻击交互的游戏都有。而动作游戏与之不同在于会对在攻击中附加控制效果">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/dfq_hit/collider.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2019/04/30/dfq_hit/"/>
+
+
+
+
+
+  <title> 《DFQ》开发随录——打击感 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2019/04/30/dfq_hit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                《DFQ》开发随录——打击感
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-04-30T14:28:38+08:00">
+                2019-04-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/04/30/dfq_hit/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/04/30/dfq_hit/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/04/30/dfq_hit/" class="leancloud_visitors" data-flag-title="《DFQ》开发随录——打击感">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　对于动作游戏（<em>本文所谓的动作游戏具体指由FTG衍生而来的「超人系ACT」，如鬼泣、猎天使魔女等</em>）而言，打击感自然是重中之重，本篇就来讲讲DFQ的打击感实现思路吧。<br>　　首先要明确打击感的定义，本人将之定义为：<strong>攻击命中时产生的反馈</strong>。就这点而言，打击感并非是动作游戏的专属，凡是涉及到攻击交互的游戏都有。而动作游戏与之不同在于会对在攻击中附加控制效果（击退、击飞等），使得动作游戏成为了围绕打击感展开操作的游戏。<br>　　而DFQ的打击感基本源于DNF，在此基础上加入个人的理解，接下来便一一讲解其中构成。</p>
+<h2 id="判定"><a href="#判定" class="headerlink" title="判定"></a>判定</h2><p>　　在产生攻击命中之前，自然得讨论如何触发了。众所周知，动作游戏讲究「所见即所得」——必须是看上去击中了，才算是命中。所以自然要使用一些方式去近似地模拟素材的边界范围，以此进行碰撞判定。而DFQ的做法则相当粗暴——直接构建一些近似的矩形，当然这矩形却不一般：<br><img src="https://musoucrow.github.io/images/dfq_hit/collider.png" alt="collider"><br>　　如图所示，人物拥有两种颜色的矩形，其中白色矩形表示人物的X-Z轴矩形，红色矩形表示为X-Y轴矩形。与一般的无纵深横版游戏（冒险岛、胧村正等）不同，DFQ这类可进行上下移动且滞空的横版游戏（DNF、三国战纪等）会去构造一种「逻辑上的三维空间」：<br><img src="https://musoucrow.github.io/images/dfq_hit/coordinate.png" alt="coordinate"><br>　　当然实际上可以直接使用3D矩形（立方体）进行构造，只是2D图形下不便表示，于是分解为两个矩形进行。自然地，判定时也是红对红、白对白。至于判定算法，由于DFQ没有太精细的需求，矩形不会参与旋转变换，故直接使用<a href="https://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box" target="_blank" rel="external">AABB</a>即可。  </p>
+<h2 id="击退"><a href="#击退" class="headerlink" title="击退"></a>击退</h2><p>　　话不多说，直接上图：<br><img src="https://musoucrow.github.io/images/dfq_hit/stun.gif" alt="stun"><br>　　击退是打击感中最基本的元素了，当然将之命名为击退只是个人行为，在业界它有着各种各样的称呼，如stun、硬直、僵直、気絶等，在此一提。<br>　　由图可见击退有两种不同的姿势（为了表现的丰富度），敌人会保持被击姿势一段时间，且变速位移一段距离。以函数的形式表示便是<code>stun(time, speed, acceleration)</code>，time表示保持姿势的时间，speed为位移的初始速度，acceleration为速度的衰减值（也可以是加速值），通过acceleration来每帧减少speed，以此实现简单的变速运动效果。当然speed与acceleration并非是必须的（不带位移的击退），但time则必须有（无time不stun）。  </p>
+<h2 id="击飞"><a href="#击飞" class="headerlink" title="击飞"></a>击飞</h2><p>　　同样，直接上图：<br><img src="https://musoucrow.github.io/images/dfq_hit/flight1.gif" alt="flight1"><br>　　与击退同样，击飞也属于动作游戏里最核心的控制效果之一，它的别名也很多，如flight、击倒、倒地、浮空等。<br>　　击飞这种控制效果在最初只是作为一种动画表现手法而已，一般用于敌人死亡、某些想表达击飞的招式等。敌人处于击飞动画时一般无法或难以继续进行互动。将之发展的据说是CAPCOM开发《鬼武者》时触发的一个BUG——敌人处于击飞时被后续攻击而产生了滞空效应。从此一发不可收拾，铸就日后《鬼泣》皇牌空战之名。<br>　　而DFQ身为2019年的游戏，自然不可能落后：<br><img src="https://musoucrow.github.io/images/dfq_hit/flight2.gif" alt="flight2"><br>　　以上两张图基本可以窥得击飞之全貌了：</p>
+<ul>
+<li>击飞在状态上可分为上升、下落、倒地，上升与下落都会进行类似击退的变速运动，且根据进度改变姿势。</li>
+<li>姿势内容为击退的两个为基础外加它们的90度旋转版本及倒地。</li>
+<li>在击飞时被攻击会切换姿势且保持滞空一小会，形成了浮空连击的效果。</li>
+<li>除此以外便是X轴的位移效果了，这点与击退一致。</li>
+<li>倒地会根据浮空高度结算出「再击飞」，画面表现上为落地弹起，若高度不足则直接倒地。</li>
+</ul>
+<p>　　与击退类似，击飞的基本函数形式则是<code>flight(speed_z, speed_x, acceleration_z_up, acceleration_z_down, acceleration_x)</code>，参数含义与击退类似，不再阐述。一般而言acceleration_z_up与acceleration_z_down会选择默认值，speed_x与acceleration_x则为可选项，但speed_z必须有（无speed_z不flight）。</p>
+<h2 id="特效"><a href="#特效" class="headerlink" title="特效"></a>特效</h2><p>　　继续上图：<br><img src="https://musoucrow.github.io/images/dfq_hit/effect.gif" alt="effect"><br>　　特效其实没什么好说的，如果说动作姿势是描线，那么特效便是上色了。需要注意的是特效出现的位置一般得是矩形碰撞的交点处，这样才有「打中这个位置」的感觉。<br>　　特效的种类一般就是斩、打、突、气四类（利器、钝器、锐器、魔法），外加出血之类等等，多多益善。<br>　　顺带一提的是，由于特效算是一种创建销毁十分频繁的对象，值得为之做对象池以减少创建销毁的开销。</p>
+<h2 id="声音"><a href="#声音" class="headerlink" title="声音"></a>声音</h2><p>　　这下上不了图了，毕竟声音的可视化形式一般人类都看不懂（笑。<br>　　由于打击感是攻击命中时产生的反馈，而反馈的形式自然不局限于视觉上的，听觉也相当的重要。当然这里讨论的声音可不仅仅是攻击瞬间产生的部分，还包括了整个招式过程。<br>　　一般而言，一个招式基本会包含以下元素：</p>
+<ul>
+<li>voice：如人物发招时的叫声，播放时机不限。</li>
+<li>swing：如人物挥剑的声音、特效产生的声音，一般于运动帧时播放。</li>
+<li>hitting：如刀砍到身上的声音，于命中时播放。</li>
+<li>damage：敌人被攻击的惨叫声，于命中时播放。</li>
+</ul>
+<p>　　声音这部分在业界不少垃圾游戏可谓是偷工减料的重灾区，实际上万万不可忽视，毕竟有时候效果好不好就靠听个响（代表：拳皇）。  </p>
+<h2 id="Hitstop、闪烁、抖动"><a href="#Hitstop、闪烁、抖动" class="headerlink" title="Hitstop、闪烁、抖动"></a>Hitstop、闪烁、抖动</h2><p>　　这仨放一块讨论是因为他们相辅相成：<br><img src="https://musoucrow.github.io/images/dfq_hit/battle.gif" alt="battle"><br>　　Hitstop这玩意我对其没有准确的中文词汇，业界一般称为硬直、僵直、卡肉等（可见多容易与击退混淆）。其定义如其名般：因hit而导致stop。表现形式为人物<strong>停止运动一段时间</strong>，这里的运动包括位移、动画之类。Hitstop是敌我双方皆有的，我称本体的Hitstop为Selfstop，敌方为Hitstop。由此可见，卡肉这个说法其实很恰当，感受起来就像是一下刀卡到肉里了。一般Hitstop的高低可以用于表示攻击的轻重，以及像内功拳法、一闪刀法等延迟杀伤效果也可以通过高Hitstop达成。<br>　　至于闪烁就更直白了，就是敌人表面有一层纯色遮罩渐变消失。值得注意的是，闪烁的运作也会受Hitstop影响，故在Hitstop期间闪烁是保持初始状态的，看起来敌人就是蒙上了一层白色。这么做可以使得命中的效果更为明显，在业界中《王者荣耀》也采用了这样的表现手法。<br>　　抖动在图中也许看不太出来，主要就是设定个时间值以及抖动范围（xa, xb, ya, yb），人物在时间内就会随机位移，形成抖动的效果。与闪烁同样，在Hitstop时间是不会流动的，所以抖动与闪烁类似，基本上便是用于加强Hitstop的表现力。在业界中CAPCOM的《吞食天地》也采用了这样的表现手法。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　以上只是打击感的一些机械的构成，实际上要做好打击感得充分利用许多元素，如场景震动、运镜、符合节奏的连击等。实际上它是一门导演的学问，要想培养就只能多抄多想多做。限于素材与平台，未能表现更丰富的元素，只能有待日后进军3D再说了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Development/" rel="tag"># Development</a>
+          
+            <a href="/tags/DFQ/" rel="tag"># DFQ</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/31/dfq_drop/" rel="next" title="《DFQ》开发随录——随机掉落">
+                <i class="fa fa-chevron-left"></i> 《DFQ》开发随录——随机掉落
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/31/dfq_ai/" rel="prev" title="《DFQ》开发随录——AI">
+                《DFQ》开发随录——AI <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2019/04/30/dfq_hit/"
+     data-title="《DFQ》开发随录——打击感"
+     data-content=""
+     data-url="https://musoucrow.github.io/2019/04/30/dfq_hit/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2019/04/30/dfq_hit/"
+           data-title="《DFQ》开发随录——打击感" data-url="https://musoucrow.github.io/2019/04/30/dfq_hit/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#判定"><span class="nav-number">2.</span> <span class="nav-text">判定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#击退"><span class="nav-number">3.</span> <span class="nav-text">击退</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#击飞"><span class="nav-number">4.</span> <span class="nav-text">击飞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特效"><span class="nav-number">5.</span> <span class="nav-text">特效</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#声音"><span class="nav-number">6.</span> <span class="nav-text">声音</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hitstop、闪烁、抖动"><span class="nav-number">7.</span> <span class="nav-text">Hitstop、闪烁、抖动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">8.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

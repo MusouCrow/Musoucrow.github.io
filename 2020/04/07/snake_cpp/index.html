@@ -1,0 +1,1077 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　因为某些机缘巧合，引起了我对C++的重视。一时兴起，决定将两年前用Unity写的Snake进行移植。经过两周的抽空，总算是完成了。项目采用现代C++标准编写，采用CMake构建，图形库为SDL。由于本次的重点不在于图形这块，所以没有使用原版的素材，采用矩形代替。　　在工程实现上除了基本的业务外，还实现了C#的event以及的Unity的Gam">
+<meta property="og:type" content="article">
+<meta property="og:title" content="移植贪吃蛇——从C#到C++">
+<meta property="og:url" content="https://musoucrow.github.io/2020/04/07/snake_cpp/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　因为某些机缘巧合，引起了我对C++的重视。一时兴起，决定将两年前用Unity写的Snake进行移植。经过两周的抽空，总算是完成了。项目采用现代C++标准编写，采用CMake构建，图形库为SDL。由于本次的重点不在于图形这块，所以没有使用原版的素材，采用矩形代替。　　在工程实现上除了基本的业务外，还实现了C#的event以及的Unity的Gam">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.493Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="移植贪吃蛇——从C#到C++">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　因为某些机缘巧合，引起了我对C++的重视。一时兴起，决定将两年前用Unity写的Snake进行移植。经过两周的抽空，总算是完成了。项目采用现代C++标准编写，采用CMake构建，图形库为SDL。由于本次的重点不在于图形这块，所以没有使用原版的素材，采用矩形代替。　　在工程实现上除了基本的业务外，还实现了C#的event以及的Unity的Gam">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2020/04/07/snake_cpp/"/>
+
+
+
+
+
+  <title> 移植贪吃蛇——从C#到C++ | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/04/07/snake_cpp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                移植贪吃蛇——从C#到C++
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-07T15:30:33+08:00">
+                2020-04-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/04/07/snake_cpp/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/04/07/snake_cpp/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/04/07/snake_cpp/" class="leancloud_visitors" data-flag-title="移植贪吃蛇——从C#到C++">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　因为某些机缘巧合，引起了我对C++的重视。一时兴起，决定将两年前用Unity写的<a href="https://github.com/MusouCrow/Snake" target="_blank" rel="external">Snake</a>进行移植。经过两周的抽空，总算是<a href="https://github.com/MusouCrow/SnakeCPP" target="_blank" rel="external">完成</a>了。项目采用现代C++标准编写，采用<a href="https://cmake.org" target="_blank" rel="external">CMake</a>构建，图形库为<a href="http://www.libsdl.org" target="_blank" rel="external">SDL</a>。由于本次的重点不在于图形这块，所以没有使用原版的素材，采用矩形代替。<br>　　在工程实现上除了基本的业务外，还实现了C#的<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/event" target="_blank" rel="external">event</a>以及的Unity的GameObject与Component。<br>　　本文将从C#开发者的角度出发比较C++的不同点，最后总结其思想。由于本人在此之前<strong>从未有</strong>C++的工程经验，对于许多特性在此之前也是一知半解，对于一些事物的理解若有误还请指教。</p>
+<h2 id="低成本封装"><a href="#低成本封装" class="headerlink" title="低成本封装"></a>低成本封装</h2><p>　　首先最引我瞩目的便是C++的参数传递，形如这般的函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Init</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; title, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>　　由于C++的引用参数<code>string&amp;</code>性质，将值传入时不会发生拷贝，而是等于直接使用原变量。可以有效<strong>降低封装抽象的成本</strong>，加上<code>const</code>字段是为使得形如<code>&quot;123&quot;</code>这样的<strong>常量区对象</strong>也能传入。<br>　　当然这在C#也并不是没有，<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/ref" target="_blank" rel="external">ref</a>便是如此。但这在C#并不会下意识去用，毕竟在C++若是不用指针或引用作为参数的话可是会直接<strong>拷贝新对象</strong>的，而在C#直接使用也不会造成很大的负担（值类型直接拷贝，引用类型用指针）。<br>　　其次便是C++的内联函数了，作为函数宏的替代品之一。可以在编译时将函数展开为具体的内容，节省了一次函数调用的消耗。但内联函数需写在头文件中，若是关联项多，修改后便会增加编译时长。且展开量过大也会增大代码量，增加编译时长。但不失为一个降低封装成本的手段。</p>
+<h2 id="明确的内存"><a href="#明确的内存" class="headerlink" title="明确的内存"></a>明确的内存</h2><p>　　其次与C#最大的不同便是对象的创建了，C++有着以下两种形式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">A a = A();</div><div class="line">A* a = <span class="keyword">new</span> A();</div></pre></td></tr></table></figure></p>
+<p>　　了解C++的自然晓得，前者在<strong>当前内存域下申请</strong>，后者<strong>在堆申请</strong>。而在C#则隐去了这个细节，而是设立固定的规则：</p>
+<ul>
+<li>引用对象使用指针，原则上在堆申请，若对象的生命周期存在于申请的函数里，则在栈申请——是为<strong>逃逸分析</strong>。</li>
+<li>值对象在当前内存域下申请，且由于不是指针，变量传递会产生<strong>拷贝</strong>。除非使用ref、in、out等参数关键字。</li>
+</ul>
+<p>　　而C++的内存申请机制则带来了<strong>明确感</strong>，如在函数里申请生命周期只存在函数里的对象，需要明确的使用<code>A a = A();</code>方式。且在构建类的时候，对于那些不使用<code>A* a = new A();</code>创建方式的成员变量，其内存占用是<strong>明确的</strong>，在类对象申请内存的时候会一并申请，即这些成员变量在内存布局上可能是<strong>连续的</strong>。从这点来说可比C#要牛逼多了。</p>
+<h2 id="相似的容器"><a href="#相似的容器" class="headerlink" title="相似的容器"></a>相似的容器</h2><p>　　在容器方面，C++与C#大体看起来是相似的，当然在API的爽度而言还是C#更胜一筹（C++17拉近了不少）。但实际上还是存在一些细节上的不同，就比如我们常用的Key-Value容器：C++的<a href="https://zh.cppreference.com/w/cpp/container/map" target="_blank" rel="external">std::map</a>与C#的<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.dictionary-2?view=netcore-3.1" target="_blank" rel="external">Dictionary</a>在实现乃至功能上就不一样。实际上std::map对应C#的应该是<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.sorteddictionary-2?view=netcore-3.1" target="_blank" rel="external">SortedDictionary</a>：它们都是基于红黑树实现，都是有序存储的表。而Dictionary则是基于哈希实现的，即我们俗称的哈希表，与之对应的是<a href="https://zh.cppreference.com/w/cpp/container/unordered_map" target="_blank" rel="external">std::unordered_map</a>。<br>　　通过命名能看出两种语言在这方面的倾向性：红黑树<strong>占用的内存更小</strong>，但查找和删除的时间复杂度都是<em>O(logn)</em>，而哈希查找和删除的时间复杂度都是<em>O(1)</em>。实际使用的时候感觉还是得权衡利弊，不能贪图方便就一直用一套。<a href="https://zh.cppreference.com/w/cpp/container/set" target="_blank" rel="external">std::set</a>与<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.hashset-1?view=netcore-3.1" target="_blank" rel="external">HashSet</a>这边也是类似的对应，以此类推。<br>　　在序列容器方面的对应倒是工整：<a href="https://zh.cppreference.com/w/cpp/container/vector" target="_blank" rel="external">std::vector</a>对应<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.list-1?view=netcore-3.1" target="_blank" rel="external">List</a>，都是不断扩容的数组容器。链表方面则是<a href="https://zh.cppreference.com/w/cpp/container/list" target="_blank" rel="external">std::list</a>对应<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.linkedlist-1?view=netcore-3.1" target="_blank" rel="external">LinkedList</a>。但<a href="https://zh.cppreference.com/w/cpp/container/array" target="_blank" rel="external">std::array</a>却无对应了，硬要说的话就是与C#的原生数组对应，毕竟这个容器出现的意义就是弥补与C语言兼容的原生数组。<br>　　顺带一提，在使用std::vector时由于会出现<strong>扩容复制</strong>的问题，需要考虑好成员对象的拷贝方案，乃至于内存泄漏的问题。</p>
+<h2 id="智能的指针"><a href="#智能的指针" class="headerlink" title="智能的指针"></a>智能的指针</h2><p>　　内存管理是所有编程语言都无法绕开的点，绝大多数编程语言对于堆内存的管理都是采用垃圾回收的方式。而在C++的鸿蒙时代则与C语言一样，需要手动管理<strong>指向堆内存</strong>的指针。尽管也有<a href="https://zh.cppreference.com/w/cpp/memory/auto_ptr" target="_blank" rel="external">std::auto_ptr</a>这样的东西，但在功能上还不够全面。而手动管理内存将难以解决对象在多处被引用时将如何安全销毁的问题，为了实现这种机制也得做出不少妥协。<br>　　所幸随着时代的发展，现代C++迎来了<a href="https://docs.microsoft.com/zh-cn/cpp/cpp/smart-pointers-modern-cpp?view=vs-2019" target="_blank" rel="external">智能指针</a>，它基于引用计数的规则，将裸指针包装起来，当符合销毁条件后便可自动回收。智能指针有着几种具体的类实现，而其中最常用的是<a href="https://zh.cppreference.com/w/cpp/memory/shared_ptr" target="_blank" rel="external">std::share_ptr</a>，当它持有指针时将增加计数，反之同理将减少计数，最终归0销毁。但其较之垃圾回收有个致命的缺陷：<strong>相互引用</strong>时将一直保持计数，无法销毁。为此C++引入了<a href="https://zh.cppreference.com/w/cpp/memory/weak_ptr" target="_blank" rel="external">std::weak_ptr</a>：它不会增加计数，在计数归0时持有指针也随之销毁。如此对于相互引用的情况下，分清主次，合理分配share_ptr与weak_ptr即可解决无法销毁的问题。<br>　　智能指针在使用上总有一种外挂的感觉，需要成体系的去使用。不如内置的垃圾回收式语言来的方便，且写起来还是有一定的心智负担（相互引用），不过在性能而言较之垃圾回收更为优越（回收对象与时机都很明确，且是被动进行的）。</p>
+<h2 id="模板与泛型"><a href="#模板与泛型" class="headerlink" title="模板与泛型"></a>模板与泛型</h2><p>　　C++的模板与C#的泛型表面上用起来很是相似，实则有所不同。以下对比两者的差异：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T, <span class="keyword">int</span> x&gt; <span class="comment">// C++支持模板参数，可填写整型或指针</span></div></pre></td></tr></table></figure></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GenericList&lt;T&gt; <span class="keyword">where</span> T : Employee <span class="comment">// 使用System.Object不支持的方法时，需进行类型约束指定基类</span></div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 这么骚的操作见过么？</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> x)</span></span>;</div><div class="line"></div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> ... Args&gt;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Do</span><span class="params">(Args... args)</span> </span>&#123;</div><div class="line">    f(args ...);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>　　从实际使用体验与两者的命名可以看出，「模板」的本质是<strong>参数化代码生成</strong>，而「泛型」则是<strong>类型参数化</strong>。即泛型只是模板功能的一部分而已。模板能实现的其他功能，在C#则以其他方式代替了（如变长参数<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/params" target="_blank" rel="external">params</a>）。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　从以上种种便能看出C++与C#在设计哲学上的不同，C#通过<strong>约束开发者行为</strong>从而达到<strong>更稳定健壮的结果</strong>，哪怕会失去一定的<strong>性能与灵活性</strong>，而C++则更依赖开发者<strong>自身的素质</strong>（如C++支持多重继承而C#仅仅支持单类+多接口继承）。<br>　　从个人的使用体验来看，现代C++并非不能作为业务开发语言。只是对开发者的素质要求较之一般语言更高，从招聘成本与项目稳定性而言是个问题。如此来看，除非有必要的性能敏感且需要一定封装的核心层（如游戏引擎），否则用C + 脚本语言或者C#/Java这类可上可下的语言是个更好的选择。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C++</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/08/shader_graph/" rel="next" title="Shader Graph踩坑实录">
+                <i class="fa fa-chevron-left"></i> Shader Graph踩坑实录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/10/lbbn_shading/" rel="prev" title="Demo的卡通渲染方案">
+                Demo的卡通渲染方案 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2020/04/07/snake_cpp/"
+     data-title="移植贪吃蛇——从C#到C++"
+     data-content=""
+     data-url="https://musoucrow.github.io/2020/04/07/snake_cpp/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/04/07/snake_cpp/"
+           data-title="移植贪吃蛇——从C#到C++" data-url="https://musoucrow.github.io/2020/04/07/snake_cpp/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#低成本封装"><span class="nav-number">2.</span> <span class="nav-text">低成本封装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#明确的内存"><span class="nav-number">3.</span> <span class="nav-text">明确的内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相似的容器"><span class="nav-number">4.</span> <span class="nav-text">相似的容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#智能的指针"><span class="nav-number">5.</span> <span class="nav-text">智能的指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模板与泛型"><span class="nav-number">6.</span> <span class="nav-text">模板与泛型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">7.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1103 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="NetworkSync,Network," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。
+前言　　在阅读这篇文章之前，你需要了解一下何为帧同步。关于帧同步的实现尝试，其实近年来一直都有不间断的尝试，不过大多浅尝辄止，这次总算是一次较为完整的实现了。接下来便对这次实现介绍一二。
+详解　　本次项目使用的开发引擎为LÖVE，项目地址在此。以下是运行演示（外网联机测试也通过了）：　　由于我并没有什么服务端开发的相关经验，所以只是使用了个简单的UDP网络库——">
+<meta property="og:type" content="article">
+<meta property="og:title" content="帧同步的初步探究">
+<meta property="og:url" content="https://musoucrow.github.io/2017/08/26/frame_sync/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。
+前言　　在阅读这篇文章之前，你需要了解一下何为帧同步。关于帧同步的实现尝试，其实近年来一直都有不间断的尝试，不过大多浅尝辄止，这次总算是一次较为完整的实现了。接下来便对这次实现介绍一二。
+详解　　本次项目使用的开发引擎为LÖVE，项目地址在此。以下是运行演示（外网联机测试也通过了）：　　由于我并没有什么服务端开发的相关经验，所以只是使用了个简单的UDP网络库——">
+<meta property="og:image" content="https://musoucrow.github.io/images/frame_sync/1.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.492Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="帧同步的初步探究">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。
+前言　　在阅读这篇文章之前，你需要了解一下何为帧同步。关于帧同步的实现尝试，其实近年来一直都有不间断的尝试，不过大多浅尝辄止，这次总算是一次较为完整的实现了。接下来便对这次实现介绍一二。
+详解　　本次项目使用的开发引擎为LÖVE，项目地址在此。以下是运行演示（外网联机测试也通过了）：　　由于我并没有什么服务端开发的相关经验，所以只是使用了个简单的UDP网络库——">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/frame_sync/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2017/08/26/frame_sync/"/>
+
+
+
+
+
+  <title> 帧同步的初步探究 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/08/26/frame_sync/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                帧同步的初步探究
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-26T17:30:16+08:00">
+                2017-08-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Network/" itemprop="url" rel="index">
+                    <span itemprop="name">Network</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/08/26/frame_sync/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/08/26/frame_sync/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/08/26/frame_sync/" class="leancloud_visitors" data-flag-title="帧同步的初步探究">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　在阅读这篇文章之前，你需要了解一下何为<a href="http://www.skywind.me/blog/archives/131" target="_blank" rel="external">帧同步</a>。关于帧同步的实现尝试，其实近年来一直都有不间断的尝试，不过大多浅尝辄止，这次总算是一次较为完整的实现了。接下来便对这次实现介绍一二。</p>
+<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　本次项目使用的开发引擎为<a href="https://love2d.org" target="_blank" rel="external">LÖVE</a>，<a href="https://git.coding.net/musoucrow/FrameSync.git" target="_blank" rel="external">项目地址在此</a>。以下是运行演示（外网联机测试也通过了）：<img src="https://musoucrow.github.io/images/frame_sync/1.png" alt="1"><br>　　由于我并没有什么服务端开发的相关经验，所以只是使用了个简单的UDP网络库——<a href="http://enet.bespin.org/index.html" target="_blank" rel="external">ENet</a>。客户端与服务端共同处于一个项目下，非常的浅薄，以下是服务端与客户端的代码展示。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--server.lua</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> Enet = <span class="built_in">require</span> (<span class="string">"enet"</span>)</div><div class="line"><span class="keyword">local</span> Lib = <span class="built_in">require</span>(<span class="string">"lib"</span>)</div><div class="line"></div><div class="line"><span class="keyword">local</span> host = Enet.host_create(<span class="string">"localhost:6789"</span>)</div><div class="line"><span class="keyword">local</span> peerMap = &#123;&#125;</div><div class="line"><span class="keyword">local</span> dataMap = &#123;&#125;</div><div class="line"><span class="keyword">local</span> inputMap = &#123;&#125;</div><div class="line"><span class="keyword">local</span> playList = &#123;&#125;</div><div class="line"><span class="keyword">local</span> playFrame = <span class="number">0</span></div><div class="line"><span class="keyword">local</span> frame = <span class="number">0</span></div><div class="line"><span class="keyword">local</span> userCount = <span class="number">0</span></div><div class="line"></div><div class="line"><span class="built_in">print</span>(<span class="string">"start"</span>)</div><div class="line"></div><div class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) <span class="keyword">do</span></div><div class="line">	<span class="keyword">local</span> event = host:service(<span class="number">17</span>)</div><div class="line">	</div><div class="line">	<span class="keyword">while</span> (event) <span class="keyword">do</span></div><div class="line">		<span class="keyword">local</span> <span class="built_in">type</span>, ip, data = Lib.Recv(event)</div><div class="line">		</div><div class="line">		<span class="keyword">if</span> (<span class="built_in">type</span> == <span class="string">"input"</span>) <span class="keyword">then</span></div><div class="line">			inputMap[ip] = data</div><div class="line">		<span class="keyword">elseif</span> (<span class="built_in">type</span> == <span class="string">"connect"</span>) <span class="keyword">then</span></div><div class="line">			event.peer:timeout(<span class="number">10</span>, <span class="number">3000</span>, <span class="number">5000</span>)</div><div class="line">			<span class="keyword">local</span> data = &#123;ip = ip, x = <span class="built_in">math</span>.random(<span class="number">0</span>, <span class="number">800</span>), y = <span class="built_in">math</span>.random(<span class="number">0</span>, <span class="number">600</span>)&#125;</div><div class="line">			</div><div class="line">			<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(peerMap) <span class="keyword">do</span></div><div class="line">				Lib.Send(v, <span class="string">"addNewUser"</span>, data)</div><div class="line">			<span class="keyword">end</span></div><div class="line">			</div><div class="line">			peerMap[ip] = event.peer</div><div class="line">			dataMap[ip] = data</div><div class="line">			inputMap[ip] = &#123;&#125;</div><div class="line">			userCount = userCount + <span class="number">1</span></div><div class="line">			</div><div class="line">			Lib.Send(event.peer, <span class="string">"loginSuccess"</span>, &#123;ip = ip, users = dataMap, playList = playList&#125;)</div><div class="line">			</div><div class="line">			<span class="built_in">print</span>(<span class="string">"connect"</span>, ip)</div><div class="line">		<span class="keyword">elseif</span> (<span class="built_in">type</span> == <span class="string">"disconnect"</span>) <span class="keyword">then</span></div><div class="line">			peerMap[ip] = <span class="keyword">nil</span></div><div class="line">			dataMap[ip] = <span class="keyword">nil</span></div><div class="line">			inputMap[ip] = <span class="keyword">nil</span></div><div class="line">			userCount = userCount - <span class="number">1</span></div><div class="line">			</div><div class="line">			<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(peerMap) <span class="keyword">do</span></div><div class="line">				Lib.Send(v, <span class="string">"delUser"</span>, ip)</div><div class="line">			<span class="keyword">end</span></div><div class="line">			</div><div class="line">			event.peer:disconnect(<span class="number">-1</span>)</div><div class="line">			<span class="built_in">print</span>(<span class="string">"disconnect"</span>, ip)</div><div class="line">		<span class="keyword">end</span></div><div class="line">		</div><div class="line">		event = host:service()</div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	<span class="keyword">if</span> (userCount &gt; <span class="number">0</span>) <span class="keyword">then</span></div><div class="line">		frame = frame + <span class="number">1</span></div><div class="line">		</div><div class="line">		<span class="keyword">if</span> (frame % <span class="number">3</span> == <span class="number">0</span>) <span class="keyword">then</span></div><div class="line">			playFrame = playFrame + <span class="number">1</span></div><div class="line">			<span class="built_in">print</span>(playFrame)</div><div class="line">			</div><div class="line">			<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(peerMap) <span class="keyword">do</span></div><div class="line">				Lib.Send(v, <span class="string">"play"</span>, inputMap)</div><div class="line">			<span class="keyword">end</span></div><div class="line">			</div><div class="line">			playList[#playList + <span class="number">1</span>] = Lib.Clone(inputMap)</div><div class="line">		<span class="keyword">end</span></div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--main.lua</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> Actor = <span class="built_in">require</span>(<span class="string">"actor"</span>)</div><div class="line"><span class="keyword">local</span> Lib = <span class="built_in">require</span>(<span class="string">"lib"</span>)</div><div class="line"><span class="keyword">local</span> Enet = <span class="built_in">require</span> (<span class="string">"enet"</span>)</div><div class="line"></div><div class="line"><span class="keyword">local</span> userList = &#123;&#125;</div><div class="line"><span class="keyword">local</span> userMap = &#123;&#125;</div><div class="line"><span class="keyword">local</span> input = &#123;&#125;</div><div class="line"><span class="keyword">local</span> playList = &#123;&#125;</div><div class="line"><span class="keyword">local</span> playFrame = <span class="number">0</span></div><div class="line"><span class="keyword">local</span> perdt = <span class="number">17</span></div><div class="line"><span class="keyword">local</span> timer = <span class="number">0</span></div><div class="line"><span class="keyword">local</span> frame = <span class="number">0</span></div><div class="line"><span class="keyword">local</span> player</div><div class="line"><span class="keyword">local</span> fps = <span class="number">0</span></div><div class="line"><span class="keyword">local</span> timer2 = <span class="number">0</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> host = Enet.host_create()</div><div class="line"><span class="keyword">local</span> server = host:connect(<span class="string">"localhost:6789"</span>)</div><div class="line"></div><div class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">NewActor</span><span class="params">(x, y, ip)</span></span></div><div class="line">	<span class="keyword">local</span> actor = Actor.New(x, y, ip)</div><div class="line">	userMap[ip] = actor</div><div class="line">	userList[#userList + <span class="number">1</span>] = actor</div><div class="line">	</div><div class="line">	<span class="keyword">return</span> actor</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">Update</span><span class="params">()</span></span></div><div class="line">	<span class="keyword">if</span> ((frame + <span class="number">1</span>) % <span class="number">3</span> == <span class="number">0</span> <span class="keyword">and</span> #playList == <span class="number">0</span>) <span class="keyword">then</span></div><div class="line">		<span class="keyword">return</span></div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	frame = frame + <span class="number">1</span></div><div class="line">	fps = fps + <span class="number">1</span></div><div class="line">	</div><div class="line">	<span class="keyword">if</span> (frame % <span class="number">3</span> == <span class="number">0</span>) <span class="keyword">then</span></div><div class="line">		<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(playList[<span class="number">1</span>]) <span class="keyword">do</span></div><div class="line">			<span class="keyword">if</span> (userMap[k]) <span class="keyword">then</span></div><div class="line">				userMap[k].input = v</div><div class="line">			<span class="keyword">end</span></div><div class="line">		<span class="keyword">end</span></div><div class="line">		</div><div class="line">		playFrame = playFrame + <span class="number">1</span></div><div class="line">		<span class="built_in">table</span>.remove(playList, <span class="number">1</span>)</div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	<span class="keyword">for</span> n=<span class="number">1</span>, #userList <span class="keyword">do</span></div><div class="line">		userList[n]:Update()</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">love.load</span><span class="params">()</span></span></div><div class="line">	<span class="keyword">local</span> event, <span class="built_in">type</span>, ip, data</div><div class="line">	</div><div class="line">	<span class="keyword">repeat</span></div><div class="line">		event = host:service()</div><div class="line">		</div><div class="line">		<span class="keyword">if</span> (event) <span class="keyword">then</span></div><div class="line">			<span class="built_in">type</span>, ip, data = Lib.Recv(event)</div><div class="line">		<span class="keyword">end</span></div><div class="line">	<span class="keyword">until</span> event ~= <span class="keyword">nil</span> <span class="keyword">and</span> <span class="built_in">type</span> == <span class="string">"loginSuccess"</span></div><div class="line"></div><div class="line">	<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(data.users) <span class="keyword">do</span></div><div class="line">		<span class="keyword">local</span> actor = NewActor(v.x, v.y, v.ip)</div><div class="line">		</div><div class="line">		<span class="keyword">if</span> (v.ip == data.ip) <span class="keyword">then</span></div><div class="line">			player = actor</div><div class="line">			<span class="built_in">print</span>(<span class="string">"loginSuccess"</span>, v.ip)</div><div class="line">		<span class="keyword">end</span></div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	playList = data.playList</div><div class="line">	</div><div class="line">	<span class="keyword">while</span> (#playList &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">		Update()</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">love.update</span><span class="params">(dt)</span></span></div><div class="line">	<span class="keyword">local</span> event = host:service()</div><div class="line">	</div><div class="line">	<span class="keyword">while</span> event <span class="keyword">do</span></div><div class="line">		<span class="keyword">local</span> <span class="built_in">type</span>, ip, data = Lib.Recv(event)</div><div class="line">		</div><div class="line">		<span class="keyword">if</span> (<span class="built_in">type</span> == <span class="string">"play"</span>) <span class="keyword">then</span></div><div class="line">			playList[#playList + <span class="number">1</span>] = data</div><div class="line">		<span class="keyword">elseif</span> (<span class="built_in">type</span> == <span class="string">"addNewUser"</span>) <span class="keyword">then</span></div><div class="line">			NewActor(data.x, data.y, data.ip)</div><div class="line">		<span class="keyword">elseif</span> (<span class="built_in">type</span> == <span class="string">"delUser"</span>) <span class="keyword">then</span></div><div class="line">			userMap[data] = <span class="keyword">nil</span></div><div class="line">			</div><div class="line">			<span class="keyword">for</span> n=#userList, <span class="number">1</span>, <span class="number">-1</span> <span class="keyword">do</span></div><div class="line">				<span class="keyword">if</span> (userList[n].ip == data) <span class="keyword">then</span></div><div class="line">					<span class="built_in">table</span>.remove(userList, n)</div><div class="line">				<span class="keyword">end</span></div><div class="line">			<span class="keyword">end</span></div><div class="line">		<span class="keyword">end</span></div><div class="line">		</div><div class="line">		event = host:service()</div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	dt = <span class="built_in">math</span>.floor(dt * <span class="number">1000</span>)</div><div class="line">	timer = timer + dt</div><div class="line">	</div><div class="line">	<span class="keyword">while</span> (timer &gt;= perdt) <span class="keyword">do</span></div><div class="line">		<span class="comment">--print(#playList)</span></div><div class="line">		<span class="keyword">if</span> ((frame + <span class="number">1</span>) % <span class="number">3</span> == <span class="number">0</span> <span class="keyword">and</span> #playList &gt; <span class="number">1</span>) <span class="keyword">then</span></div><div class="line">			<span class="keyword">while</span> (#playList &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">				Update()</div><div class="line">			<span class="keyword">end</span></div><div class="line">		<span class="keyword">else</span></div><div class="line">			Update()</div><div class="line">		<span class="keyword">end</span></div><div class="line">		</div><div class="line">		timer = timer - perdt</div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	timer2 = timer2 + dt</div><div class="line">	</div><div class="line">	<span class="keyword">if</span> (timer2 &gt;= <span class="number">1000</span>) <span class="keyword">then</span></div><div class="line">		<span class="comment">--print(timer2, fps)</span></div><div class="line">		fps = <span class="number">0</span></div><div class="line">		timer2 = timer2 - <span class="number">1000</span></div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">love.draw</span><span class="params">()</span></span></div><div class="line">	<span class="keyword">for</span> n=<span class="number">1</span>, #userList <span class="keyword">do</span></div><div class="line">		userList[n]:Draw()</div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	love.graphics.<span class="built_in">print</span>(playFrame, <span class="number">5</span>, <span class="number">5</span>)</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">love.keypressed</span><span class="params">(key)</span></span></div><div class="line">	<span class="keyword">if</span> (key == <span class="string">"up"</span> <span class="keyword">or</span> key == <span class="string">"down"</span> <span class="keyword">or</span> key == <span class="string">"left"</span> <span class="keyword">or</span> key == <span class="string">"right"</span>) <span class="keyword">then</span></div><div class="line">		input[key] = <span class="number">1</span></div><div class="line">		Lib.Send(server, <span class="string">"input"</span>, input)</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">love.keyreleased</span><span class="params">(key)</span></span></div><div class="line">	<span class="keyword">if</span> (key == <span class="string">"up"</span> <span class="keyword">or</span> key == <span class="string">"down"</span> <span class="keyword">or</span> key == <span class="string">"left"</span> <span class="keyword">or</span> key == <span class="string">"right"</span>) <span class="keyword">then</span></div><div class="line">		input[key] = <span class="number">0</span></div><div class="line">		Lib.Send(server, <span class="string">"input"</span>, input)</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　从代码中可以看出，以上实现便是Skywind所说的<strong>乐观帧锁定</strong>。事实上我认为传统的帧同步（Lockstep）并不适合网络游戏，甚至只是一种早期的理论模型。在实际应用还是要以乐观帧锁定为准。关于乐观帧锁定的实现原理我便不再复述，只说说实际开发中遇到的一些问题。  </p>
+<h3 id="Fixed-Update"><a href="#Fixed-Update" class="headerlink" title="Fixed Update"></a>Fixed Update</h3><p>　　很抱歉我找不到这个词对应的中文词汇，直译过来的意思便是“固定的更新”。在实际应用的含义为，每隔一段时间便会Update一次，如果遇到卡住之类导致积累了很长时间的行为，则会根据时间一次性进行多次Update。也就是这段代码：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--Fixed Update(main.lua)</span></div><div class="line"></div><div class="line">timer = timer + dt</div><div class="line"></div><div class="line"><span class="keyword">while</span> (timer &gt;= perdt) <span class="keyword">do</span></div><div class="line">    <span class="keyword">if</span> ((frame + <span class="number">1</span>) % <span class="number">3</span> == <span class="number">0</span> <span class="keyword">and</span> #playList &gt; <span class="number">1</span>) <span class="keyword">then</span></div><div class="line">        <span class="keyword">while</span> (#playList &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">            Update()</div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">else</span></div><div class="line">        Update()</div><div class="line">    <span class="keyword">end</span></div><div class="line">    </div><div class="line">    timer = timer - perdt</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　使用了Fixed Update后，你的游戏进度便由时间牢牢把控住，这样便能摆脱帧率的影响。在业务层也不再需要使用DT(Delta Time)了，而是采用一个固定的值（譬如1 / 60）。这个概念很重要，因为过快与过慢的帧率都会与同步不那么搭调。</p>
+<h3 id="收发频率"><a href="#收发频率" class="headerlink" title="收发频率"></a>收发频率</h3><p>　　按照Skywind的说法是服务端每秒20-50次向所有客户端发送同步包。这里我们需要理清乐观帧锁定的本质：<strong>就是服务端每隔一段时间发送同步包，然后客户端每隔一段时间接收并应用之，如果在那段时间内没有收到，就持续等待。</strong>所以我们必须设置好合适的时间，令服务端和客户端之间配合无间。<br>　　在我的设计里，为服务端和客户端都设置了帧（Frame）的概念，每Update一次即是一帧，每次Update的间隔时间为<em>17毫秒</em>，这个数字是根据(1/60)秒取整得出。每隔三帧服务端便会发送同步包，而客户端则是每帧都会接收，每隔三帧便会应用之。我称这种每隔三帧的帧为<strong>同步帧</strong>。<br>　　衡量设置是否良好，主要看每帧接收的同步包的数量，以及每秒帧数的多少。正常情况下，每帧接收的同步包的数量应是0-1，如果超过这个数值，证明服务端或客户端其中一方的频率太快或太慢。至于每秒帧数的多少，则能看出发送频率是否过剩，正常情况下在60左右即可，这和FPS的要求是类似的。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> event = host:service(<span class="number">17</span>) <span class="comment">--服务端每隔17毫秒接收一次封包</span></div></pre></td></tr></table></figure>
+<h3 id="收包Q-amp-A"><a href="#收包Q-amp-A" class="headerlink" title="收包Q&amp;A"></a>收包Q&amp;A</h3><ul>
+<li>关于收包的问题，有个最明显的问题便是为何不是在同步帧时进行收包，而是每帧都尝试收包？<ul>
+<li>这是因为收包的内容不仅仅是关于帧同步，还可能有其他东西。其次便是先收后收并不影响什么，以及每隔三帧才进行一次收包恐怕会卡。</li>
+</ul>
+</li>
+<li>关于一次性收到多个同步包的情况时，该怎么办？<ul>
+<li>遇到收到多个同步包的情况，说明客户端失联了一段时间，这时候便需要一次性进行多次Update以迅速追回进度。</li>
+</ul>
+</li>
+<li>既然确定遇到多个同步包时需要一次性追回进度，那为何不选择在接收后立即执行，而要等到同步帧？<ul>
+<li>因为基本上不会遇到这种情况，能遇到多个同步包的情况，一般客户端已经在等待了。换做客户端卡住这种情况的话，根据Fixed Update的规则，本来就会立即赶到同步帧的。</li>
+</ul>
+</li>
+<li>为何等待同步包的代码并非是阻塞式的，而是每帧去判定一下？<ul>
+<li>因为如果是阻塞式的话，会使得DT变得很大，影响Fixed Update。</li>
+</ul>
+</li>
+</ul>
+<h3 id="输入应用"><a href="#输入应用" class="headerlink" title="输入应用"></a>输入应用</h3><p>　　关于输入应用方面，首先要明确一点：客户端每次按下/释放按键，就会改写输入表然后发送之。服务端收到后便会改写在服务端的对应输入表。这种模式在高延迟的表现便是呈现出某些按键因为一直按下而导致一些鬼畜操作，这点算是可以接受的。<br>　　另外注意不要贪图方便每次只发送当前修改的按键，这样会失去输入的稳定性，一旦发生丢包之类的，会产生键盘失灵的感觉。<br>　　在每次同步帧时便会根据同步包的内容更新所有玩家的输入表，从而改变每个联机角色的操作。这个输入表会一直应用到下次同步帧之前，从这点来看帧同步也是一种回合制。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--根据同步包的内容更新所有玩家的输入表(main.lua)</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> (frame % <span class="number">3</span> == <span class="number">0</span>) <span class="keyword">then</span></div><div class="line">	<span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(playList[<span class="number">1</span>]) <span class="keyword">do</span></div><div class="line">		<span class="keyword">if</span> (userMap[k]) <span class="keyword">then</span></div><div class="line">			userMap[k].input = v</div><div class="line">		<span class="keyword">end</span></div><div class="line">	<span class="keyword">end</span></div><div class="line">	</div><div class="line">	playFrame = playFrame + <span class="number">1</span></div><div class="line">	<span class="built_in">table</span>.remove(playList, <span class="number">1</span>)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--客户端每次按下/释放按键，就会改写输入表然后发送之(main.lua)</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">love.keypressed</span><span class="params">(key)</span></span></div><div class="line">	<span class="keyword">if</span> (key == <span class="string">"up"</span> <span class="keyword">or</span> key == <span class="string">"down"</span> <span class="keyword">or</span> key == <span class="string">"left"</span> <span class="keyword">or</span> key == <span class="string">"right"</span>) <span class="keyword">then</span></div><div class="line">		input[key] = <span class="number">1</span></div><div class="line">		Lib.Send(server, <span class="string">"input"</span>, input)</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">love.keyreleased</span><span class="params">(key)</span></span></div><div class="line">	<span class="keyword">if</span> (key == <span class="string">"up"</span> <span class="keyword">or</span> key == <span class="string">"down"</span> <span class="keyword">or</span> key == <span class="string">"left"</span> <span class="keyword">or</span> key == <span class="string">"right"</span>) <span class="keyword">then</span></div><div class="line">		input[key] = <span class="number">0</span></div><div class="line">		Lib.Send(server, <span class="string">"input"</span>, input)</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<h3 id="断线重连-中途加入"><a href="#断线重连-中途加入" class="headerlink" title="断线重连/中途加入"></a>断线重连/中途加入</h3><p>　　想要做到这两点，便需要做到在服务端保存每一份同步包，这样服务端只需要记录每个玩家的初始数据，在新玩家加入游戏时，首先发送每个玩家的初始数据给新玩家同步，然后再把所有同步包打包发送给新玩家，让新玩家一次性Update，即可完成中途加入。当然不要忘记给现有玩家发送新玩家的数据。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--新玩家同步(main.lua)</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> event, <span class="built_in">type</span>, ip, data</div><div class="line"></div><div class="line"><span class="keyword">repeat</span></div><div class="line">	event = host:service()</div><div class="line">	</div><div class="line">	<span class="keyword">if</span> (event) <span class="keyword">then</span></div><div class="line">		<span class="built_in">type</span>, ip, data = Lib.Recv(event)</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">until</span> event ~= <span class="keyword">nil</span> <span class="keyword">and</span> <span class="built_in">type</span> == <span class="string">"loginSuccess"</span></div><div class="line"></div><div class="line"><span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(data.users) <span class="keyword">do</span></div><div class="line">	<span class="keyword">local</span> actor = NewActor(v.x, v.y, v.ip)</div><div class="line">	</div><div class="line">	<span class="keyword">if</span> (v.ip == data.ip) <span class="keyword">then</span></div><div class="line">		player = actor</div><div class="line">		<span class="built_in">print</span>(<span class="string">"loginSuccess"</span>, v.ip)</div><div class="line">	<span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line">playList = data.playList</div><div class="line"></div><div class="line"><span class="keyword">while</span> (#playList &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">	Update()</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<h3 id="浮点数"><a href="#浮点数" class="headerlink" title="浮点数"></a>浮点数</h3><p>　　根据网上的信息看来，浮点数因为在不同环境的实现有所偏差，所以可能会导致不一致的问题，这样便会产生蝴蝶效应，最终导致同步失效。目前我使用LuaJIT在Windows(x64)、Ubuntu(x64)、macOS、Android(红米Note4)、iOS测试来看，浮点数在「输出」的场合下并无不同。当然只是输出，并不能代表真实数据的情况。以及我的测试范本并不算多，对于浮点数的问题还不敢保证。所以我选择在业务层放弃使用浮点数，相关数据都事先进行转换，到最后需要浮点数的对接场合再进行转换。当然我并不敢保证这种做法的可行性，真正成熟的做法应该是使用定点数，但我暂时并未这么做。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">dt = <span class="built_in">math</span>.floor(dt * <span class="number">1000</span>) <span class="comment">-- 浮点数转换为整数（毫秒）</span></div></pre></td></tr></table></figure>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　以上便是本次我对帧同步的初步探究，它注定是不成熟的，需要经过实践的检验，接下来我会考虑将其接入到一些项目中。有相关经验的朋友欢迎前来讨论。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/NetworkSync/" rel="tag"># NetworkSync</a>
+          
+            <a href="/tags/Network/" rel="tag"># Network</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/21/spk_analysis/" rel="next" title="DNF的SPK文件解析笔记">
+                <i class="fa fa-chevron-left"></i> DNF的SPK文件解析笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/13/about_strtok/" rel="prev" title="关于C语言函数strtok引发的思考">
+                关于C语言函数strtok引发的思考 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2017/08/26/frame_sync/"
+     data-title="帧同步的初步探究"
+     data-content=""
+     data-url="https://musoucrow.github.io/2017/08/26/frame_sync/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/08/26/frame_sync/"
+           data-title="帧同步的初步探究" data-url="https://musoucrow.github.io/2017/08/26/frame_sync/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#详解"><span class="nav-number">2.</span> <span class="nav-text">详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Fixed-Update"><span class="nav-number">2.1.</span> <span class="nav-text">Fixed Update</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#收发频率"><span class="nav-number">2.2.</span> <span class="nav-text">收发频率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#收包Q-amp-A"><span class="nav-number">2.3.</span> <span class="nav-text">收包Q&A</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输入应用"><span class="nav-number">2.4.</span> <span class="nav-text">输入应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#断线重连-中途加入"><span class="nav-number">2.5.</span> <span class="nav-text">断线重连/中途加入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#浮点数"><span class="nav-number">2.6.</span> <span class="nav-text">浮点数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">3.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

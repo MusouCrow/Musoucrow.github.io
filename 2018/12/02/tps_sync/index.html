@@ -1,0 +1,1085 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Development,NetworkSync," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　因友人的项目要做TPS联机对战游戏，本人遂对此进行了一番研究，经过四回的辗转反侧，Demo总算是做出来了。本次Demo是C/S一体化的设计，即服务端也是Unity做的（可选择1P兼任服务器或者将Unity以命令行模式运行于服务器）。网络模块采用了UDP+KCP，即先前BNB的强化版，而之所以没用UNet是因为之前搞出了乌龙所以换了现在这套，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TPS游戏网络同步总结">
+<meta property="og:url" content="https://musoucrow.github.io/2018/12/02/tps_sync/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　因友人的项目要做TPS联机对战游戏，本人遂对此进行了一番研究，经过四回的辗转反侧，Demo总算是做出来了。本次Demo是C/S一体化的设计，即服务端也是Unity做的（可选择1P兼任服务器或者将Unity以命令行模式运行于服务器）。网络模块采用了UDP+KCP，即先前BNB的强化版，而之所以没用UNet是因为之前搞出了乌龙所以换了现在这套，">
+<meta property="og:image" content="https://musoucrow.github.io/images/tps_sync/flow.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.494Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TPS游戏网络同步总结">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　因友人的项目要做TPS联机对战游戏，本人遂对此进行了一番研究，经过四回的辗转反侧，Demo总算是做出来了。本次Demo是C/S一体化的设计，即服务端也是Unity做的（可选择1P兼任服务器或者将Unity以命令行模式运行于服务器）。网络模块采用了UDP+KCP，即先前BNB的强化版，而之所以没用UNet是因为之前搞出了乌龙所以换了现在这套，">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/tps_sync/flow.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2018/12/02/tps_sync/"/>
+
+
+
+
+
+  <title> TPS游戏网络同步总结 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/12/02/tps_sync/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                TPS游戏网络同步总结
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-02T21:45:51+08:00">
+                2018-12-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/12/02/tps_sync/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/12/02/tps_sync/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/12/02/tps_sync/" class="leancloud_visitors" data-flag-title="TPS游戏网络同步总结">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　因友人的项目要做TPS联机对战游戏，本人遂对此进行了一番研究，经过四回的辗转反侧，<a href="https://github.com/MusouCrow/TPSDemo.git" target="_blank" rel="external">Demo</a>总算是做出来了。本次Demo是C/S一体化的设计，即服务端也是Unity做的（可选择1P兼任服务器或者将Unity以命令行模式运行于服务器）。网络模块采用了UDP+KCP，即先前<a href="https://github.com/MusouCrow/BrickAndBall.git" target="_blank" rel="external">BNB</a>的强化版，而之所以没用UNet是因为之前搞出了乌龙所以换了现在这套，但序列化部分还是用的UNet。以上只是背景交代，本文仅聚焦于网络同步方面的细节。</p>
+<h2 id="实现思想"><a href="#实现思想" class="headerlink" title="实现思想"></a>实现思想</h2><p>　　如果你对这方面有所涉猎，想必大致了解何为<strong>状态同步</strong>。市面上的大多文章将其与帧锁定同步对立而论，但本人认为两者并非是对立的存在，关于这点<a href="https://zhuanlan.zhihu.com/p/32843758" target="_blank" rel="external">这篇文章</a>讲的非常清楚，希望读者不要拘泥于形式。在阐述详细的实现思想之前，我们先来看看FPS/TPS游戏的需求：</p>
+<ul>
+<li>非常迅速的操作反馈（若采用服务器应答后方有反馈的设计，很难达到要求，尤其是操作镜头） → <strong>本地先行</strong></li>
+<li>个人体验第一（对于是否命中敌人与被命中不是很敏感） → <strong>玩家之间看到画面情况不一致</strong></li>
+<li>ACT元素低（不存在ACT游戏的打击控制链，不需要帧判定） → <strong>不需要精确到帧的同步</strong></li>
+<li>服务器权威（命中判定由服务器决定） → <strong>服务端模拟游戏世界、同步验证</strong></li>
+<li>房间战斗（玩家人数不多） → <strong>与MMORPG同步不同</strong></li>
+<li>相对同步（玩家之间的时间差不可拉得太大） → <strong>追赶进度</strong></li>
+</ul>
+<p>　　Well done，由以上几点需求已经得出了TPS游戏同步的实现思想，下文将根据实现思想阐述具体实现细节。</p>
+<h2 id="快照"><a href="#快照" class="headerlink" title="快照"></a>快照</h2><p>　　在探究同步流程之前，首先要了解同步的核心：快照。换言之，也就是我们所同步的内容。快照（Snapshot）通俗来讲就是玩家的操作指令与相关数据的集合，由于需要做<strong>同步验证</strong>，所以将数据分为必要数据(Must)与验证数据(Check)，先来看看移动的快照数据结构吧:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Actor/Common.cs</span></div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Move</span> &#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">string</span> fd; <span class="comment">// Address:Port(Must)</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> frame; <span class="comment">// Game Frame(Must)</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">bool</span> fromServer; <span class="comment">// It is from server, or client?(Must)</span></div><div class="line">    <span class="keyword">public</span> Vector3 velocity; <span class="comment">// Moving Velocity(Must)</span></div><div class="line">    <span class="keyword">public</span> Vector3 position; <span class="comment">// Position before moving(Check)</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　如上文所示，<code>position</code>为移动前的坐标，像这类数据客户端是不需要上传的，仅用于与服务端传来的快照作对比，以进行同步验证。</p>
+<h2 id="同步流程"><a href="#同步流程" class="headerlink" title="同步流程"></a>同步流程</h2><p>　　由于<strong>服务端模拟游戏世界</strong>，所以采用了C/S一体化的设计。在代码层面上则是分为<code>ServerMgr</code>与<code>ClientMgr</code>两个<code>MonoBehaviour</code>，ServerMgr负责收集客户端的快照并整合下发，而ClientMgr负责发送快照与模拟来自服务端的快照以驱动同步单位的运行。如下图所示:<br><img src="https://musoucrow.github.io/images/tps_sync/flow.png" alt="flow"><br>　　图中所说的<em>同步快照</em>，是一种特殊的快照列表，它由服务端每帧打包，包括了多个客户端的一帧快照，客户端模拟它们即可驱动其他客户端代表的对象。采用这种同步流程只能保证在<strong>客户端是同一帧生成的快照，在服务端也会打包到同一个同步快照里</strong>。除此之外都不会保证（不会考虑到快照之间的帧间隔执行情况），即<strong>不需要精确到帧的同步</strong>。</p>
+<h2 id="追赶进度"><a href="#追赶进度" class="headerlink" title="追赶进度"></a>追赶进度</h2><p>　　在正常的同步过程中情况总是理想的，但是一旦出现网络延迟或卡住的话，在恢复之时便会面临大量的快照，那么按照现有的做法便会导致与其他玩家的时间轴拉得太远（看到的画面是很久以前的了），这便需要设计<strong>追赶进度</strong>的机制。需要注意的是，追赶进度是服务端与客户端都需要的（服务器也有网络延迟和卡住的可能），客户端的追赶处理相当简单，同步快照超过一个数量则循环模拟:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ClientMgr.cs</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> (<span class="keyword">this</span>.syncList.Count &gt; <span class="number">0</span>) &#123;</div><div class="line">    <span class="keyword">this</span>.Simulate();</div><div class="line">    </div><div class="line">    <span class="comment">// SYNCMAX = 15</span></div><div class="line">    <span class="keyword">while</span>(<span class="keyword">this</span>.syncList.Count &gt; SYNCMAX) &#123;</div><div class="line">        <span class="keyword">this</span>.Simulate();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　服务端方面则较为复杂，简而言之就是要知道每个客户端快照列表有<em>多少帧</em>（如4个快照，帧号分别为1, 2, 2, 3，则为3帧），当某个每个客户端快照的帧数过高，则循环打包到同步快照列表:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ServerMgr.cs</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> list = <span class="keyword">new</span> List&lt;Snapshot&gt;(); <span class="comment">// sync-snapshot</span></div><div class="line"></div><div class="line"><span class="comment">// Foreach all clients.</span></div><div class="line"><span class="keyword">foreach</span> (<span class="keyword">var</span> i <span class="keyword">in</span> <span class="keyword">this</span>.unitMap) &#123;</div><div class="line">    <span class="keyword">int</span> frame = <span class="number">-1</span>;</div><div class="line">    <span class="keyword">var</span> sl = i.Value.list;</div><div class="line"></div><div class="line">    <span class="comment">// INTERVAL = 10, i.Value.count that is count of frame.</span></div><div class="line">    <span class="keyword">while</span> (sl.Count &gt; <span class="number">0</span> &amp;&amp; (i.Value.count &gt; INTERVAL || (frame == <span class="number">-1</span> || sl[<span class="number">0</span>].frame == frame))) &#123;</div><div class="line">        <span class="keyword">var</span> s = sl[<span class="number">0</span>];</div><div class="line">        list.Add(s);</div><div class="line">        sl.RemoveAt(<span class="number">0</span>);</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (frame != s.frame) &#123;</div><div class="line">            frame = s.frame;</div><div class="line">            i.Value.count--;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="本地先行"><a href="#本地先行" class="headerlink" title="本地先行"></a>本地先行</h2><p>　　本地先行可谓这类同步最玄学之处，不过只要了解其原理倒也无甚。需要本地先行的理由在上文已经阐述，由于是以服务端权威且不那么介意判定的问题，所以是可以允许玩家之间看到画面情况不一致这种情况的。况且在大多数场合下，玩家先行并不会造成什么问题（最终的结果趋于一致），但假设在这么一个场合下：<em>玩家A一直行走，在玩家B的视角里对玩家A进行了眩晕</em>。如此便会造成不同步了，所以需要进行<strong>同步验证</strong>以将问题修正。<br>　　要实现同步验证的思路倒也朴素:就是用一个验证列表将快照保存，当收到同步快照列表时就进行逐个对照（对比它们的验证数据，见前文），一旦发现不一致之处，就以当前位置开始，循环模拟同步快照，然后再继续循环模拟验证列表里进度比目前快的快照，追上最新进度:<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// ClientMgr.cs</span></div><div class="line"></div><div class="line"><span class="comment">// Compare sync list and check list.</span></div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; list.Count; i++) &#123;</div><div class="line">    <span class="keyword">if</span> (!list[i].Equals(<span class="keyword">this</span>.checkList[i])) &#123;</div><div class="line">        index = i;</div><div class="line">        print(i);</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">if</span> (index == list.Count) &#123; <span class="comment">// Agreement</span></div><div class="line">    <span class="keyword">this</span>.checkList.RemoveRange(<span class="number">0</span>, list.Count);</div><div class="line">&#125;</div><div class="line"><span class="keyword">else</span> &#123; <span class="comment">// Need to fix.</span></div><div class="line">    <span class="keyword">var</span> frame = list[list.Count - <span class="number">1</span>].frame;</div><div class="line"></div><div class="line">    <span class="comment">// Remove useless snapshots.</span></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="keyword">this</span>.checkList.Count - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.checkList[i].frame &lt;= frame) &#123;</div><div class="line">            <span class="keyword">this</span>.checkList.RemoveAt(i);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// Loop simulate.</span></div><div class="line">    ClientMgr.Resolve(<span class="keyword">this</span>.fd, list, index);</div><div class="line">    ClientMgr.Resolve(<span class="keyword">this</span>.fd, <span class="keyword">this</span>.checkList, <span class="number">0</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="服务端权威"><a href="#服务端权威" class="headerlink" title="服务端权威"></a>服务端权威</h2><p>　　从上文可以看出，本地先行会修正的范围只有本地玩家而已，回到之前的例子:<em>在玩家B的视角里对玩家A进行了眩晕</em>，假设这个行为在服务端上并没有达成（玩家A闪现走了），那么该如何修正呢？很显然可以选择搞个更大的修正系统，但我认为这样并不符合业界的常规做法，所以我给出的答案是: 眩晕行为需要在服务端触发了，然后由服务端将其作为快照，以正常同步的形式在诸客户端上展示。事实上在网络正常的情况下，这样的间隔最多也只是0.1x秒左右而已，完全可以接受。当然这么做对于玩家B而言肯定会发生修正（眩晕按理来说是之前的事了），所以我对此作了个措施: 为快照设计了<code>fromServer</code>属性，一旦是<code>fromServer = true</code>且属于本地玩家的快照，本地玩家会直接模拟而不会将其进行修正对比。这也可以看出这套同步的一个规则:<strong>会影响他人的操作，都需要由服务端发起</strong>。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　很显然，目前这个demo仍很不成熟，不少地方在业界应该会有更好的处理，如CS的射击纠正（服务端根据客户端的射击时间回滚之前的场景进行判定）。如此只能算是一个雏形，还是缺少实战项目的淬炼，先根据接下来的项目看看效果吧。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Development/" rel="tag"># Development</a>
+          
+            <a href="/tags/NetworkSync/" rel="tag"># NetworkSync</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/29/dfq_ui/" rel="next" title="《DFQ》开发随录——界面">
+                <i class="fa fa-chevron-left"></i> 《DFQ》开发随录——界面
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/27/dfq_ecs/" rel="prev" title="《DFQ》开发随录——ECS">
+                《DFQ》开发随录——ECS <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2018/12/02/tps_sync/"
+     data-title="TPS游戏网络同步总结"
+     data-content=""
+     data-url="https://musoucrow.github.io/2018/12/02/tps_sync/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/12/02/tps_sync/"
+           data-title="TPS游戏网络同步总结" data-url="https://musoucrow.github.io/2018/12/02/tps_sync/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现思想"><span class="nav-number">2.</span> <span class="nav-text">实现思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快照"><span class="nav-number">3.</span> <span class="nav-text">快照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步流程"><span class="nav-number">4.</span> <span class="nav-text">同步流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#追赶进度"><span class="nav-number">5.</span> <span class="nav-text">追赶进度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地先行"><span class="nav-number">6.</span> <span class="nav-text">本地先行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端权威"><span class="nav-number">7.</span> <span class="nav-text">服务端权威</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">8.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

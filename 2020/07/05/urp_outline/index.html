@@ -1,0 +1,1086 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Graphics,Post-process," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。     
+前言　　最近在Demo开发的过程中，遇到了一个细节问题，场景模型之间的边界感很弱：　　这样就会导致玩家难以分辨接下来面对的究竟是可以跳下去的台阶，亦或是要跳过去的台阶了。我们想到的解决方法便是给场景模型加个外描边，以此区分：　　整挺好，于是本文就来介绍一下实现思路。首先按照惯性我们直接采用了与人物相同的法线外扩描边，但是效果却不尽人意：　　这完全就牛头">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在URP实现局部后处理描边">
+<meta property="og:url" content="https://musoucrow.github.io/2020/07/05/urp_outline/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。     
+前言　　最近在Demo开发的过程中，遇到了一个细节问题，场景模型之间的边界感很弱：　　这样就会导致玩家难以分辨接下来面对的究竟是可以跳下去的台阶，亦或是要跳过去的台阶了。我们想到的解决方法便是给场景模型加个外描边，以此区分：　　整挺好，于是本文就来介绍一下实现思路。首先按照惯性我们直接采用了与人物相同的法线外扩描边，但是效果却不尽人意：　　这完全就牛头">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/0.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/1.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/2.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/3.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/4.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/5.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/6.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/7.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/8.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/urp_outline/9.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.494Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在URP实现局部后处理描边">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。     
+前言　　最近在Demo开发的过程中，遇到了一个细节问题，场景模型之间的边界感很弱：　　这样就会导致玩家难以分辨接下来面对的究竟是可以跳下去的台阶，亦或是要跳过去的台阶了。我们想到的解决方法便是给场景模型加个外描边，以此区分：　　整挺好，于是本文就来介绍一下实现思路。首先按照惯性我们直接采用了与人物相同的法线外扩描边，但是效果却不尽人意：　　这完全就牛头">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/urp_outline/0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2020/07/05/urp_outline/"/>
+
+
+
+
+
+  <title> 在URP实现局部后处理描边 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/07/05/urp_outline/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                在URP实现局部后处理描边
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-07-05T21:23:45+08:00">
+                2020-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/07/05/urp_outline/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/07/05/urp_outline/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/07/05/urp_outline/" class="leancloud_visitors" data-flag-title="在URP实现局部后处理描边">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>     </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　最近在Demo开发的过程中，遇到了一个细节问题，场景模型之间的边界感很弱：<br><img src="https://musoucrow.github.io/images/urp_outline/0.png" alt="0"><br>　　这样就会导致玩家难以分辨接下来面对的究竟是可以跳下去的台阶，亦或是要跳过去的台阶了。我们想到的解决方法便是给场景模型加个外描边，以此区分：<br><img src="https://musoucrow.github.io/images/urp_outline/1.png" alt="1"><br>　　整挺好，于是本文就来介绍一下实现思路。首先按照惯性我们直接采用了与人物相同的<a href="http://musoucrow.github.io/2020/05/10/lbbn_shading/">法线外扩描边</a>，但是效果却不尽人意：<br><img src="https://musoucrow.github.io/images/urp_outline/2.png" alt="2"><br>　　这完全就牛头不对马嘴，既然老办法不好使那就看看后处理描边吧。不过由于Demo使用的渲染管线是<a href="https://unity.com/srp/universal-render-pipeline#universal-render-pipeline-vs-built-rendering" target="_blank" rel="external">URP</a>，在后处理这块与原生完全不同。于是乎再一次踏上了踩坑之旅……<br>另附源码地址：<a href="https://github.com/MusouCrow/TypeOutline" target="_blank" rel="external">https://github.com/MusouCrow/TypeOutline</a></p>
+<h2 id="RenderFeature"><a href="#RenderFeature" class="headerlink" title="RenderFeature"></a>RenderFeature</h2><p>　　经过调查发现，URP除了<a href="https://docs.unity3d.com/Manual/PostProcessingOverview.html" target="_blank" rel="external">Post-processing</a>之外，并没有<strong>直接提供</strong>屏幕后处理的方案。而URP的Post-processing尚不稳定（与原生产生了版本分裂），所以还是去寻找更稳妥的方式。根据<a href="https://github.com/Unity-Technologies/UniversalRenderingExamples" target="_blank" rel="external">官方例程</a>找到了实现屏幕后处理描边的方式，当然它们的描边实现方式很搓，并不适合我们项目。于是取其精华去其糟粕，发现了其实现后处理的关键：RenderFeature。<br><img src="https://musoucrow.github.io/images/urp_outline/3.png" alt="3"><br>　　RenderFeature系属于URP的配置三件套之一的Forward Renderer，你可以在该配置文件里添加想要的RenderFeature，可以将它看做是一种自定义的渲染行为，通过<a href="https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.html" target="_blank" rel="external">CommandBuffer</a>提交自己的渲染命令到任一渲染时点（如渲染不透明物体后、进行后处理之前）。URP默认只提供了RenderObjects这一RenderFeature，作用是<em>使用特定的材质，在某个渲染时机，对某些Layer的对象</em>进行一遍渲染。这显然不是我们所需要的，所幸官方例程里提供了我们想要的RenderFeature——<a href="https://github.com/MusouCrow/TypeOutline/blob/master/Assets/Source/RenderPasses/Blit.cs" target="_blank" rel="external">Blit</a>，它提供了<em>根据材质、且材质可获取屏幕贴图，并渲染到屏幕上</em>的功能：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">Shader <span class="string">"Custom/Test"</span></div><div class="line">&#123;</div><div class="line">    Properties</div><div class="line">    &#123;</div><div class="line">        [HideInInspector]_MainTex(<span class="string">"Base (RGB)"</span>, <span class="number">2</span>D) = <span class="string">"white"</span> &#123;&#125;</div><div class="line">    &#125;</div><div class="line">    SubShader</div><div class="line">    &#123;</div><div class="line">        Pass</div><div class="line">        &#123;</div><div class="line">            HLSLPROGRAM</div><div class="line"></div><div class="line">            <span class="meta">#<span class="meta-keyword">pragma</span> vertex vert</span></div><div class="line">			<span class="meta">#<span class="meta-keyword">pragma</span> fragment frag</span></div><div class="line"></div><div class="line">            <span class="meta">#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</span></div><div class="line"></div><div class="line">            TEXTURE2D(_MainTex);</div><div class="line">            SAMPLER(sampler_MainTex);</div><div class="line"></div><div class="line">            <span class="keyword">struct</span> Attributes</div><div class="line">            &#123;</div><div class="line">                float4 positionOS : POSITION;</div><div class="line">                float2 uv : TEXCOORD0;</div><div class="line">            &#125;;</div><div class="line"></div><div class="line">            <span class="keyword">struct</span> Varyings</div><div class="line">            &#123;</div><div class="line">                float4 vertex : SV_POSITION;</div><div class="line">                float2 uv : TEXCOORD0;</div><div class="line">            &#125;;</div><div class="line"></div><div class="line">            <span class="function">Varyings <span class="title">vert</span>(<span class="params">Attributes input</span>)</span></div><div class="line">            &#123;</div><div class="line">                Varyings output;</div><div class="line"></div><div class="line">                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);</div><div class="line">                output.vertex = vertexInput.positionCS;</div><div class="line">                output.uv = input.uv;</div><div class="line"></div><div class="line">                <span class="keyword">return</span> output;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="function">float4 <span class="title">frag</span>(<span class="params">Varyings input</span>) : SV_Target</span></div><div class="line">            &#123;</div><div class="line">                float4 color = <span class="number">1</span> - SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);</div><div class="line">                </div><div class="line">                <span class="keyword">return</span> color;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            ENDHLSL</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    FallBack <span class="string">"Diffuse"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/urp_outline/4.png" alt="4"><br>　　如此这般便实现了经典的反色效果，只要引入Blit的相关代码，然后在Forward Renderer文件进行RenderFeature的相关配置，并实现Shader与材质，即可生效。较之原生在MonoBehaviour做这种事，URP的设计明显更为合理。</p>
+<h2 id="Outline"><a href="#Outline" class="headerlink" title="Outline"></a>Outline</h2><p>　　后处理部署完毕，接下来便是描边的实现了。按照正统的屏幕后处理做法，应该是基于一些屏幕贴图（深度、法线、颜色等），使用Sobel算子之类做边缘检测。然而也有一些杂技做法，如官方例程以及<a href="https://alexanderameye.github.io/outlineshader" target="_blank" rel="external">此篇</a>。当然相同的是，它们都需要使用屏幕贴图作为依据来进行处理，不同的屏幕贴图会导致不一样的效果，如上文那篇就使用<strong>深度与法线结合</strong>的贴图，产生了内描边的效果。然而我们只需要外描边而已，所以使用深度贴图即可。<br>　　深度贴图在URP的获取相当简单，只需要在RenderPipelineAsset文件将<code>Depth Texture</code>勾选，然后便可在后处理Shader通过<code>_CameraDepthTexture</code>变量获取：<br><img src="https://musoucrow.github.io/images/urp_outline/5.png" alt="5"><br>　　有了深度贴图，那么接下来逮着别人的Shader抄就完事了——然而那些杂技做法的效果通通不行：官方的更适合美式风格，上文那篇的做法在某些场合会产生奇怪的斑点。于是只好按照《UnityShader入门精要》的写法来了：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div></pre></td><td class="code"><pre><div class="line">Shader <span class="string">"Custom/Outline"</span></div><div class="line">&#123;</div><div class="line">    Properties</div><div class="line">    &#123;</div><div class="line">        [HideInInspector]_MainTex(<span class="string">"Base (RGB)"</span>, <span class="number">2</span>D) = <span class="string">"white"</span> &#123;&#125;</div><div class="line">        _Rate(<span class="string">"Rate"</span>, Float) = <span class="number">0.5</span></div><div class="line">        _Strength(<span class="string">"Strength"</span>, Float) = <span class="number">0.7</span></div><div class="line">    &#125;</div><div class="line">    SubShader</div><div class="line">    &#123;</div><div class="line">        Pass</div><div class="line">        &#123;</div><div class="line">            HLSLPROGRAM</div><div class="line"></div><div class="line">            <span class="meta">#<span class="meta-keyword">pragma</span> vertex vert</span></div><div class="line">			<span class="meta">#<span class="meta-keyword">pragma</span> fragment frag</span></div><div class="line"></div><div class="line">            <span class="meta">#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</span></div><div class="line"></div><div class="line">            TEXTURE2D(_MainTex);</div><div class="line">            SAMPLER(sampler_MainTex);</div><div class="line"></div><div class="line">            TEXTURE2D(_CameraDepthTexture);</div><div class="line">            SAMPLER(sampler_CameraDepthTexture);</div><div class="line">            float4 _CameraDepthTexture_TexelSize;</div><div class="line"></div><div class="line">            <span class="keyword">float</span> _Rate;</div><div class="line">            <span class="keyword">float</span> _Strength;</div><div class="line"></div><div class="line">            <span class="keyword">struct</span> Attributes</div><div class="line">            &#123;</div><div class="line">                float4 positionOS : POSITION;</div><div class="line">                float2 uv : TEXCOORD0;</div><div class="line">            &#125;;</div><div class="line"></div><div class="line">            <span class="keyword">struct</span> Varyings</div><div class="line">            &#123;</div><div class="line">                float4 vertex : SV_POSITION;</div><div class="line">                float2 uv[<span class="number">9</span>] : TEXCOORD0;</div><div class="line">            &#125;;</div><div class="line"></div><div class="line">            <span class="function">Varyings <span class="title">vert</span>(<span class="params">Attributes input</span>)</span></div><div class="line">            &#123;</div><div class="line">                Varyings output;</div><div class="line"></div><div class="line">                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);</div><div class="line">                output.vertex = vertexInput.positionCS;</div><div class="line"></div><div class="line">                output.uv[<span class="number">0</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">-1</span>, <span class="number">-1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">1</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">0</span>, <span class="number">-1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">2</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">1</span>, <span class="number">-1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">3</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">-1</span>, <span class="number">0</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">4</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">0</span>, <span class="number">0</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">5</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">1</span>, <span class="number">0</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">6</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">-1</span>, <span class="number">1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">7</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">0</span>, <span class="number">1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">8</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">1</span>, <span class="number">1</span>) * _Rate;</div><div class="line"></div><div class="line">                <span class="keyword">return</span> output;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="function">float4 <span class="title">frag</span>(<span class="params">Varyings input</span>) : SV_Target</span></div><div class="line">            &#123;</div><div class="line">                <span class="keyword">const</span> half Gx[<span class="number">9</span>] = &#123;</div><div class="line">                    <span class="number">-1</span>,  <span class="number">0</span>,  <span class="number">1</span>,</div><div class="line">                    <span class="number">-2</span>,  <span class="number">0</span>,  <span class="number">2</span>,</div><div class="line">                    <span class="number">-1</span>,  <span class="number">0</span>,  <span class="number">1</span></div><div class="line">                &#125;;</div><div class="line"></div><div class="line">                <span class="keyword">const</span> half Gy[<span class="number">9</span>] = &#123;</div><div class="line">                    <span class="number">-1</span>, <span class="number">-2</span>, <span class="number">-1</span>,</div><div class="line">                    <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>,</div><div class="line">                    <span class="number">1</span>,  <span class="number">2</span>,  <span class="number">1</span></div><div class="line">                &#125;;</div><div class="line">                </div><div class="line">                <span class="keyword">float</span> edgeY = <span class="number">0</span>;</div><div class="line">                <span class="keyword">float</span> edgeX = <span class="number">0</span>;    </div><div class="line">                <span class="keyword">float</span> luminance = <span class="number">0</span>;</div><div class="line"></div><div class="line">                float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv[<span class="number">4</span>]);</div><div class="line"></div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</div><div class="line">                    <span class="keyword">float</span> depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, input.uv[i]);</div><div class="line">                    luminance = LinearEyeDepth(depth, _ZBufferParams) * <span class="number">0.1</span>;</div><div class="line">                    edgeX += luminance * Gx[i];</div><div class="line">                    edgeY += luminance * Gy[i];</div><div class="line">                &#125;</div><div class="line">                </div><div class="line">                <span class="keyword">float</span> edge = (<span class="number">1</span> - abs(edgeX) - abs(edgeY));</div><div class="line">                edge = saturate(edge);</div><div class="line"></div><div class="line">                <span class="keyword">return</span> lerp(color * _Strength, color, edge);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            ENDHLSL</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    FallBack <span class="string">"Diffuse"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/urp_outline/6.png" alt="6"><br>　　很棒，但是可以看到，身为一般物件的方砖也被描边了，可我们想要的只是场景描边而已——于是进入了最后的难题：对<strong>特定对象</strong>的后处理。</p>
+<h2 id="Mask"><a href="#Mask" class="headerlink" title="Mask"></a>Mask</h2><p>　　首先我们参考<a href="https://indienova.com/indie-game-development/stencil-buffer-4/" target="_blank" rel="external">原生下的做法</a>，利用模板测试的特性，对特定对象的Shader写入模板值，然后在后处理时根据模板值做判断是否处理，确实是个绝妙的做法——很可惜，在URP下我找不到能够生效的做法。根据上文那篇需要渲染出深度法线结合的屏幕贴图的需要，作者实现了一个新的RenderFeature：根据渲染对象们的某个Pass，渲染成一张新的屏幕贴图（可选择使用特定的材质，若不使用则是Pass的结果）。并可作为全局变量供后续的后处理Shader使用。我将之命名为<a href="https://github.com/MusouCrow/TypeOutline/blob/master/Assets/Source/RenderPasses/RenderToTexture.cs" target="_blank" rel="external">RenderToTexture</a>，这也是后处理常用的一种技术。<br>　　有了这个便有了新的想法：为所有渲染对象的Shader添加新的Pass（名为Mask），该Pass根据参数配置决定渲染成怎样的颜色（需要描边为白色，不需要为黑色）。如此渲染成屏幕贴图后便可作为描边Shader的参考（下称Mask贴图），决定是否需要描边：<br><img src="https://musoucrow.github.io/images/urp_outline/7.png" alt="7"><br>　　注意要为Mask贴图的底色设置为非黑色，否则与底色接壤的物件会描边失败。那么见证成果吧：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div></pre></td><td class="code"><pre><div class="line">Shader <span class="string">"Custom/Outline"</span></div><div class="line">&#123;</div><div class="line">    Properties</div><div class="line">    &#123;</div><div class="line">        [HideInInspector]_MainTex(<span class="string">"Base (RGB)"</span>, <span class="number">2</span>D) = <span class="string">"white"</span> &#123;&#125;</div><div class="line">        _Rate(<span class="string">"Rate"</span>, Float) = <span class="number">0.5</span></div><div class="line">        _Strength(<span class="string">"Strength"</span>, Float) = <span class="number">0.7</span></div><div class="line">    &#125;</div><div class="line">    SubShader</div><div class="line">    &#123;</div><div class="line">        Pass</div><div class="line">        &#123;</div><div class="line">            HLSLPROGRAM</div><div class="line"></div><div class="line">            <span class="meta">#<span class="meta-keyword">pragma</span> vertex vert</span></div><div class="line">			<span class="meta">#<span class="meta-keyword">pragma</span> fragment frag</span></div><div class="line"></div><div class="line">            <span class="meta">#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"</span></div><div class="line"></div><div class="line">            TEXTURE2D(_MainTex);</div><div class="line">            SAMPLER(sampler_MainTex);</div><div class="line"></div><div class="line">            TEXTURE2D(_CameraDepthTexture);</div><div class="line">            SAMPLER(sampler_CameraDepthTexture);</div><div class="line">            float4 _CameraDepthTexture_TexelSize;</div><div class="line"></div><div class="line">            TEXTURE2D(_MaskTexture);</div><div class="line">            SAMPLER(sampler_MaskTexture);</div><div class="line"></div><div class="line">            <span class="keyword">float</span> _Rate;</div><div class="line">            <span class="keyword">float</span> _Strength;</div><div class="line"></div><div class="line">            <span class="keyword">struct</span> Attributes</div><div class="line">            &#123;</div><div class="line">                float4 positionOS : POSITION;</div><div class="line">                float2 uv : TEXCOORD0;</div><div class="line">            &#125;;</div><div class="line"></div><div class="line">            <span class="keyword">struct</span> Varyings</div><div class="line">            &#123;</div><div class="line">                float4 vertex : SV_POSITION;</div><div class="line">                float2 uv[<span class="number">9</span>] : TEXCOORD0;</div><div class="line">            &#125;;</div><div class="line"></div><div class="line">            <span class="function">Varyings <span class="title">vert</span>(<span class="params">Attributes input</span>)</span></div><div class="line">            &#123;</div><div class="line">                Varyings output;</div><div class="line"></div><div class="line">                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);</div><div class="line">                output.vertex = vertexInput.positionCS;</div><div class="line"></div><div class="line">                output.uv[<span class="number">0</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">-1</span>, <span class="number">-1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">1</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">0</span>, <span class="number">-1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">2</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">1</span>, <span class="number">-1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">3</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">-1</span>, <span class="number">0</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">4</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">0</span>, <span class="number">0</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">5</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">1</span>, <span class="number">0</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">6</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">-1</span>, <span class="number">1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">7</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">0</span>, <span class="number">1</span>) * _Rate;</div><div class="line">                output.uv[<span class="number">8</span>] = input.uv + _CameraDepthTexture_TexelSize.xy * half2(<span class="number">1</span>, <span class="number">1</span>) * _Rate;</div><div class="line"></div><div class="line">                <span class="keyword">return</span> output;</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="function">float4 <span class="title">frag</span>(<span class="params">Varyings input</span>) : SV_Target</span></div><div class="line">            &#123;</div><div class="line">                <span class="keyword">const</span> half Gx[<span class="number">9</span>] = &#123;</div><div class="line">                    <span class="number">-1</span>,  <span class="number">0</span>,  <span class="number">1</span>,</div><div class="line">                    <span class="number">-2</span>,  <span class="number">0</span>,  <span class="number">2</span>,</div><div class="line">                    <span class="number">-1</span>,  <span class="number">0</span>,  <span class="number">1</span></div><div class="line">                &#125;;</div><div class="line"></div><div class="line">                <span class="keyword">const</span> half Gy[<span class="number">9</span>] = &#123;</div><div class="line">                    <span class="number">-1</span>, <span class="number">-2</span>, <span class="number">-1</span>,</div><div class="line">                    <span class="number">0</span>,  <span class="number">0</span>,  <span class="number">0</span>,</div><div class="line">                    <span class="number">1</span>,  <span class="number">2</span>,  <span class="number">1</span></div><div class="line">                &#125;;</div><div class="line">                </div><div class="line">                <span class="keyword">float</span> edgeY = <span class="number">0</span>;</div><div class="line">                <span class="keyword">float</span> edgeX = <span class="number">0</span>;    </div><div class="line">                <span class="keyword">float</span> luminance = <span class="number">0</span>;</div><div class="line"></div><div class="line">                float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv[<span class="number">4</span>]);</div><div class="line">                <span class="keyword">float</span> mask = <span class="number">1</span>;</div><div class="line">                </div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</div><div class="line">                    mask *= SAMPLE_DEPTH_TEXTURE(_MaskTexture, sampler_MaskTexture, input.uv[i]);</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="keyword">if</span> (mask == <span class="number">0</span>) &#123;</div><div class="line">                    <span class="keyword">return</span> color;</div><div class="line">                &#125;</div><div class="line"></div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; i++) &#123;</div><div class="line">                    <span class="keyword">float</span> depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, sampler_CameraDepthTexture, input.uv[i]);</div><div class="line">                    luminance = LinearEyeDepth(depth, _ZBufferParams) * <span class="number">0.1</span>;</div><div class="line">                    edgeX += luminance * Gx[i];</div><div class="line">                    edgeY += luminance * Gy[i];</div><div class="line">                &#125;</div><div class="line">                </div><div class="line">                <span class="keyword">float</span> edge = (<span class="number">1</span> - abs(edgeX) - abs(edgeY));</div><div class="line">                edge = saturate(edge);</div><div class="line"></div><div class="line">                <span class="keyword">return</span> lerp(color * _Strength, color, edge);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            ENDHLSL</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    FallBack <span class="string">"Diffuse"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/urp_outline/8.png" alt="8"><br>　　很棒，这下一般物件不会被描边了，局部后处理描边完成！当然随后遇到一个新的问题：<br><img src="https://musoucrow.github.io/images/urp_outline/9.png" alt="9"><br>　　这是因为透明（Transparent）模式下的对象按照通用做法是不会写入深度信息的（为了透明时能看到模型内部），然而我们描边需要的正是深度信息，由于树叶没有写入深度信息，所以在描边时当它不存在了，于是产生了这样的结果。解决方法也好办，在透明模式也写入深度信息（ZWrite）即可，毕竟我们的透明模型不需要看到内部，一举两得。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　其实期间还产生了投机心理，想着把角色自带的描边给废了，统一后处理，岂不美哉？很可惜搞出来的效果始终是不满意，法线外扩 is Good，没办法喽——<br>　　顺带一提，对于后处理的贴图创建记得将<code>msaaSamples</code>属性设为1，否则就会进行抗锯齿处理，那可真的炸裂……</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Graphics/" rel="tag"># Graphics</a>
+          
+            <a href="/tags/Post-process/" rel="tag"># Post-process</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/07/lbbn_tile/" rel="next" title="3D瓦片地图采坑录">
+                <i class="fa fa-chevron-left"></i> 3D瓦片地图采坑录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/02/lbbn_baked/" rel="prev" title="在Demo实装光照烘焙与探针">
+                在Demo实装光照烘焙与探针 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2020/07/05/urp_outline/"
+     data-title="在URP实现局部后处理描边"
+     data-content=""
+     data-url="https://musoucrow.github.io/2020/07/05/urp_outline/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2020/07/05/urp_outline/"
+           data-title="在URP实现局部后处理描边" data-url="https://musoucrow.github.io/2020/07/05/urp_outline/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RenderFeature"><span class="nav-number">2.</span> <span class="nav-text">RenderFeature</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Outline"><span class="nav-number">3.</span> <span class="nav-text">Outline</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mask"><span class="nav-number">4.</span> <span class="nav-text">Mask</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">5.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

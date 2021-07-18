@@ -1,0 +1,1083 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Unity,Analysis,DNF," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。      
+前言　　《DNFMobile》的新一波内测到来了，恰好得到了安装包。便欲对比其资源较之端游有何不同，遂试图提取之。在尝试的途中遇到了不少问题，特此记录之。源码地址
+读取资源包　　与众多手游的习惯一样，初始的安装包所携带的资源甚少，皆需经过更新方才完整。更新后经过观察得知游戏采用Unity制作，那么事情便简单了，直接上UnityStudio读取。虽然资">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《DNFMobile》图片资源提取笔记">
+<meta property="og:url" content="https://musoucrow.github.io/2018/01/20/dnf_mobile_ex/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　《DNFMobile》的新一波内测到来了，恰好得到了安装包。便欲对比其资源较之端游有何不同，遂试图提取之。在尝试的途中遇到了不少问题，特此记录之。源码地址
+读取资源包　　与众多手游的习惯一样，初始的安装包所携带的资源甚少，皆需经过更新方才完整。更新后经过观察得知游戏采用Unity制作，那么事情便简单了，直接上UnityStudio读取。虽然资">
+<meta property="og:image" content="https://musoucrow.github.io/images/dnf_mobile_ex/bwanga.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.492Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《DNFMobile》图片资源提取笔记">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
+前言　　《DNFMobile》的新一波内测到来了，恰好得到了安装包。便欲对比其资源较之端游有何不同，遂试图提取之。在尝试的途中遇到了不少问题，特此记录之。源码地址
+读取资源包　　与众多手游的习惯一样，初始的安装包所携带的资源甚少，皆需经过更新方才完整。更新后经过观察得知游戏采用Unity制作，那么事情便简单了，直接上UnityStudio读取。虽然资">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/dnf_mobile_ex/bwanga.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2018/01/20/dnf_mobile_ex/"/>
+
+
+
+
+
+  <title> 《DNFMobile》图片资源提取笔记 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/01/20/dnf_mobile_ex/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                《DNFMobile》图片资源提取笔记
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-01-20T03:47:38+08:00">
+                2018-01-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Analysis/" itemprop="url" rel="index">
+                    <span itemprop="name">Analysis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/20/dnf_mobile_ex/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/01/20/dnf_mobile_ex/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/01/20/dnf_mobile_ex/" class="leancloud_visitors" data-flag-title="《DNFMobile》图片资源提取笔记">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　《DNFMobile》的新一波内测到来了，恰好得到了安装包。便欲对比其资源较之端游有何不同，遂试图提取之。在尝试的途中遇到了不少问题，特此记录之。<a href="https://git.coding.net/musoucrow/DNFMobileEX.git" target="_blank" rel="external">源码地址</a></p>
+<h2 id="读取资源包"><a href="#读取资源包" class="headerlink" title="读取资源包"></a>读取资源包</h2><p>　　与众多手游的习惯一样，初始的安装包所携带的资源甚少，皆需经过更新方才完整。更新后经过观察得知游戏采用<a href="https://unity3d.com" target="_blank" rel="external">Unity</a>制作，那么事情便简单了，直接上<a href="https://github.com/Perfare/UnityStudio" target="_blank" rel="external">UnityStudio</a>读取。虽然资源文件的后缀名为.npk，但实际上则是Unity的AssetBundle，且并未作加密。然而诸多现成的Unity提取工具皆有多少缺陷（无法识别pvr格式、无法批量化操作、导出资源过于原始等），且图片资源是大图形式存在的，需要进行切图，而使用切图工具一则怕不够精确，二则怕无法批量化。于是我选择直接使用Unity制作工具以面对此需求。<br>　　由于资源文件本身即是Unity的格式，那么直接调用API加载即可，类似如此：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> assetBundle = AssetBundle.LoadFromFile(path);</div><div class="line"><span class="keyword">var</span> assetBundle.LoadAllAssets&lt;Texture2D&gt;();</div><div class="line"></div><div class="line"><span class="keyword">foreach</span> (<span class="keyword">var</span> tex <span class="keyword">in</span> texs) &#123;</div><div class="line">	<span class="comment">//...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="切图"><a href="#切图" class="headerlink" title="切图"></a>切图</h2><p>　　这样可谓相当方便，接下来的问题便是切图了。我本以为大图是由Unity自动生成，所以理应资源内会有对应的Sprite资源，这样通过Sprite资源的信息即可进行切割。但实际上并非如此：大图是事先生成好，然后使用脚本填写每帧配置在运行时自动生成Sprite。这种做法也是理所当然的，毕竟Unity的Sprite的pivot与DNF的IMG包提供的偏移点可谓天南地北。（一者为当前图片下的浮点百分比，另一者为实际坐标）通过直接在配置直接对接IMG包的数据然后进行转化这是很正常的做法。可这下子就麻烦了，我们并无法直接知道这脚本的具体信息。幸好UnityStudio的解析中包括了关于MonoBehavior资源配置的信息。<br><img src="https://musoucrow.github.io/images/dnf_mobile_ex/bwanga.png" alt="bwanga"><br>　　可即使知道也无法直接Unity进行获取，毕竟我们本身是没有该脚本的。鉴于UnityStudio开源的特性，我起初打算阅读源码掌握其解析之法。最后也成功了，可我突然脑内灵光一闪，想到了直接建立一个同名脚本，并根据配置的信息进行模拟。代码如下：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">using</span> System;</div><div class="line"><span class="keyword">using</span> System.Collections;</div><div class="line"><span class="keyword">using</span> System.Collections.Generic;</div><div class="line"><span class="keyword">using</span> UnityEngine;</div><div class="line"></div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DNFAtlasAsset</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">    [Serializable]</div><div class="line">    <span class="keyword">public</span> <span class="keyword">struct</span> Rectf &#123;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">float</span> x;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">float</span> y;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">float</span> width;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">float</span> height;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    [Serializable]</div><div class="line">    <span class="keyword">public</span> <span class="keyword">struct</span> DNFAtlasElement &#123;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">string</span> name;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> originIndex;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> referenceIndex;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> originWidth;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> originHeight;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> offsetX;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> offsetY;</div><div class="line">        <span class="keyword">public</span> Rectf rect;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    [Serializable]</div><div class="line">    <span class="keyword">public</span> <span class="keyword">struct</span> DNFAtlasSlot &#123;</div><div class="line">        <span class="keyword">public</span> <span class="keyword">int</span> matType;</div><div class="line">        <span class="keyword">public</span> DNFAtlasElement[] elementList;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">string</span> atalsName;</div><div class="line">    <span class="keyword">public</span> DNFAtlasSlot[] atlasSlotList;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　天可怜见，居然成功了！那么接下来采用类似如下方法即可：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> width = (<span class="keyword">int</span>)element.rect.width;</div><div class="line"><span class="keyword">int</span> height = (<span class="keyword">int</span>)element.rect.height;</div><div class="line"></div><div class="line"><span class="keyword">if</span> (width == <span class="number">0</span> || height == <span class="number">0</span>) &#123;</div><div class="line">	<span class="keyword">continue</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> colors = tex.GetPixels((<span class="keyword">int</span>)element.rect.x, (<span class="keyword">int</span>)element.rect.y, width, height);</div><div class="line"><span class="keyword">var</span> newTex = <span class="keyword">new</span> Texture2D(width, height, tex.format, tex.mipmapCount &gt; <span class="number">1</span>);</div><div class="line">newTex.SetPixels(colors);</div><div class="line">newTex.Apply();</div><div class="line"></div><div class="line"><span class="keyword">var</span> path = <span class="keyword">this</span>.GetPath() + tex.name + <span class="string">"/"</span>;</div><div class="line"><span class="keyword">var</span> bytes = newTex.EncodeToPNG();</div><div class="line"><span class="keyword">var</span> json = JsonUtility.ToJson(element);</div><div class="line"><span class="keyword">var</span> name = <span class="keyword">this</span>.ToNumber(element.name);</div><div class="line"></div><div class="line"><span class="keyword">this</span>.CreateDirectory(path);</div><div class="line">File.WriteAllText(path + name + <span class="string">".json"</span>, json);</div><div class="line">File.WriteAllBytes(path + name + <span class="string">".png"</span>, bytes);</div><div class="line">Texture2D.DestroyImmediate(newTex, <span class="literal">true</span>);</div></pre></td></tr></table></figure>
+<p>　　主要思路便是通过GetPixels方法读取区域像素并覆盖至新图。最后将图片转换为PNG、配置转换为JSON并输出即可。<br>　　当然这里还有关于Texture2D的readable问题，隶属于资源包的Texture2D并无法直接使用GetPixels方法，需要对其进行复制，然后利用新图施为，为此我写了个函数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> Texture2D <span class="title">GetTexture</span>(<span class="params">Texture2D tex</span>)</span>&#123;</div><div class="line">	<span class="keyword">if</span> (!<span class="keyword">this</span>.texureMap.ContainsKey(tex)) &#123;</div><div class="line">		<span class="keyword">if</span> (tex.width == <span class="number">0</span> || tex.height == <span class="number">0</span>) &#123;</div><div class="line">			<span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">var</span> copyTex = <span class="keyword">new</span> Texture2D(tex.width, tex.height, tex.format, tex.mipmapCount &gt; <span class="number">1</span>);</div><div class="line">		copyTex.LoadRawTextureData(tex.GetRawTextureData());</div><div class="line">		copyTex.Apply();</div><div class="line">		<span class="keyword">var</span> writeTex = <span class="keyword">new</span> Texture2D(copyTex.width, copyTex.height);</div><div class="line">		writeTex.SetPixels32(copyTex.GetPixels32());</div><div class="line">		writeTex.Apply();</div><div class="line">		writeTex.name = <span class="keyword">this</span>.ToName(tex.name);</div><div class="line"></div><div class="line">		<span class="keyword">this</span>.texureMap[tex] = writeTex;</div><div class="line">		Texture2D.DestroyImmediate(copyTex, <span class="literal">true</span>);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">return</span> <span class="keyword">this</span>.texureMap[tex];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　以上便是关于切图方面的问题，具体可参阅源码。</p>
+<h2 id="内存问题"><a href="#内存问题" class="headerlink" title="内存问题"></a>内存问题</h2><p>　　游戏目前的资源包数量高达2900以上，在尝试一口气全部提取时内存竟然高达5G！最终电脑不堪重负倒下收场。这很显然是资源并未回收所致，是以作此函数：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Destroy</span>(<span class="params"></span>) </span>&#123;</div><div class="line">	<span class="keyword">foreach</span> (<span class="keyword">var</span> texture <span class="keyword">in</span> <span class="keyword">this</span>.texureMap) &#123;</div><div class="line">		Texture2D.DestroyImmediate(texture.Key, <span class="literal">true</span>);</div><div class="line">		Texture2D.DestroyImmediate(texture.Value, <span class="literal">true</span>);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">this</span>.texureMap.Clear();</div><div class="line">	<span class="keyword">this</span>.assetBundle.Unload(<span class="literal">true</span>);</div><div class="line">	AssetBundle.DestroyImmediate(<span class="keyword">this</span>.assetBundle, <span class="literal">true</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　这里采用的是DestroyImmediate方法，好处是立即进行回收，但却会因此阻塞，影响提取效率。若使用Destroy方法则不会如此，不过峰值内存会上升。但大规模读取时还是以稳定为主，而小份读取则两者并无所谓。是以选择DestroyImmediate方法。<br>　　另外在其他地方涉及到资源生成且是继承自UnityEngine.Object的，皆需注意此问题。在经过优化后，占用由5G跌倒了500M-1.5G之间，成功提取了全部图片资源。大功告成！</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　这次《DNFMobile》的声音资源经过了高压，原本几M的音乐变成了上百K，可谓惨不忍听，遂无提取的价值。而纸娃娃方面则是采用了类似NPK_Ver4的色板做法，也并无法直接提取到成品。由此可见制作组为了节省空间可是下了不少功夫呀。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+            <a href="/tags/Analysis/" rel="tag"># Analysis</a>
+          
+            <a href="/tags/DNF/" rel="tag"># DNF</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/31/summary_2017/" rel="next" title="2017年度总结">
+                <i class="fa fa-chevron-left"></i> 2017年度总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/18/weak_event_csharp/" rel="prev" title="C#之弱事件（Weak Event）的实现">
+                C#之弱事件（Weak Event）的实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2018/01/20/dnf_mobile_ex/"
+     data-title="《DNFMobile》图片资源提取笔记"
+     data-content=""
+     data-url="https://musoucrow.github.io/2018/01/20/dnf_mobile_ex/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/01/20/dnf_mobile_ex/"
+           data-title="《DNFMobile》图片资源提取笔记" data-url="https://musoucrow.github.io/2018/01/20/dnf_mobile_ex/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取资源包"><span class="nav-number">2.</span> <span class="nav-text">读取资源包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#切图"><span class="nav-number">3.</span> <span class="nav-text">切图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#内存问题"><span class="nav-number">4.</span> <span class="nav-text">内存问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">5.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>

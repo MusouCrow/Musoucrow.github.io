@@ -1,0 +1,1184 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Git,Hexo,Blog," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Musoucrow' BLOG" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="欢迎参与讨论，转载请注明出处。
+前言　　在整这个博客时遇到了不少坑，正适合作为此博客的第一篇正文。另外本文会随博客的调整而更新，可保持关注。　　本次的博客搭建平台为Mac OS X 11.6，但总体来说用到系统本身特性的地方很少，所以其他系统的使用者亦可参考。　　本文涉及到一些软件的相关知识，如果你不了解它们，请先去了解一番。　　如果你已是GitHub用户并且创建了GitHub Pages仓库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Mac平台使用GitHub和Hexo搭建博客">
+<meta property="og:url" content="https://musoucrow.github.io/2017/02/26/build_bolg/index.html">
+<meta property="og:site_name" content="Musoucrow' BLOG">
+<meta property="og:description" content="欢迎参与讨论，转载请注明出处。
+前言　　在整这个博客时遇到了不少坑，正适合作为此博客的第一篇正文。另外本文会随博客的调整而更新，可保持关注。　　本次的博客搭建平台为Mac OS X 11.6，但总体来说用到系统本身特性的地方很少，所以其他系统的使用者亦可参考。　　本文涉及到一些软件的相关知识，如果你不了解它们，请先去了解一番。　　如果你已是GitHub用户并且创建了GitHub Pages仓库">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/register.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/welcome.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/newrep.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/brew.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/path.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/download.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/themes.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/change_theme.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/muse.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/language.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/avatar.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/scheme.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/menu.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/social1.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/social2.png">
+<meta property="og:image" content="https://musoucrow.github.io/images/build_bolg/format.png">
+<meta property="og:updated_time" content="2021-07-17T12:41:21.491Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Mac平台使用GitHub和Hexo搭建博客">
+<meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。
+前言　　在整这个博客时遇到了不少坑，正适合作为此博客的第一篇正文。另外本文会随博客的调整而更新，可保持关注。　　本次的博客搭建平台为Mac OS X 11.6，但总体来说用到系统本身特性的地方很少，所以其他系统的使用者亦可参考。　　本文涉及到一些软件的相关知识，如果你不了解它们，请先去了解一番。　　如果你已是GitHub用户并且创建了GitHub Pages仓库">
+<meta name="twitter:image" content="https://musoucrow.github.io/images/build_bolg/register.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://musoucrow.github.io/2017/02/26/build_bolg/"/>
+
+
+
+
+
+  <title> 在Mac平台使用GitHub和Hexo搭建博客 | Musoucrow' BLOG </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Musoucrow' BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description"></h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/02/26/build_bolg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                在Mac平台使用GitHub和Hexo搭建博客
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-26T06:01:28+08:00">
+                2017-02-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/02/26/build_bolg/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/26/build_bolg/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/02/26/build_bolg/" class="leancloud_visitors" data-flag-title="在Mac平台使用GitHub和Hexo搭建博客">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　在整这个博客时遇到了不少坑，正适合作为此博客的第一篇正文。另外本文会随博客的调整而更新，可保持关注。<br>　　本次的博客搭建平台为<strong>Mac OS X 11.6</strong>，但总体来说用到系统本身特性的地方很少，所以其他系统的使用者亦可参考。<br>　　本文涉及到一些软件的相关知识，如果你不了解它们，请先去了解一番。<br>　　如果你已是<a href="https://github.com/" target="_blank" rel="external">GitHub</a>用户并且创建了<a href="https://pages.github.com/" target="_blank" rel="external">GitHub Pages</a>仓库，你可以跳过<em>部署GitHub</em>。<br>　　如果你已安装<a href="https://git-scm.com/" target="_blank" rel="external">Git</a>、<a href="https://www.npmjs.com/" target="_blank" rel="external">NPM</a>和<a href="https://nodejs.org/" target="_blank" rel="external">Node.js</a>，或<strong>非Mac OS平台</strong>，你可以跳过<em>安装前置软件</em>，但非Mac OS平台的用户请自行解决前置软件的问题。</p>
+<h2 id="部署GitHub"><a href="#部署GitHub" class="headerlink" title="部署GitHub"></a>部署GitHub</h2><h3 id="前言-1"><a href="#前言-1" class="headerlink" title="前言"></a>前言</h3><p>　　本次博客的发布网站是隶属于GitHub的GitHub Pages仓库，通过把网站文件存放到这种仓库里，你便可以利用GitHub提供给你的外链访问它。<br>　　声明：以下部分内容转载自铁锚的<a href="http://blog.csdn.net/renfufei/article/details/37725057/" target="_blank" rel="external">创建GitHub技术博客全攻略</a>。</p>
+<h3 id="注册账号"><a href="#注册账号" class="headerlink" title="注册账号"></a>注册账号</h3><p>　　前往<a href="https://github.com/" target="_blank" rel="external">GitHub</a>官网，参考下图输入账号、邮箱、密码，然后点击注册按钮。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/register.png" alt="register"></p>
+<h3 id="初始设置"><a href="#初始设置" class="headerlink" title="初始设置"></a>初始设置</h3><p>　　注册完成后，选择Free免费账号完成设置。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/welcome.png" alt="welcome.png"></p>
+<h3 id="验证邮箱"><a href="#验证邮箱" class="headerlink" title="验证邮箱"></a>验证邮箱</h3><p>　　请打开你的邮箱，查看发送给你的确认邮件。你需要验证邮箱后，后面生成的个人主页才会被接受和发布。</p>
+<h3 id="创建页面仓库"><a href="#创建页面仓库" class="headerlink" title="创建页面仓库"></a>创建页面仓库</h3><p>　　前往<a href="https://github.com/new" target="_blank" rel="external">创建仓库</a>，参考下图。<br>　　仓库的名字需要和你的账号对应， 如 <em>tiemaocsdn.github.io</em>。<br>　　输入基本信息，然后点击创建仓库。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/newrep.png" alt="newrep"></p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>　　当你创建完页面仓库后，此时你的个人页面<em><a href="https://username.github.io/" target="_blank" rel="external">https://username.github.io/</a></em>已经创建完成（username即你的GitHub用户名，下同），虽然还是空无一物，不过你已可以进行下一步了。  </p>
+<h2 id="安装前置软件"><a href="#安装前置软件" class="headerlink" title="安装前置软件"></a>安装前置软件</h2><h3 id="前言-2"><a href="#前言-2" class="headerlink" title="前言"></a>前言</h3><p>　　在进行安装核心软件之前，你需要先准备好其所依赖的软件。包括<a href="https://git-scm.com/" target="_blank" rel="external">Git</a>、<a href="https://www.npmjs.com/" target="_blank" rel="external">NPM</a>和<a href="https://nodejs.org/" target="_blank" rel="external">Node.js</a>。  </p>
+<h3 id="安装Homebrew"><a href="#安装Homebrew" class="headerlink" title="安装Homebrew"></a>安装Homebrew</h3><p>　　在Mac OS下，你可以选择通过<a href="https://brew.sh/" target="_blank" rel="external">Homebrew</a>来进行许多服务类软件的安装（这样会方便很多），在其他系统下也有类似的替代方案。<br>　　打开终端, 输入以下脚本。  </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/bin/ruby <span class="_">-e</span> <span class="string">"<span class="variable">$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)</span>"</span></div></pre></td></tr></table></figure>
+<p>　　等待安装完成后，在终端输入<strong>brew</strong>进行调试，如无报错则可继续。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/brew.png" alt="brew"></p>
+<h3 id="通过Homebrew安装其余软件"><a href="#通过Homebrew安装其余软件" class="headerlink" title="通过Homebrew安装其余软件"></a>通过Homebrew安装其余软件</h3><p>　　如果你不用Homebrew，那么请通过其他方式进行下载并安装（例如官网）。以下演示使用Homebrew安装他们，一样是通过终端输入，需要按照顺序。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">brew install git</div><div class="line">brew install node</div><div class="line">brew install npm</div></pre></td></tr></table></figure>
+<p>　　与Homebrew一样，安装完成后，你可以尝试依次在终端输入<strong>git</strong>、<strong>node</strong>、<strong>npm</strong>进行调试，如无报错则可继续。  </p>
+<h3 id="后记-1"><a href="#后记-1" class="headerlink" title="后记"></a>后记</h3><p>　　如果你觉得Homebrew的速度很慢，那么你可以考虑选择<strong>更换镜像</strong>。请通过搜索引擎寻找相关资料。  </p>
+<h2 id="安装Hexo及主题"><a href="#安装Hexo及主题" class="headerlink" title="安装Hexo及主题"></a>安装Hexo及主题</h2><h3 id="前言-3"><a href="#前言-3" class="headerlink" title="前言"></a>前言</h3><p>　　本次博客的框架源自<a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>，我们通过使用它来搭建出博客。Hexo基于Node.js，所以我们可以使用NPM来安装它，这在其他系统下也是一样的。  </p>
+<h3 id="使用NPM安装"><a href="#使用NPM安装" class="headerlink" title="使用NPM安装"></a>使用NPM安装</h3><p>　　与之前一样，在终端输入以下内容（选择其中之一），你的网络如果不是很好的话，可以选择方案二（通过淘宝镜像进行下载）。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm install -g hexo-cli</div><div class="line">npm install -g hexo-cli --registry=https://registry.npm.taobao.org</div></pre></td></tr></table></figure>
+<h3 id="新建博客工程"><a href="#新建博客工程" class="headerlink" title="新建博客工程"></a>新建博客工程</h3><p>　　接下来你需要在终端切换到你觉得合适的目录下通过Hexo新建你的博客工程（也可以不管，只要你知道当前终端目录的所在）。例如（目录可通过拖动文件夹到终端指定）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /Users/Username/Documents/Bolg</div><div class="line">hexo init</div></pre></td></tr></table></figure>
+<p>　　经过一段时间后便会在Bolg文件夹下新建一堆文件，如下图这般，如无报错则可继续。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/path.png" alt="path"></p>
+<h3 id="关于博客主题"><a href="#关于博客主题" class="headerlink" title="关于博客主题"></a>关于博客主题</h3><p>　　在你新建博客工程后仍需要选择一个<em>主题(theme)</em>应用到博客里，主题文件位于博客工程下的<strong>themes</strong>目录，默认便存在一款名为<em>landscape</em>的主题。你可以选择从Hexo官网的<a href="https://hexo.io/themes/" target="_blank" rel="external">主题专栏</a>下载其他主题。<br>　　以下便以本博客所使用的<a href="https://github.com/iissnan/hexo-theme-next/" target="_blank" rel="external">NexT</a>为范例进行演示。接下来的内容将会参考<a href="http://theme-next.iissnan.com/getting-started.html" target="_blank" rel="external">这里</a>。</p>
+<h3 id="安装NexT主题"><a href="#安装NexT主题" class="headerlink" title="安装NexT主题"></a>安装NexT主题</h3><p>　　前往<a href="https://github.com/iissnan/hexo-theme-next/releases" target="_blank" rel="external">发布页面</a>选择你想要的版本（下图0.4.0版仅为示范），下载解压后获得Next主题，然后将其以文件夹的形式放到themes目录下。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/download.png" alt="download">  </p>
+<p>　　贴士：你可以考虑像我这样把解压后的文件夹名称更改为next，这样会更清晰。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/themes.png" alt="themes"></p>
+<h3 id="后记-2"><a href="#后记-2" class="headerlink" title="后记"></a>后记</h3><p>　　关于主题的选择其实远不止官网所刊，关于这些方面的你可以多去寻觅甚至自己动手丰衣足食！</p>
+<h2 id="部署博客"><a href="#部署博客" class="headerlink" title="部署博客"></a>部署博客</h2><h3 id="前言-4"><a href="#前言-4" class="headerlink" title="前言"></a>前言</h3><p>　　接下来我们要确立一个概念：在 Hexo 中有两份主要的配置文件，其名称都是 <em>_config.yml</em>。 其中，一份位于<strong>博客工程目录（根目录）</strong>下，主要包含 Hexo 本身的配置；另一份位于<strong>主题目录</strong>下，这份配置由主题作者提供，主要用于配置主题相关的选项。<br>　　为了描述方便，在以下说明中，将前者称为<strong>站点配置文件</strong>， 后者称为<strong>主题配置文件</strong>。  </p>
+<h3 id="启用主题并调试"><a href="#启用主题并调试" class="headerlink" title="启用主题并调试"></a>启用主题并调试</h3><p>　　打开<strong>站点配置文件</strong>，找到<em>theme</em>字段，并将其值更改为<em>next</em>（主题文件夹名称）。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/change_theme.png" alt="change_theme"><br>　　到此，NexT 主题安装完成。下一步我们将验证主题是否正确启用。<br>　　首先打开终端并切换目录到博客工程，输入<code>hexo server --debug</code>进行网站调试。当命令行输出中提示出：<br>　　<code>INFO  Hexo is running at http://0.0.0.0:4000/. Press Ctrl+C to stop.</code><br>　　此时即可使用浏览器访问<code>http://localhost:4000</code>，检查站点是否正确运行。<br>　　当你看到站点的外观与下图所示类似时即说明你已成功安装 NexT 主题。这是 NexT 默认的 Scheme —— Muse。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/muse.png" alt="muse"><br>　　现在，你已经成功安装并启用了 NexT 主题。你现在可以在终端按下Ctrl+C结束调试，下一步我们将要更改一些主题的设定，包括个性化以及集成第三方服务。</p>
+<h3 id="个性化设置"><a href="#个性化设置" class="headerlink" title="个性化设置"></a>个性化设置</h3><p>　　打开<strong>站点配置文件</strong>，你可以修改以下字段来实现：  </p>
+<ul>
+<li><p>language  </p>
+<ul>
+<li>设置成你所需要的语言，例如：<em>language: zh-Hans</em></li>
+<li>目前 NexT 支持的语言如以下表格所示：<img src="https://musoucrow.github.io/images/build_bolg/language.png" alt="language"></li>
+</ul>
+</li>
+<li><p>avatar</p>
+<ul>
+<li>设置成头像的链接地址，例如：<em>avatar: <a href="http://example.com/avatar.png" target="_blank" rel="external">http://example.com/avatar.png</a></em></li>
+<li>其中，头像的链接地址可以是：<img src="https://musoucrow.github.io/images/build_bolg/avatar.png" alt="avatar"></li>
+</ul>
+</li>
+<li><p>author</p>
+<ul>
+<li><p>设置author为你的昵称，例如：<em>Musoucrow</em></p>
+<p>打开<strong>主题配置文件</strong>，你可以修改以下字段来实现：</p>
+</li>
+</ul>
+</li>
+<li><p>scheme</p>
+<ul>
+<li>Scheme是NexT提供的一种特性，借助于Scheme，NexT为你提供多种不同的外观。同时，几乎所有的配置都可以 在Scheme之间共用。目前NexT支持三种Scheme，他们是：<ul>
+<li>Muse - 默认 Scheme，这是 NexT 最初的版本，黑白主调，大量留白</li>
+<li>Mist - Muse 的紧凑版本，整洁有序的单栏外观</li>
+<li>Pisces - 双栏 Scheme，小家碧玉似的清新</li>
+</ul>
+</li>
+<li>搜索scheme关键字。 你会看到有三行scheme的配置，将你需用启用的scheme前面注释<em>#</em>即可。<img src="https://musoucrow.github.io/images/build_bolg/scheme.png" alt="scheme"></li>
+</ul>
+</li>
+<li><p>menu</p>
+<ul>
+<li>设定菜单内容，可通过解除几个自带项的注释<em>#</em>来开启栏目。</li>
+<li>也可以自己进行新增，格式为<em>item name: link</em>。<ul>
+<li>item name是一个名称，这个名称并不直接显示在页面上，它将用于匹配图标以及翻译。</li>
+</ul>
+</li>
+<li>NexT 默认的菜单项有（标注！的项表示需要手动创建这个页面）：<img src="https://musoucrow.github.io/images/build_bolg/menu.png" alt="menu"> </li>
+</ul>
+</li>
+<li><p>social</p>
+<ul>
+<li>social可让博客的侧栏里的角色介绍栏目下增加链接项（可添加多个），你可以这样设置：<img src="https://musoucrow.github.io/images/build_bolg/social1.png" alt="social1"> </li>
+<li>博客的具体效果为：<img src="https://musoucrow.github.io/images/build_bolg/social2.png" alt="social2"> </li>
+</ul>
+</li>
+</ul>
+<h3 id="新建标签和分类栏目"><a href="#新建标签和分类栏目" class="headerlink" title="新建标签和分类栏目"></a>新建标签和分类栏目</h3><p>　　回到终端，仍然是博客工程目录下，依次输入以下两句：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo new page tags</div><div class="line">hexo new page categories</div></pre></td></tr></table></figure>
+<p>　　这样便创建好了标签和分类栏目的页面文件，但仍需要做一些处理。<br>　　打开<em>source/categories/index.md</em>和<em>source/tags/index.md</em>，分别修改成： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: categories</div><div class="line">date: 2017-02-25 21:43:34</div><div class="line">comments: false</div><div class="line">type: &quot;categories&quot;</div><div class="line">---</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: tags</div><div class="line">date: 2017-02-25 22:40:53</div><div class="line">comments: false</div><div class="line">type: &quot;tags&quot;</div><div class="line">---</div></pre></td></tr></table></figure>
+<p>　　你现在可以再次调试一下看看效果，不出意外的话，已经实现了标签和分类栏目。记得要先结束之前的网站调试（在调试终端下按<strong>Ctrl+C</strong>），再重新进行。</p>
+<h3 id="后记-3"><a href="#后记-3" class="headerlink" title="后记"></a>后记</h3><p>　　静态站点拥有一定的局限性，因此我们需要借助于第三方服务来扩展站点的功能。 以下是 NexT 目前支持的第三方服务，你可以根据你的需求集成一些功能进来。<a href="http://theme-next.iissnan.com/getting-started.html" target="_blank" rel="external">详情查看</a></p>
+<h2 id="发表帖子"><a href="#发表帖子" class="headerlink" title="发表帖子"></a>发表帖子</h2><h3 id="前言-5"><a href="#前言-5" class="headerlink" title="前言"></a>前言</h3><p>　　博客的帖子是Markdown格式（后缀名为.md），如果你尚未熟悉，请去进行专门的学习。
+　</p>
+<h3 id="新建帖子"><a href="#新建帖子" class="headerlink" title="新建帖子"></a>新建帖子</h3><p>　　在终端、博客工程目录下输入：<code>hexo new post test1</code>以创建一个标题名为test1的帖子。你可以在<em>source/_posts/</em>目录下看到它。<br>　　在文件顶部有着与<em>source/categories/index.md</em>和<em>source/tags/index.md</em>相同格式的配置，该类配置可拥有如下属性（comments属性必须保证已经安装了第三方服务后才能生效）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">title: 文章的标题</div><div class="line">date: 创建日期，例如(2017-02-26 00:54:28)</div><div class="line">updated: 修改日期</div><div class="line">comments: 是否开启评论(true or false)</div><div class="line">type: 标签，多个时表示为([a, b, c])</div><div class="line">categories: 分类</div></pre></td></tr></table></figure>
+<h3 id="修改创建格式"><a href="#修改创建格式" class="headerlink" title="修改创建格式"></a>修改创建格式</h3><p>　　使用命令创建的帖子文件的格式，系源自于<em>scaffolds/post.md</em>，你可以通过修改它来达到帖子模板化的效果，例如：<br>　　<img src="https://musoucrow.github.io/images/build_bolg/format.png" alt="format"> </p>
+<h3 id="后记-4"><a href="#后记-4" class="headerlink" title="后记"></a>后记</h3><p>　　帖子文件的本质就是从模板产生的克隆品，所以也可以自己手动新建文件。同理删除帖子也只需要直接删除文件即可，无需通过网站管理之类的手段，非常方便。</p>
+<h2 id="发布网站"><a href="#发布网站" class="headerlink" title="发布网站"></a>发布网站</h2><h3 id="前言-6"><a href="#前言-6" class="headerlink" title="前言"></a>前言</h3><p>　　发布网站的原理其实就是生成网站文件夹并传输到GitHub上对应的仓库<em><a href="https://github.com/username/username.github.io" target="_blank" rel="external">https://github.com/username/username.github.io</a></em>，然后便可通过<em><a href="https://username.github.io" target="_blank" rel="external">https://username.github.io</a></em>进行访问。</p>
+<h3 id="上传部署"><a href="#上传部署" class="headerlink" title="上传部署"></a>上传部署</h3><p>　　在终端输入<code>npm install hexo-deployer-git --save</code>，安装完毕后打开<strong>站点配置文件</strong>，添加<em>deploy</em>字段。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">deploy:</div><div class="line">  type: git</div><div class="line">  repository: http://github.com/username/username.github.io.git</div><div class="line">  branch: master</div></pre></td></tr></table></figure>
+<ul>
+<li>注意事项<ul>
+<li>是http而非https。</li>
+<li>在旧版(&lt;3.0)的Hexo里是github而非git。</li>
+<li>username即你的GitHub用户名，实际以你自己创建的仓库地址为准。</li>
+</ul>
+</li>
+</ul>
+<h3 id="生成并上传"><a href="#生成并上传" class="headerlink" title="生成并上传"></a>生成并上传</h3><p>　　在终端、博客工程目录下输入：<code>hexo generate</code>，完成后便会发现新增了<em>public</em>目录。那便是网站文件夹，用于上传到GitHub仓库。<br>　　接下来再输入<code>hexo deploy</code>，将网站文件夹上传到GitHub仓库。以后在本地做了修改后，便进行这两个操作将网站生成并上传即可。</p>
+<h3 id="后记-5"><a href="#后记-5" class="headerlink" title="后记"></a>后记</h3><p>　　有时候把一些配置文件搞炸的时候或者上传有问题时，可以使用<code>hexo clean</code>来尝试修复。<br>　　如果觉得GitHub的传输速度过慢，可考虑修改<em>host</em>尝试能否增速，以下是一个江湖偏方：<br>　　<code>151.101.88.249 github.global.ssl.fastly.Net</code>
+　    </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Git/" rel="tag"># Git</a>
+          
+            <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          
+            <a href="/tags/Blog/" rel="tag"># Blog</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/26/first/" rel="next" title="终于整了个博客">
+                <i class="fa fa-chevron-left"></i> 终于整了个博客
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/03/research_awesomenauts/" rel="prev" title="王牌英雄(Awesomenauts)研究报告">
+                王牌英雄(Awesomenauts)研究报告 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <div class="ds-share flat" data-thread-key="2017/02/26/build_bolg/"
+     data-title="在Mac平台使用GitHub和Hexo搭建博客"
+     data-content=""
+     data-url="https://musoucrow.github.io/2017/02/26/build_bolg/">
+  <div class="ds-share-inline">
+    <ul  class="ds-share-icons-16">
+
+      <li data-toggle="ds-share-icons-more"><a class="ds-more" href="javascript:void(0);">分享到：</a></li>
+      <li><a class="ds-weibo" href="javascript:void(0);" data-service="weibo">微博</a></li>
+      <li><a class="ds-qzone" href="javascript:void(0);" data-service="qzone">QQ空间</a></li>
+      <li><a class="ds-qqt" href="javascript:void(0);" data-service="qqt">腾讯微博</a></li>
+      <li><a class="ds-wechat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+
+    </ul>
+    <div class="ds-share-icons-more">
+    </div>
+  </div>
+</div>
+      
+    </div>
+  </div>
+
+          
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/02/26/build_bolg/"
+           data-title="在Mac平台使用GitHub和Hexo搭建博客" data-url="https://musoucrow.github.io/2017/02/26/build_bolg/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.jpg"
+               alt="Musoucrow" />
+          <p class="site-author-name" itemprop="name">Musoucrow</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+           
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">posts</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://coding.net/u/musoucrow" target="_blank" title="Coding">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Coding
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/MusouCrow" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  Github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署GitHub"><span class="nav-number">2.</span> <span class="nav-text">部署GitHub</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-1"><span class="nav-number">2.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册账号"><span class="nav-number">2.2.</span> <span class="nav-text">注册账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始设置"><span class="nav-number">2.3.</span> <span class="nav-text">初始设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证邮箱"><span class="nav-number">2.4.</span> <span class="nav-text">验证邮箱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建页面仓库"><span class="nav-number">2.5.</span> <span class="nav-text">创建页面仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">2.6.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装前置软件"><span class="nav-number">3.</span> <span class="nav-text">安装前置软件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-2"><span class="nav-number">3.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Homebrew"><span class="nav-number">3.2.</span> <span class="nav-text">安装Homebrew</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过Homebrew安装其余软件"><span class="nav-number">3.3.</span> <span class="nav-text">通过Homebrew安装其余软件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记-1"><span class="nav-number">3.4.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Hexo及主题"><span class="nav-number">4.</span> <span class="nav-text">安装Hexo及主题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-3"><span class="nav-number">4.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用NPM安装"><span class="nav-number">4.2.</span> <span class="nav-text">使用NPM安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新建博客工程"><span class="nav-number">4.3.</span> <span class="nav-text">新建博客工程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于博客主题"><span class="nav-number">4.4.</span> <span class="nav-text">关于博客主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装NexT主题"><span class="nav-number">4.5.</span> <span class="nav-text">安装NexT主题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记-2"><span class="nav-number">4.6.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署博客"><span class="nav-number">5.</span> <span class="nav-text">部署博客</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-4"><span class="nav-number">5.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启用主题并调试"><span class="nav-number">5.2.</span> <span class="nav-text">启用主题并调试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#个性化设置"><span class="nav-number">5.3.</span> <span class="nav-text">个性化设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新建标签和分类栏目"><span class="nav-number">5.4.</span> <span class="nav-text">新建标签和分类栏目</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记-3"><span class="nav-number">5.5.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发表帖子"><span class="nav-number">6.</span> <span class="nav-text">发表帖子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-5"><span class="nav-number">6.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新建帖子"><span class="nav-number">6.2.</span> <span class="nav-text">新建帖子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改创建格式"><span class="nav-number">6.3.</span> <span class="nav-text">修改创建格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记-4"><span class="nav-number">6.4.</span> <span class="nav-text">后记</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发布网站"><span class="nav-number">7.</span> <span class="nav-text">发布网站</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言-6"><span class="nav-number">7.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上传部署"><span class="nav-number">7.2.</span> <span class="nav-text">上传部署</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成并上传"><span class="nav-number">7.3.</span> <span class="nav-text">生成并上传</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记-5"><span class="nav-number">7.4.</span> <span class="nav-text">后记</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Musoucrow</span>
+</div>
+
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"musoucrow"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="local-search-pop-overlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("yhjLFkD4PnRxISuvmJFRDE0w-gzGzoHsz", "Qw708UVatkDdMTPY8PtLty9O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+
+  
+
+</body>
+</html>
