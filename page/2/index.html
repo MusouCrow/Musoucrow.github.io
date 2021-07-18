@@ -291,6 +291,202 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/03/08/shader_graph/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2020/03/08/shader_graph/" itemprop="url">
+                  Shader Graph踩坑实录
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-08T17:41:18+08:00">
+                2020-03-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/03/08/shader_graph/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/03/08/shader_graph/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/03/08/shader_graph/" class="leancloud_visitors" data-flag-title="Shader Graph踩坑实录">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　Demo也到了做渲染的时候了，经过一番鏖战后，算是大体完成了。但随着后续需求的到来，发现这套纯代码的Shader方案对于扩展、复用等方面有着诸多不便。于是便打起了<a href="https://unity.com/shader-graph" target="_blank" rel="external">Shader Graph</a>的主意……经过一番纠缠，于是有了本篇踩坑实录。另附<a href="https://github.com/MusouCrow/CustomShaderGraph" target="_blank" rel="external">源码地址</a>，但本篇并不会对其做讲解。基于Unity2020.1.0a20，渲染管线为URP7.18。</p>
+<h2 id="优劣"><a href="#优劣" class="headerlink" title="优劣"></a>优劣</h2><p>　　首先要明确的是：Shader Graph不支持Builtin渲染管线，且尚未处于彻底成熟的阶段，哪怕是最新版本尚有不少缺陷。但瑕不掩瑜，且说其优劣：</p>
+<ul>
+<li>优点<ul>
+<li>由于节点化与Sub Graph的存在，Shader的组装将变得相当容易，极大提升了模块化水平。</li>
+<li>调整Property与Keyword变得相当方便，纯代码下将需要多些工序。</li>
+<li>内置各种节点，降低了美术参与创作的门槛。</li>
+<li>能够实时预览每个节点造成的变化预览，虽然对我而言没啥用。</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>编辑器尚不够稳定，经常会出现整个程序崩溃的情况。</li>
+<li>生成的代码不够优化，比较暴力，存在各种分支判断、重复函数（也许最终会优化？）</li>
+<li>由于Slot机制的原因，可能会出现很多运算集中在片元着色器中。</li>
+<li>对于创建Pass并不友好，需要修改源码。</li>
+</ul>
+</li>
+</ul>
+<h2 id="来龙"><a href="#来龙" class="headerlink" title="来龙"></a>来龙</h2><p>　　其实一般的浅度Shader Graph使用者并不会如我这般踩这么多坑：直接使用内置的Graph模板进行创作即可。不幸的是，如前文所言：对于创建Pass并不友好，需要修改源码。于是便开始了踩坑之旅……<br>　　在默认情况下，Unity的Package将保存在工程的Library/PackageCache目录下，这样子是不能直接修改源码的（Library目录下的东西属于可再生物，随时会被覆盖），需将之搬迁至工程的Packages目录下。<br>　　对于考虑到日后Shader Graph的版本升级情况，所以尽可能的<strong>不要修改原工程的内容</strong>，而是尽量新建文件。但考虑到Shader Graph源码下存在不少inner元素，直接在外面写自己的内容也并非彻底可行。只能直接在Shader Graph包下进行添加文件的方式了，这也是要将之移至Packages目录的原因。<br>　　我要做的事情相当明确：<strong>新建一个自定义的Graph类型</strong>。在URP下已经自带Unlit与PBR两种类型了，于是本人便基于Unlit Graph并结合先前实现的Shader的特性进行新类型的创作。  </p>
+<h2 id="去脉"><a href="#去脉" class="headerlink" title="去脉"></a>去脉</h2><p>　　我们能接触到Unlit Graph创建的起点便是Project区下右键菜单的<code>Create-&gt;Shader-&gt;Unlit Graph</code>了，直接在Shader Graph源码包下全局搜索<code>Create/Shader/Unlit Graph</code>即可找到：<br><img src="https://musoucrow.github.io/images/shader_graph/0.png" alt="0"><br>　　照葫芦画瓢在同目录下弄个新文件实现相同功能即可，这下我们便知道Unlit Graph的正主了：<code>UnlitMasterNode</code>。经过研究发现，它决定了在编辑器下Unlit Master Node的样式：<br><img src="https://musoucrow.github.io/images/shader_graph/1.png" alt="1"><br><img src="https://musoucrow.github.io/images/shader_graph/2.png" alt="2"><br>　　但这只是个壳子罢了，根据代码中的<code>IUnlitSubShader</code>为引，找到了其核心：<br><img src="https://musoucrow.github.io/images/shader_graph/3.png" alt="3"><br>　　这个<code>UniversalUnlitSubShader</code>的作用相当简单：根据编辑器的设置<strong>生成Shader代码</strong>。如上图便可看出定义Pass数据结构的行为，这也是诱使我来改源码的直接原因。在里面你将见到形如这般的代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> unlitMasterNode = masterNode <span class="keyword">as</span> UnlitMasterNode;</div><div class="line"><span class="keyword">var</span> subShader = <span class="keyword">new</span> ShaderGenerator();</div><div class="line"></div><div class="line">subShader.AddShaderChunk(<span class="string">"SubShader"</span>, <span class="literal">true</span>);</div><div class="line">subShader.AddShaderChunk(<span class="string">"&#123;"</span>, <span class="literal">true</span>);</div><div class="line">subShader.Indent();</div><div class="line">&#123;</div><div class="line">    <span class="keyword">var</span> surfaceTags = ShaderGenerator.BuildMaterialTags(unlitMasterNode.surfaceType);</div><div class="line">    <span class="keyword">var</span> tagsBuilder = <span class="keyword">new</span> ShaderStringBuilder(<span class="number">0</span>);</div><div class="line">    surfaceTags.GetTags(tagsBuilder, <span class="string">"UniversalPipeline"</span>);</div><div class="line">    subShader.AddShaderChunk(tagsBuilder.ToString());</div><div class="line">    </div><div class="line">    GenerateShaderPass(unlitMasterNode, m_UnlitPass, mode, subShader, sourceAssetDependencyPaths);</div><div class="line">    GenerateShaderPass(unlitMasterNode, m_ShadowCasterPass, mode, subShader, sourceAssetDependencyPaths);</div><div class="line">    GenerateShaderPass(unlitMasterNode, m_DepthOnlyPass, mode, subShader, sourceAssetDependencyPaths);   </div><div class="line">&#125;</div><div class="line">subShader.Deindent();</div><div class="line">subShader.AddShaderChunk(<span class="string">"&#125;"</span>, <span class="literal">true</span>);</div></pre></td></tr></table></figure>
+<p>　　如此情况便变得相当清晰了，只要清楚<strong>你想生成怎样的</strong>Shader代码，在摸熟了生成代码的API，便可自由地进行创作了。通过右键节点可以随时查看生成的代码情况：<br><img src="https://musoucrow.github.io/images/shader_graph/4.png" alt="4">  </p>
+<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>　　也许看似还算简单，但其中坑点还是有不少的：  </p>
+<ul>
+<li>不要尝试采用继承的形式去新建新类型，其本身代码就没打算让你这么做，必然会碰壁，除非改源码（如此便违反原则了）</li>
+<li>做出了修改后，要到对应的Graph文件进行Save操作触发检测。</li>
+<li>也许是检测的原因，有时候HLSL代码做出了修改后不会被识别到，需要换下行。</li>
+<li>Shader Graph生成的着色器参数有着自己的一套处理方式，务必参考自带的代码。</li>
+<li>Unlit Graph的主Pass并没有LightMode，想做背面Pass的时候要注意下。</li>
+<li>Unlit Graph将渲染模式、混合模式、剔除做成节点设置并不是一个好选择（无法让材质修改），推荐按照URP的方式做成材质属性。<img src="https://musoucrow.github.io/images/shader_graph/5.png" alt="5"></li>
+<li>Shader Graph对于生成的Shader代码存在分支数限制，需要到<code>Preference-&gt;Shader Graph</code>进行修改上限。值得一提的是，全局Keyword与局部Keyword似乎是分别对待的。</li>
+<li>Shader Graph并不存在完整的环境，它是无法识别到一些渲染管线里的函数的。所以在编写Custom Shader的时候需要加上<code>#if SHADERGRAPH_PREVIEW</code>分支判定以处理在编辑模式下的情况：</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">MainLight_float</span><span class="params">(float3 WorldPos, out float3 Direction, out float3 Color, out <span class="keyword">float</span> DistanceAtten, out <span class="keyword">float</span> ShadowAtten)</span></span></div><div class="line">&#123;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SHADERGRAPH_PREVIEW</span></div><div class="line">    Direction = float3(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0</span>);</div><div class="line">    Color = <span class="number">1</span>;</div><div class="line">    DistanceAtten = <span class="number">1</span>;</div><div class="line">    ShadowAtten = <span class="number">1</span>;</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SHADOWS_SCREEN</span></div><div class="line">    float4 clipPos = TransformWorldToHClip(WorldPos);</div><div class="line">    float4 shadowCoord = ComputeScreenPos(clipPos);</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line">    float4 shadowCoord = TransformWorldToShadowCoord(WorldPos);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    Light mainLight = GetMainLight(shadowCoord);</div><div class="line">    Direction = mainLight.direction;</div><div class="line">    Color = mainLight.color;</div><div class="line">    DistanceAtten = mainLight.distanceAttenuation;</div><div class="line">    ShadowAtten = mainLight.shadowAttenuation;</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　现在感觉游戏开发的未来方向就是连连看了，从这点来说UE4的确算是时代前沿。在编辑器里加入逻辑控制元素，让更多人能加入创作，尽可能地解放生产力，的确是游戏开发所需要的。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/02/01/animation_guide/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1897,167 +2093,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/12/31/summary_2018/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2018/12/31/summary_2018/" itemprop="url">
-                  2018年度总结
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-31T22:04:28+08:00">
-                2018-12-31
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Talk/" itemprop="url" rel="index">
-                    <span itemprop="name">Talk</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/12/31/summary_2018/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/12/31/summary_2018/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/12/31/summary_2018/" class="leancloud_visitors" data-flag-title="2018年度总结">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　不知不觉中2018年即将过去了，与<a href="https://musoucrow.github.io/2017/12/31/summary_2017/">去年</a>相同，特作总结，以为归纳。<br>　　今年的Blog总共写了14篇，较之去年的13篇算是相差不大。但内容方面则更为单纯了，简要说来便是：DFQ、网络同步、ECS、实践记录。期望明年能有新的花样。<br>　　今年的主要成果为对网络同步的涉猎，在帧锁定同步方面有<a href="https://github.com/MusouCrow/BrickAndBall" target="_blank" rel="external">《Brick &amp; Ball》</a>，在FPS/TPS同步方面有<a href="https://github.com/MusouCrow/TPSDemo" target="_blank" rel="external">TPSDemo</a>。收获了不少同仁的赞可，但都算不上是正式项目的实践，只能有待机会了。<br>　　项目方面，《DFQ》的开发也算是正式进行了，这将是明年的总旋律。与今年类似，如无特殊情况则保持月更相关Blog。待最终完工开源后（也许）将会是一个很好的学习素材。<br>　　平常时刻也有与ChawDoe进行一些作业方面的研究，涉及到诸如强化学习、哈希表、寻路算法、词法分析、UNIX/POSIX API、OpenGL等方面，也是获益良多，作为巩固基础了。<br>　　总的来说，愈发感觉到计算机图形学是自己的待恶补项，以及3D游戏开发中的不少方面也值得实践，这将是明年的发展方向，期望在这些方面能有所建树，作出一些心得分享。<br>　　以上便是本人的2018年度总结，今年下半年以来的社会经济状况不是很好，祈祷明年能够回暖吧。<br>　　无双草泥马<br>　　2018.12.31</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2107,7 +2142,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">49</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

@@ -291,6 +291,201 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2021/07/17/irradiance_volume/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2021/07/17/irradiance_volume/" itemprop="url">
+                  基于IrradianceVolume魔改的全局光照方案
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-07-17T18:54:25+08:00">
+                2021-07-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2021/07/17/irradiance_volume/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2021/07/17/irradiance_volume/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2021/07/17/irradiance_volume/" class="leancloud_visitors" data-flag-title="基于IrradianceVolume魔改的全局光照方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>　　自<a href="https://www.bilibili.com/video/BV1864y1S7TG" target="_blank" rel="external">《拉维瓦纳》技术性Demo演示</a>公布后，得到不少反馈与总结。其中内部达成共识的一处便是目前的<strong>场景效果仍需提升</strong>，于是便围绕此展开了新的计划。其中明显的一点便是场景的<strong>着色表现太过平滑</strong>，近乎为Unlit。于是需要为此增添不少变化，其中一项措施便是<strong>全局光照</strong>。<br>　　而采用Unity自带的全局光照方案：<a href="https://docs.unity.cn/cn/2020.3/Manual/Lightmappers.html" target="_blank" rel="external">Lightmap</a>时则遇到不少问题与效果的不尽人意：</p>
+<ul>
+<li><a href="https://docs.unity.cn/cn/2020.3/Manual/ProgressiveLightmapper-UVOverlap.html" target="_blank" rel="external">UV overlap</a>问题</li>
+<li><a href="https://docs.unity.cn/cn/2020.3/Manual/GPUProgressiveLightmapper.html" target="_blank" rel="external">GPU烘焙</a>时功能不齐全（如不支持TextureArray），而CPU烘焙则速度不佳</li>
+<li>对于动态物体需使用<a href="https://docs.unity.cn/cn/2020.3/Manual/LightProbes.html" target="_blank" rel="external">Light Probes</a>方案，效果不够一体化</li>
+<li>对于场景内会动、会破坏的部分的支持度不佳</li>
+<li>烘焙器不开源，效果的可定制性不强</li>
+</ul>
+<p>　　基于以上原因，最终选择考虑其他的全局光照方案。以安柏霖的<a href="https://zhuanlan.zhihu.com/p/23410011" target="_blank" rel="external">游戏中的Irradiance Volume</a>为引，得出了一种<strong>自我魔改</strong>的全局光照方案，<strong>并不代表真正的Irradiance Volume方案</strong>，仅供参考，<a href="https://github.com/MusouCrow/IrradianceVolume" target="_blank" rel="external">附上工程链接</a>。</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>　　根据安柏霖一文大致可以看出，Irradiance Volume是<em>一种将场景划分为多个区域，每个区域记录关键信息，最终应用于区域内的对象</em>的一种全局光照方案。这听起来很像Light Probes，只不过Light Probes是逐对象的（整个模型着色），而Irradiance Volume能做到逐顶点/片元。<br>　　经过一番研究，参考了<a href="https://www.semanticscholar.org/paper/The-Irradiance-Volume-Greger-Shirley/3ac84672d6b0cef2b765ff369da1147a9bd4d901?p2df" target="_blank" rel="external">论文</a>、<a href="https://www.valvesoftware.com/publications/2006/SIGGRAPH06_Course_ShadingInValvesSourceEngine.pdf" target="_blank" rel="external">半条命2</a>、<a href="http://developer.amd.com/wordpress/media/2012/10/Tatarchuk_Irradiance_Volumes.pdf" target="_blank" rel="external">AMD</a>、<a href="https://link.zhihu.com/?target=http%3A//advances.realtimerendering.com/s2016/Volumetric%2520Global%2520Illumination%2520at%2520Treyarch.pptx" target="_blank" rel="external">COD</a>等诸多资料后，得出一点：这Irradiance Volume如同ECS一般，<strong>只有大致的概念，并无标准的实现</strong>。网上亦无太多相关开源实现，那么只好按照自己的理解去发挥了。<br>　　其核心概念在上文也已说明，现落地为实际方案：</p>
+<ul>
+<li>按固定大小的格子划分场景</li>
+<li>使用<a href="https://docs.unity.cn/2020.3/Documentation/ScriptReference/ReflectionProbe.RenderProbe.html" target="_blank" rel="external">ReflectionProbe</a>拍摄每个格子下的<a href="https://docs.unity.cn/2020.3/Documentation/Manual/class-Cubemap.html" target="_blank" rel="external">CubeMap</a>，提取6个面的代表色</li>
+<li>将每个面的代表色按位置存储到<a href="https://docs.unity.cn/2020.3/Documentation/Manual/class-Texture3D.html" target="_blank" rel="external">3D纹理</a>，由于有6个面，所以需要6张</li>
+<li>具体模型着色时，根据顶点坐标找到所属格子，根据法线方向采样对应面的颜色进行混合，最终着色</li>
+</ul>
+<h3 id="构建格子"><a href="#构建格子" class="headerlink" title="构建格子"></a>构建格子</h3><p>　　首先是按固定大小的格子划分场景，为完成这一点，我们构造一个专门的MonoBehavior <code>ProbeMgr</code>，并构造格子的专属数据结构 <code>ProbeData</code>：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">[Serializable]</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ProbeData</span> &#123;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> index; <span class="comment">// 格子在容器中的索引</span></div><div class="line">    <span class="keyword">public</span> Vector3Int position; <span class="comment">// 格子位置</span></div><div class="line">    <span class="keyword">public</span> Color[] colors; <span class="comment">// 格子内六个面的代表色</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　通过在ProbeMgr定义格子在场景的数量（XYZ）、格子的大小、设置存储格子的容器，最后加上预览：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">[ExecuteAlways]</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ProbeMgr</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">    <span class="comment">// 六个面的方向向量</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Vector3[] Directions = <span class="keyword">new</span> Vector3[] &#123;</div><div class="line">        <span class="keyword">new</span> Vector3(<span class="number">-1</span>, <span class="number">0</span>, <span class="number">0</span>),</div><div class="line">        <span class="keyword">new</span> Vector3(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>),</div><div class="line">        <span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">-1</span>, <span class="number">0</span>),</div><div class="line">        <span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>),</div><div class="line">        <span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">-1</span>),</div><div class="line">        <span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>),</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> Vector3Int size; <span class="comment">// 格子在场景的数量</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">float</span> interval; <span class="comment">// 格子的大小</span></div><div class="line">    <span class="keyword">public</span> ProbeData[] datas; <span class="comment">// 存储格子的容器</span></div><div class="line"></div><div class="line">    <span class="comment">// 预览</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">OnDrawGizmosSelected</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        Gizmos.color = Color.black;</div><div class="line">        <span class="keyword">var</span> size = <span class="keyword">new</span> Vector3(<span class="keyword">this</span>.interval, <span class="keyword">this</span>.interval, <span class="keyword">this</span>.interval);</div><div class="line">        <span class="keyword">var</span> position = <span class="keyword">this</span>.transform.position;</div><div class="line"></div><div class="line">        <span class="comment">// 显示格子</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> x = -<span class="keyword">this</span>.size.x; x &lt;= <span class="keyword">this</span>.size.x; x++) &#123;</div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> y = -<span class="keyword">this</span>.size.y; y &lt;= <span class="keyword">this</span>.size.y; y++) &#123;</div><div class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> z = -<span class="keyword">this</span>.size.z; z &lt;= <span class="keyword">this</span>.size.z; z++) &#123;</div><div class="line">                    <span class="keyword">var</span> pos = <span class="keyword">new</span> Vector3(x, y, z) * <span class="keyword">this</span>.interval;</div><div class="line">                    Gizmos.DrawWireCube(position + pos, size);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 显示六个面的代表色</span></div><div class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> data <span class="keyword">in</span> <span class="keyword">this</span>.datas) &#123;</div><div class="line">            <span class="keyword">var</span> pos = <span class="keyword">this</span>.GetProbePosition(data);</div><div class="line">            </div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; data.colors.Length; i++) &#123;</div><div class="line">                Gizmos.color = data.colors[i];</div><div class="line">                Gizmos.DrawSphere(pos + Directions[i] * <span class="keyword">this</span>.interval * <span class="number">0.3</span>f, <span class="keyword">this</span>.interval * <span class="number">0.1</span>f);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/irradiance_volume/0.png" alt="0"><br>　　上图已是烘焙好的结果，仅供参考，如此格子的构建便完成了。</p>
+<h3 id="提取代表色"><a href="#提取代表色" class="headerlink" title="提取代表色"></a>提取代表色</h3><p>　　所谓提取格子六个面的代表色，这种做法其实有个专属名词：<a href="https://zhuanlan.zhihu.com/p/156739444" target="_blank" rel="external">Ambient Cube</a>。其核心思想就是<strong>简化某个区域内的光照信息</strong>，这很显然是非常物理不正确且粗暴的，但有道是图形学第一理论：<em>看起来对了，那就是对了</em>。类似替代方案还可以采用二阶球谐，两者在效果上较为接近，这并非本文重点，不再展开。<br>　　在上文也提到对此的具体方案：使用ReflectionProbe拍摄每个格子下的CubeMap，最后采样Cubemap的每个面的颜色求平均值即可。看起来这是个可并行化的任务：<strong>为每个格子都创建ReflectionProbe对象进行拍摄，然后使用Compute Shader对Cubemap进行采样提取颜色</strong>。可惜事与愿违，在Unity内部实现中，ReflectionProbe的拍摄同一时刻只有一个，而类似的Camera拍摄Cubemap更是非异步的，可见拍摄这一块想达到真正的并行化是做不到了。所幸Compute Shader那一块还行，也懒得改成非并行写法了（万一有天支持了），附上相关代码：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div></pre></td><td class="code"><pre><div class="line">[ExecuteAlways]</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ProbeMgr</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">    <span class="comment">// Cubemap大小</span></div><div class="line">    <span class="keyword">private</span> <span class="keyword">const</span> <span class="keyword">int</span> SIZE = <span class="number">128</span>;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> ComputeShader shader; <span class="comment">// 提取代表色的Compute Shader</span></div><div class="line">    <span class="keyword">public</span> Texture3D[] textures; <span class="comment">// 六个面对应的3D纹理</span></div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">int</span> progress; <span class="comment">// 拍摄进度</span></div><div class="line"></div><div class="line">    <span class="keyword">public</span> <span class="keyword">bool</span> IsBaking &#123;</div><div class="line">        <span class="keyword">get</span>;</div><div class="line">        <span class="keyword">private</span> <span class="keyword">set</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"><span class="comment">// 编辑器模式下专属，拍摄时需时刻保持刷新</span></div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> UNITY_EDITOR</span></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.IsBaking) &#123;</div><div class="line">            EditorUtility.SetDirty(<span class="keyword">this</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line"></div><div class="line">    <span class="comment">// 拍摄总函数入口，注意它是协程形式的</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">async</span> <span class="keyword">void</span> <span class="title">Bake</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// 部署拍摄，让相关Shader切换为拍摄模式</span></div><div class="line">        <span class="keyword">this</span>.IsBaking = <span class="literal">true</span>;</div><div class="line">        Shader.EnableKeyword(<span class="string">"_BAKING"</span>);</div><div class="line">        <span class="keyword">this</span>.progress = <span class="number">0</span>;</div><div class="line"></div><div class="line">        <span class="keyword">this</span>.FlushProbe(); <span class="comment">// 构建格子</span></div><div class="line"></div><div class="line">        <span class="comment">// 构建贴图资源</span></div><div class="line">        <span class="keyword">this</span>.textures = <span class="keyword">new</span> Texture3D[<span class="number">6</span>];</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.textures.Length; i++) &#123;</div><div class="line">            <span class="keyword">var</span> texture = <span class="keyword">new</span> Texture3D(<span class="keyword">this</span>.size.x * <span class="number">2</span> + <span class="number">1</span>, <span class="keyword">this</span>.size.y * <span class="number">2</span> + <span class="number">1</span>, <span class="keyword">this</span>.size.z * <span class="number">2</span> + <span class="number">1</span>, DefaultFormat.HDR, <span class="number">0</span>);</div><div class="line">            texture.wrapMode = TextureWrapMode.Clamp;</div><div class="line">            <span class="keyword">this</span>.textures[i] = texture;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 全格子发起拍摄</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.datas.Length; i++) &#123;</div><div class="line">            <span class="keyword">this</span>.CaptureProbe(<span class="keyword">this</span>.datas[i]);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// progress代表拍摄进度，在未全部拍摄完成前进行刷新并等待</span></div><div class="line">        <span class="keyword">while</span> (<span class="keyword">this</span>.progress &lt; <span class="keyword">this</span>.datas.Length) &#123;</div><div class="line">            EditorUtility.SetDirty(<span class="keyword">this</span>);</div><div class="line">            <span class="keyword">await</span> Task.Yield();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 拍摄完毕了，贴图应用</span></div><div class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> texture <span class="keyword">in</span> <span class="keyword">this</span>.textures) &#123;</div><div class="line">            texture.Apply();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 设置相关数据到Shader，关闭拍摄模式</span></div><div class="line">        <span class="keyword">this</span>.SetValue();</div><div class="line">        Shader.DisableKeyword(<span class="string">"_BAKING"</span>);</div><div class="line">        <span class="keyword">this</span>.IsBaking = <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 格子拍摄，注意它是协程形式的</span></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">async</span> <span class="keyword">void</span> <span class="title">CaptureProbe</span>(<span class="params">ProbeData data</span>) </span>&#123;</div><div class="line">        <span class="comment">// 为格子构建专属ReflectionProbe对象</span></div><div class="line">        <span class="keyword">var</span> go = <span class="keyword">new</span> GameObject(<span class="string">"Reflect"</span>);</div><div class="line">        <span class="keyword">var</span> reflect = go.AddComponent&lt;ReflectionProbe&gt;();</div><div class="line">        reflect.nearClipPlane = <span class="number">0.001</span>f;</div><div class="line">        reflect.farClipPlane = <span class="number">100</span>;</div><div class="line">        reflect.hdr = <span class="literal">true</span>;</div><div class="line">        reflect.backgroundColor = Color.white;</div><div class="line">        reflect.clearFlags = ReflectionProbeClearFlags.SolidColor;</div><div class="line">        reflect.resolution = <span class="number">128</span>;</div><div class="line"></div><div class="line">        <span class="comment">// 设置ReflectionProbe的位置到格子中心</span></div><div class="line">        <span class="keyword">var</span> position = <span class="keyword">this</span>.GetProbePosition(data);</div><div class="line">        go.transform.SetParent(<span class="keyword">this</span>.transform);</div><div class="line">        go.transform.position = position;</div><div class="line">        </div><div class="line">        <span class="comment">// 构建Cubemap贴图</span></div><div class="line">        <span class="keyword">var</span> rt = RenderTexture.GetTemporary(SIZE, SIZE, <span class="number">32</span>, RenderTextureFormat.ARGBFloat);</div><div class="line">        rt.dimension = TextureDimension.Cube;</div><div class="line"></div><div class="line">        <span class="comment">// 进行拍摄</span></div><div class="line">        <span class="keyword">var</span> id = reflect.RenderProbe(rt);</div><div class="line"></div><div class="line">        <span class="comment">// 等待拍摄完成，在此期间保持刷新</span></div><div class="line">        <span class="keyword">while</span> (!reflect.IsFinishedRendering(id)) &#123;</div><div class="line">            EditorUtility.SetDirty(<span class="keyword">this</span>);</div><div class="line">            <span class="keyword">await</span> Task.Yield();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 构建颜色数据，它对应着colors[6]</span></div><div class="line">        <span class="keyword">var</span> colorBuffer = <span class="keyword">new</span> ComputeBuffer(<span class="number">6</span>, <span class="keyword">sizeof</span>(<span class="keyword">float</span>) * <span class="number">4</span>);</div><div class="line"></div><div class="line">        <span class="comment">// 设置相关属性到Compute Shader并启动</span></div><div class="line">        <span class="keyword">int</span> kernel = <span class="keyword">this</span>.shader.FindKernel(<span class="string">"CSMain"</span>);</div><div class="line">        <span class="keyword">this</span>.shader.SetTexture(kernel, <span class="string">"_CubeMap"</span>, rt);</div><div class="line">        <span class="keyword">this</span>.shader.SetBuffer(kernel, <span class="string">"_Colors"</span>, colorBuffer);</div><div class="line">        <span class="keyword">this</span>.shader.SetFloat(<span class="string">"_Size"</span>, SIZE);</div><div class="line">        <span class="keyword">this</span>.shader.Dispatch(kernel, <span class="number">6</span>, <span class="number">1</span>, <span class="number">1</span>);</div><div class="line"></div><div class="line">        <span class="comment">// 执行完毕，将提取后的代表色存放到格子数据中</span></div><div class="line">        colorBuffer.GetData(data.colors);</div><div class="line"></div><div class="line">        <span class="comment">// 设置代表色到对应位置的3D纹理中</span></div><div class="line">        <span class="keyword">var</span> pos = data.position;</div><div class="line"></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; data.colors.Length; i++) &#123;</div><div class="line">            <span class="keyword">var</span> color = data.colors[i];</div><div class="line">            <span class="keyword">this</span>.textures[i].SetPixel(pos.x, pos.y, pos.z, color);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 清理资源，进度+1</span></div><div class="line">        colorBuffer.Release();</div><div class="line">        RenderTexture.ReleaseTemporary(rt);</div><div class="line">        DestroyImmediate(go);</div><div class="line">        <span class="keyword">this</span>.progress++;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">pragma</span> kernel CSMain</span></div><div class="line"></div><div class="line">TextureCube&lt;float4&gt; _CubeMap;</div><div class="line">SamplerState _LinearClamp;</div><div class="line"></div><div class="line">RWStructuredBuffer&lt;float4&gt; _Colors;</div><div class="line"><span class="keyword">float</span> _Size; <span class="comment">// CubeMap贴图大小</span></div><div class="line"></div><div class="line"><span class="comment">// 只开了6条线程，实现每个面取色的并行化</span></div><div class="line">[numthreads(<span class="number">6</span>, <span class="number">1</span>, <span class="number">1</span>)]</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">CSMain</span> <span class="params">(uint3 id : SV_GroupID)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">float</span> rate = <span class="number">1.0</span> / _Size;</div><div class="line">    float3 color = float3(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; _Size; i++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; _Size; j++) &#123;</div><div class="line">            <span class="comment">// 通过位置获取对应uv</span></div><div class="line">            float2 uv = float2(j, i) * rate;</div><div class="line">            uv = <span class="number">2.0</span> * uv - <span class="number">1.0</span>; <span class="comment">// 0~1 -&gt; -1~1</span></div><div class="line"></div><div class="line">            float3 coord = float3(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</div><div class="line"></div><div class="line">            <span class="comment">// 获取每个面对应的Cubemap纹理坐标</span></div><div class="line">            <span class="keyword">if</span> (id.x == <span class="number">0</span>) &#123; <span class="comment">// +X</span></div><div class="line">                coord = float3(<span class="number">1.0</span>, uv);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (id.x == <span class="number">1</span>) &#123; <span class="comment">// -X</span></div><div class="line">                coord = float3(<span class="number">-1.0</span>, uv);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (id.x == <span class="number">2</span>) &#123; <span class="comment">// +Y</span></div><div class="line">                coord = float3(uv.x, <span class="number">1.0</span>, uv.y);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (id.x == <span class="number">3</span>) &#123; <span class="comment">// -Y</span></div><div class="line">                coord = float3(uv.x, <span class="number">-1.0</span>, uv.y);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (id.x == <span class="number">4</span>) &#123; <span class="comment">// +Z</span></div><div class="line">                coord = float3(uv, <span class="number">1.0</span>);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (id.x == <span class="number">5</span>) &#123; <span class="comment">// -Z</span></div><div class="line">                coord = float3(uv, <span class="number">-1.0</span>);</div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="comment">// 将每个点的颜色采样加起来</span></div><div class="line">            color += _CubeMap.SampleLevel(_LinearClamp, coord, <span class="number">0</span>).rgb;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 求颜色平均值，得到代表色</span></div><div class="line">    <span class="keyword">float</span> maxn = _Size * _Size;</div><div class="line">    _Colors[id.x] = float4(color / maxn, <span class="number">1.0</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/irradiance_volume/1.gif" alt="1"><br>　　上图是拍摄现场，可惜拍摄这块无法达成并行化，显得有点捞，只能将就了。</p>
+<h3 id="着色"><a href="#着色" class="headerlink" title="着色"></a>着色</h3><p>　　我们所需的数据都已构建完成，接下来便是着色了。首先需要将相关数据传到Shader，作为全局变量使用：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">[ExecuteAlways]</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ProbeMgr</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">SetValue</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.datas == <span class="literal">null</span>) &#123;</div><div class="line">            <span class="keyword">return</span>;</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">        <span class="comment">// 将六个面的3D纹理传递到Shader</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.textures.Length; i++) &#123;</div><div class="line">            Shader.SetGlobalTexture(<span class="string">"_VolumeTex"</span> + i, <span class="keyword">this</span>.textures[i]);</div><div class="line">        &#125;</div><div class="line">        </div><div class="line">        Shader.SetGlobalVector(<span class="string">"_VolumeSize"</span>, (Vector3)<span class="keyword">this</span>.size); <span class="comment">// 格子数量（XYZ）</span></div><div class="line">        Shader.SetGlobalVector(<span class="string">"_VolumePosition"</span>, <span class="keyword">this</span>.position); <span class="comment">// 格子矩阵的原点坐标（基于transform.position减去宽高而来）</span></div><div class="line">        Shader.SetGlobalFloat(<span class="string">"_VolumeInterval"</span>, <span class="keyword">this</span>.interval); <span class="comment">// 格子大小</span></div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　然后便是核心Shader代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line">sampler3D _VolumeTex0;</div><div class="line">sampler3D _VolumeTex1;</div><div class="line">sampler3D _VolumeTex2;</div><div class="line">sampler3D _VolumeTex3;</div><div class="line">sampler3D _VolumeTex4;</div><div class="line">sampler3D _VolumeTex5;</div><div class="line"></div><div class="line">CBUFFER_START(IrradianceVolume)</div><div class="line">float3 _VolumeSize;</div><div class="line">float3 _VolumePosition;</div><div class="line"><span class="keyword">float</span> _VolumeInterval;</div><div class="line">CBUFFER_END</div><div class="line"></div><div class="line"><span class="comment">// position: 顶点世界坐标</span></div><div class="line"><span class="comment">// normal: 顶点世界法线</span></div><div class="line"><span class="comment">// 获取该顶点下对应的颜色</span></div><div class="line"><span class="function">float3 <span class="title">GetIrradiance</span><span class="params">(float3 position, float3 normal)</span> </span>&#123;</div><div class="line">    float3 pos = position - _VolumePosition; <span class="comment">// 获取顶点坐标在格子矩阵下的相对位置</span></div><div class="line">    float3 size = (_VolumeSize * <span class="number">2</span> + <span class="number">1</span>) * _VolumeInterval; <span class="comment">// 获取格子矩阵的总大小</span></div><div class="line">    float4 coord = float4(pos / size, <span class="number">0</span>); <span class="comment">// 获取顶点坐标在格子矩阵下的uv</span></div><div class="line">    float3 direction = reflect(-_MainLightPosition.xyz, normal); <span class="comment">// 这里是个魔改措施，为了让颜色的反映更加风骚</span></div><div class="line">    float3 color = GetAmbientColor(direction, coord); <span class="comment">// 获取AmbientCube下的颜色</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> color;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// normal: 顶点世界法线</span></div><div class="line"><span class="comment">// coord: 3d纹理uv</span></div><div class="line"><span class="comment">// 根据法线，获取AmbientCube下的颜色</span></div><div class="line"><span class="function">float3 <span class="title">GetAmbientColor</span><span class="params">(float3 normal, float4 coord)</span> </span>&#123;</div><div class="line">    <span class="comment">// 无负数的权重值</span></div><div class="line">    float3 nSquared = normal * normal;</div><div class="line"></div><div class="line">    <span class="comment">// 根据法线方向判断对应的三个面的纹理进行采样</span></div><div class="line">    <span class="comment">// 实测这里的三目运算符并不会产生分支</span></div><div class="line">    float3 colorX = normal.x &gt;= <span class="number">0.0</span> ? tex3Dlod(_VolumeTex0, coord).rgb : tex3Dlod(_VolumeTex1, coord).rgb;</div><div class="line">    float3 colorY = normal.y &gt;= <span class="number">0.0</span> ? tex3Dlod(_VolumeTex2, coord).rgb : tex3Dlod(_VolumeTex3, coord).rgb;</div><div class="line">    float3 colorZ = normal.z &gt;= <span class="number">0.0</span> ? tex3Dlod(_VolumeTex4, coord).rgb : tex3Dlod(_VolumeTex5, coord).rgb;</div><div class="line"></div><div class="line">    <span class="comment">// 将三个方向对应的颜色乘以权重值，得出最终色</span></div><div class="line">    float3 color = nSquared.x * colorX + nSquared.y * colorY + nSquared.z * colorZ;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> color;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如此，通过调用<code>GetIrradiance</code>函数，传入顶点世界坐标与法线便可获取相关颜色，然后根据个人喜好进行着色即可：  </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// URP SimpleLitForwardPass.hlsl</span></div><div class="line"></div><div class="line">half4 color = UniversalFragmentBlinnPhong(inputData, diffuse, specular, smoothness, emission, alpha);</div><div class="line"></div><div class="line"><span class="comment">// 处于拍摄模式下将屏蔽这段代码</span></div><div class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> _BAKING</span></div><div class="line">    <span class="meta">#<span class="meta-keyword">ifdef</span> _VOLUME_GI_ON</span></div><div class="line">        half3 ambientColor = GetIrradiance(inputData.positionWS, inputData.normalWS);</div><div class="line">    <span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line">        half3 ambientColor = <span class="number">1.0</span>;</div><div class="line">    <span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    </div><div class="line">    color.rgb *= ambientColor;</div><div class="line">    color.rgb = MixFog(color.rgb, inputData.fogCoord);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line"></div><div class="line">color.a = OutputAlpha(color.a, _Surface);</div></pre></td></tr></table></figure>
+<h3 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h3><p>　　以下是成果展示：<br><img src="https://musoucrow.github.io/images/irradiance_volume/2.png" alt="2"><br><img src="https://musoucrow.github.io/images/irradiance_volume/3.png" alt="3"><br><img src="https://musoucrow.github.io/images/irradiance_volume/4.png" alt="4">  </p>
+<p>　　相较于传统GI方案来说，这样的效果未免过于浓郁了，这是我故意加了魔改代码后的结果：<strong>要的就是这种效果</strong>。毕竟GI对于我的目的而言<strong>并非为了什么物理正确</strong>，只是想让场景增添更多的<strong>颜色变化</strong>而已罢了。</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>　　这套GI方案的好处便是可控性强，有着做出更具风味效果的可能性。当然就性能消耗而言实际上是较传统Lightmap要高的（采样三张图），一般项目估计也用不上，仅供一乐。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/12/31/summary_2020/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1866,202 +2061,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/03/08/shader_graph/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2020/03/08/shader_graph/" itemprop="url">
-                  Shader Graph踩坑实录
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-03-08T17:41:18+08:00">
-                2020-03-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Teach/" itemprop="url" rel="index">
-                    <span itemprop="name">Teach</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2020/03/08/shader_graph/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/03/08/shader_graph/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2020/03/08/shader_graph/" class="leancloud_visitors" data-flag-title="Shader Graph踩坑实录">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　Demo也到了做渲染的时候了，经过一番鏖战后，算是大体完成了。但随着后续需求的到来，发现这套纯代码的Shader方案对于扩展、复用等方面有着诸多不便。于是便打起了<a href="https://unity.com/shader-graph" target="_blank" rel="external">Shader Graph</a>的主意……经过一番纠缠，于是有了本篇踩坑实录。另附<a href="https://github.com/MusouCrow/CustomShaderGraph" target="_blank" rel="external">源码地址</a>，但本篇并不会对其做讲解。基于Unity2020.1.0a20，渲染管线为URP7.18。</p>
-<h2 id="优劣"><a href="#优劣" class="headerlink" title="优劣"></a>优劣</h2><p>　　首先要明确的是：Shader Graph不支持Builtin渲染管线，且尚未处于彻底成熟的阶段，哪怕是最新版本尚有不少缺陷。但瑕不掩瑜，且说其优劣：</p>
-<ul>
-<li>优点<ul>
-<li>由于节点化与Sub Graph的存在，Shader的组装将变得相当容易，极大提升了模块化水平。</li>
-<li>调整Property与Keyword变得相当方便，纯代码下将需要多些工序。</li>
-<li>内置各种节点，降低了美术参与创作的门槛。</li>
-<li>能够实时预览每个节点造成的变化预览，虽然对我而言没啥用。</li>
-</ul>
-</li>
-<li>缺点<ul>
-<li>编辑器尚不够稳定，经常会出现整个程序崩溃的情况。</li>
-<li>生成的代码不够优化，比较暴力，存在各种分支判断、重复函数（也许最终会优化？）</li>
-<li>由于Slot机制的原因，可能会出现很多运算集中在片元着色器中。</li>
-<li>对于创建Pass并不友好，需要修改源码。</li>
-</ul>
-</li>
-</ul>
-<h2 id="来龙"><a href="#来龙" class="headerlink" title="来龙"></a>来龙</h2><p>　　其实一般的浅度Shader Graph使用者并不会如我这般踩这么多坑：直接使用内置的Graph模板进行创作即可。不幸的是，如前文所言：对于创建Pass并不友好，需要修改源码。于是便开始了踩坑之旅……<br>　　在默认情况下，Unity的Package将保存在工程的Library/PackageCache目录下，这样子是不能直接修改源码的（Library目录下的东西属于可再生物，随时会被覆盖），需将之搬迁至工程的Packages目录下。<br>　　对于考虑到日后Shader Graph的版本升级情况，所以尽可能的<strong>不要修改原工程的内容</strong>，而是尽量新建文件。但考虑到Shader Graph源码下存在不少inner元素，直接在外面写自己的内容也并非彻底可行。只能直接在Shader Graph包下进行添加文件的方式了，这也是要将之移至Packages目录的原因。<br>　　我要做的事情相当明确：<strong>新建一个自定义的Graph类型</strong>。在URP下已经自带Unlit与PBR两种类型了，于是本人便基于Unlit Graph并结合先前实现的Shader的特性进行新类型的创作。  </p>
-<h2 id="去脉"><a href="#去脉" class="headerlink" title="去脉"></a>去脉</h2><p>　　我们能接触到Unlit Graph创建的起点便是Project区下右键菜单的<code>Create-&gt;Shader-&gt;Unlit Graph</code>了，直接在Shader Graph源码包下全局搜索<code>Create/Shader/Unlit Graph</code>即可找到：<br><img src="https://musoucrow.github.io/images/shader_graph/0.png" alt="0"><br>　　照葫芦画瓢在同目录下弄个新文件实现相同功能即可，这下我们便知道Unlit Graph的正主了：<code>UnlitMasterNode</code>。经过研究发现，它决定了在编辑器下Unlit Master Node的样式：<br><img src="https://musoucrow.github.io/images/shader_graph/1.png" alt="1"><br><img src="https://musoucrow.github.io/images/shader_graph/2.png" alt="2"><br>　　但这只是个壳子罢了，根据代码中的<code>IUnlitSubShader</code>为引，找到了其核心：<br><img src="https://musoucrow.github.io/images/shader_graph/3.png" alt="3"><br>　　这个<code>UniversalUnlitSubShader</code>的作用相当简单：根据编辑器的设置<strong>生成Shader代码</strong>。如上图便可看出定义Pass数据结构的行为，这也是诱使我来改源码的直接原因。在里面你将见到形如这般的代码：</p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> unlitMasterNode = masterNode <span class="keyword">as</span> UnlitMasterNode;</div><div class="line"><span class="keyword">var</span> subShader = <span class="keyword">new</span> ShaderGenerator();</div><div class="line"></div><div class="line">subShader.AddShaderChunk(<span class="string">"SubShader"</span>, <span class="literal">true</span>);</div><div class="line">subShader.AddShaderChunk(<span class="string">"&#123;"</span>, <span class="literal">true</span>);</div><div class="line">subShader.Indent();</div><div class="line">&#123;</div><div class="line">    <span class="keyword">var</span> surfaceTags = ShaderGenerator.BuildMaterialTags(unlitMasterNode.surfaceType);</div><div class="line">    <span class="keyword">var</span> tagsBuilder = <span class="keyword">new</span> ShaderStringBuilder(<span class="number">0</span>);</div><div class="line">    surfaceTags.GetTags(tagsBuilder, <span class="string">"UniversalPipeline"</span>);</div><div class="line">    subShader.AddShaderChunk(tagsBuilder.ToString());</div><div class="line">    </div><div class="line">    GenerateShaderPass(unlitMasterNode, m_UnlitPass, mode, subShader, sourceAssetDependencyPaths);</div><div class="line">    GenerateShaderPass(unlitMasterNode, m_ShadowCasterPass, mode, subShader, sourceAssetDependencyPaths);</div><div class="line">    GenerateShaderPass(unlitMasterNode, m_DepthOnlyPass, mode, subShader, sourceAssetDependencyPaths);   </div><div class="line">&#125;</div><div class="line">subShader.Deindent();</div><div class="line">subShader.AddShaderChunk(<span class="string">"&#125;"</span>, <span class="literal">true</span>);</div></pre></td></tr></table></figure>
-<p>　　如此情况便变得相当清晰了，只要清楚<strong>你想生成怎样的</strong>Shader代码，在摸熟了生成代码的API，便可自由地进行创作了。通过右键节点可以随时查看生成的代码情况：<br><img src="https://musoucrow.github.io/images/shader_graph/4.png" alt="4">  </p>
-<h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>　　也许看似还算简单，但其中坑点还是有不少的：  </p>
-<ul>
-<li>不要尝试采用继承的形式去新建新类型，其本身代码就没打算让你这么做，必然会碰壁，除非改源码（如此便违反原则了）</li>
-<li>做出了修改后，要到对应的Graph文件进行Save操作触发检测。</li>
-<li>也许是检测的原因，有时候HLSL代码做出了修改后不会被识别到，需要换下行。</li>
-<li>Shader Graph生成的着色器参数有着自己的一套处理方式，务必参考自带的代码。</li>
-<li>Unlit Graph的主Pass并没有LightMode，想做背面Pass的时候要注意下。</li>
-<li>Unlit Graph将渲染模式、混合模式、剔除做成节点设置并不是一个好选择（无法让材质修改），推荐按照URP的方式做成材质属性。<img src="https://musoucrow.github.io/images/shader_graph/5.png" alt="5"></li>
-<li>Shader Graph对于生成的Shader代码存在分支数限制，需要到<code>Preference-&gt;Shader Graph</code>进行修改上限。值得一提的是，全局Keyword与局部Keyword似乎是分别对待的。</li>
-<li>Shader Graph并不存在完整的环境，它是无法识别到一些渲染管线里的函数的。所以在编写Custom Shader的时候需要加上<code>#if SHADERGRAPH_PREVIEW</code>分支判定以处理在编辑模式下的情况：</li>
-</ul>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">MainLight_float</span><span class="params">(float3 WorldPos, out float3 Direction, out float3 Color, out <span class="keyword">float</span> DistanceAtten, out <span class="keyword">float</span> ShadowAtten)</span></span></div><div class="line">&#123;</div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SHADERGRAPH_PREVIEW</span></div><div class="line">    Direction = float3(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0</span>);</div><div class="line">    Color = <span class="number">1</span>;</div><div class="line">    DistanceAtten = <span class="number">1</span>;</div><div class="line">    ShadowAtten = <span class="number">1</span>;</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">if</span> SHADOWS_SCREEN</span></div><div class="line">    float4 clipPos = TransformWorldToHClip(WorldPos);</div><div class="line">    float4 shadowCoord = ComputeScreenPos(clipPos);</div><div class="line"><span class="meta">#<span class="meta-keyword">else</span></span></div><div class="line">    float4 shadowCoord = TransformWorldToShadowCoord(WorldPos);</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">    Light mainLight = GetMainLight(shadowCoord);</div><div class="line">    Direction = mainLight.direction;</div><div class="line">    Color = mainLight.color;</div><div class="line">    DistanceAtten = mainLight.distanceAttenuation;</div><div class="line">    ShadowAtten = mainLight.shadowAttenuation;</div><div class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　现在感觉游戏开发的未来方向就是连连看了，从这点来说UE4的确算是时代前沿。在编辑器里加入逻辑控制元素，让更多人能加入创作，尽可能地解放生产力，的确是游戏开发所需要的。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2111,7 +2110,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">49</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

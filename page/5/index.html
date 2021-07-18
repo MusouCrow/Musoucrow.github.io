@@ -291,6 +291,176 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/07/16/socket_listen/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/07/16/socket_listen/" itemprop="url">
+                  关于Socket.listen方法的一点体悟
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-16T11:58:36+08:00">
+                2017-07-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Network/" itemprop="url" rel="index">
+                    <span itemprop="name">Network</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/16/socket_listen/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/16/socket_listen/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/07/16/socket_listen/" class="leancloud_visitors" data-flag-title="关于Socket.listen方法的一点体悟">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　最近在接触<a href="https://docs.python.org/3/library/socket.html#module-socket" target="_blank" rel="external">Socket</a>的的时候，关于其中的listen方法感到不解，于是对其进行了一番研究，得出了一点体悟，特此记录。</p>
+<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　让我们先来看看listen方法在Python3.6文档说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">socket.listen([backlog])</div><div class="line"></div><div class="line">Enable a server to accept connections. If backlog is specified, it must be at least 0 (if it is lower, it is set to 0); it specifies the number of unaccepted connections that the system will allow before refusing new connections. If not specified, a default reasonable value is chosen.</div><div class="line">启用服务器以接受连接。如果指定backlog，则必须至少为0（如果低于0，则设置为0）；它指定系统在拒绝新连接之前将允许的未接受连接的数量。如果未指定，则选择默认的合理值。</div><div class="line"></div><div class="line">Changed in version 3.5: The backlog parameter is now optional.</div><div class="line">在版本3.5中已更改： backlog参数现在是可选的。</div></pre></td></tr></table></figure>
+<p>　　起初我看了这说明想当然的以为是可以接入的Client上限，不过实践过后发现并非如此。在网上找的解答基本上就是文档所言的复述，后来请教了专业人士后，方知这涉及到Socket的底层知识。<br>　　在了解listen方法之前，首先我们需要了解connect方法和accept方法，以下是文档说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">socket.connect(address)</div><div class="line"></div><div class="line">Connect to a remote socket at address. (The format of address depends on the address family — see above.)</div><div class="line">在地址连接到远程套接字。（地址的格式取决于地址系列 - 请参见上文）</div><div class="line"></div><div class="line">If the connection is interrupted by a signal, the method waits until the connection completes, or raise a socket.timeout on timeout, if the signal handler doesn’t raise an exception and the socket is blocking or has a timeout. For non-blocking sockets, the method raises an InterruptedError exception if the connection is interrupted by a signal (or the exception raised by the signal handler).</div><div class="line">如果连接被信号中断，则该方法等待直到连接完成，或者如果信号处理程序没有引发异常并且套接字正在阻塞或者已经阻塞，则在超时时引入socket.timeout超时。对于非阻塞套接字，如果连接被信号中断（或由信号处理程序引发的异常），则该方法引发InterruptedError异常。</div><div class="line"></div><div class="line">Changed in version 3.5: The method now waits until the connection completes instead of raising an InterruptedError exception if the connection is interrupted by a signal, the signal handler doesn’t raise an exception and the socket is blocking or has a timeout (see the PEP 475 for the rationale).</div><div class="line">在版本3.5中已更改：该方法现在等待直到连接完成，而不是提高InterruptedError异常，如果连接被信号中断，信号处理程序不引发异常，套接字阻塞或超时（参见 PEP 475）。</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">socket.accept()</div><div class="line"></div><div class="line">Accept a connection. The socket must be bound to an address and listening for connections. The return value is a pair (conn, address) where conn is a new socket object usable to send and receive data on the connection, and address is the address bound to the socket on the other end of the connection.</div><div class="line">接收一个连接.该socket 必须要绑定一个地址和监听连接.返回值是一对（conn， 地址）其中conn是新 t4 &gt; socket对象可用于在连接上发送和接收数据，address是连接另一端的套接字的地址。</div><div class="line"></div><div class="line">The newly created socket is non-inheritable.</div><div class="line">新创建的套接字non-inheritable。</div><div class="line"></div><div class="line">Changed in version 3.4: The socket is now non-inheritable.</div><div class="line">在版本3.4中更改：套接字现在是不可继承的。</div><div class="line"></div><div class="line">Changed in version 3.5: If the system call is interrupted and the signal handler does not raise an exception, the method now retries the system call instead of raising an InterruptedError exception (see PEP 475 for the rationale).</div><div class="line">在版本3.5中更改：如果系统调用中断并且信号处理程序没有引发异常，则此方法现在重试系统调用，而不是引发InterruptedError异常 PEP 475）。</div></pre></td></tr></table></figure>
+<p>　　相比listen方法，它俩就好理解多了，一个是Client用于连接Server的方法，一个是Server用于接收Client的连接申请的方法。<br>　　但事实上accept方法一次只能接收一个Client的连接申请，而Client则是多个的，这样Socket会设计一个队列来存储Client的连接申请则是理所当然的。于是accept便从这个队列里提取首位成员处理即可。以下是示意图：<img src="https://musoucrow.github.io/images/socket_listen/1.png" alt="1"></p>
+<p>　　如此便很清晰了，backlog参数的含义便是这个队列的最大值，也就是同时受理连接申请的最大值。关于backlog该设置为多少，从<a href="https://github.com/cloudwu/skynet" target="_blank" rel="external">Skynet</a>得到的参考为32。如果满了便需要Client重新connect。以上listen方法之谜便解开了。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　不得不说网络编程的水真的很深，我也得买点书充充电了，目前的目标为啃下谢希仁著的《计算机网络》。另外推荐《TCP/IP详解》及《UNIX网络编程》。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/06/16/mvc_thinking/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2049,7 +2219,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">49</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
