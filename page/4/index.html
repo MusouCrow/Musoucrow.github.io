@@ -291,6 +291,180 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/03/12/bnb_3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/03/12/bnb_3/" itemprop="url">
+                  《Brick & Ball》开发总结（三）——游戏性
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-03-12T18:06:12+08:00">
+                2018-03-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/03/12/bnb_3/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/03/12/bnb_3/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/03/12/bnb_3/" class="leancloud_visitors" data-flag-title="《Brick & Ball》开发总结（三）——游戏性">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　总算到了最后一篇了，这篇我想写一些关于本游戏在画面表现与游戏性方面的总结，毕竟游戏项目的重点不仅在于程序，还在于策划与美术。<br>　　《Brick &amp; Ball》（下称BNB）从游戏元素来看其实就是乒乓球与打砖块的结合，但其实创作灵感是源自<a href="https://en.wikipedia.org/wiki/Table_football" target="_blank" rel="external">《Table football》</a>，这是一种实体游戏，当时我玩了之后便爱不释手，起了将其搬上手机的想法（实际上已有人这么做了）。但因其操作的复杂度对于手机而言过高遂进行了精简，便有了现在的BNB。</p>
+<h2 id="画面表现"><a href="#画面表现" class="headerlink" title="画面表现"></a>画面表现</h2><h3 id="界面风格"><a href="#界面风格" class="headerlink" title="界面风格"></a>界面风格</h3><p>　　界面的美术风格选择的是类似《Persona5》的黑白风格，这种风格可以明显地与场景区别出来。个人认为界面与场景的分隔是很重要的，这样方能轻松识别两者。</p>
+<p><img src="https://musoucrow.github.io/images/bnb_3/p5.jpg" alt="p5"></p>
+<p><img src="https://musoucrow.github.io/images/bnb_3/ui.png" alt="ui"></p>
+<h3 id="Tween运动"><a href="#Tween运动" class="headerlink" title="Tween运动"></a>Tween运动</h3><p>　　Tween运动出自<a href="https://www.createjs.com" target="_blank" rel="external">tween.js</a>，意为包含多种样式的插值运动。由此可实现多种曲线的运动效果，在本项目使用的库为<a href="http://dotween.demigiant.com" target="_blank" rel="external">DOTween</a>。<br>　　Tween运动在游戏的运用可谓方方面面，如LOGO与按钮的弹出、镜头的运动、计分板的变化等等。它使得运动的表现更为柔和与多变，而不是朴素的线性运动。</p>
+<p><img src="https://musoucrow.github.io/images/bnb_3/tween.png" alt="tween"></p>
+<h3 id="打击感"><a href="#打击感" class="headerlink" title="打击感"></a>打击感</h3><p>　　作为存在碰撞交互的游戏，打击感的表现自然是重中之重。在搭载物理引擎的基础上，还表现为在高速下球会产生扭曲现象（如下图所示）以及产生碰撞后会出现特效、音效以及物体抖动、镜头抖动和手机震动的效果。</p>
+<p><img src="https://musoucrow.github.io/images/bnb_3/hit.png" alt="hit"></p>
+<h3 id="战时无界面"><a href="#战时无界面" class="headerlink" title="战时无界面"></a>战时无界面</h3><p>　　鉴于游戏性质的原因，游戏进行时并不适合存在界面显示，而事实上存在着计分以及冷却提示的需求。于是利用了两边的墙壁作为计分板，利用砖头的颜色变化作为冷却进度以及冷却完毕的提示。</p>
+<h2 id="游戏性"><a href="#游戏性" class="headerlink" title="游戏性"></a>游戏性</h2><h3 id="渐进的节奏"><a href="#渐进的节奏" class="headerlink" title="渐进的节奏"></a>渐进的节奏</h3><p>　　由于本游戏的核心玩法实际上是较为单调单一的，所以必须严格控制游戏时长，不能陷入长期的拉扯战。所以必须加入逐渐让游戏加速的设定，具体表现为背景音乐的速度以及球的速度。当加速到一定程度便能穿透砖头，所以不会出现理论上的无限期游戏，达到了控制游戏时长的目的。</p>
+<h3 id="速度控制"><a href="#速度控制" class="headerlink" title="速度控制"></a>速度控制</h3><p>　　球的速度与游戏体验息息相关，所以对此作了严格的控制。球的初始速度来自发射，碰到砖块时会保留一定比例的当前速度并追加速度。所以理论上是会越来越快的，但速度累积到一定程度后便会陷入暴走，所以在保留比例上会采用反比例函数使得高速下的保留比例更低，而反之低速下的保留更多，从而达到更健康的游戏体验。另外撞到墙壁或拉伸下的砖块都会有速度加成。</p>
+<h3 id="场景变化"><a href="#场景变化" class="headerlink" title="场景变化"></a>场景变化</h3><p>　　随着游戏进度会使得场景产生变化，从而影响游戏性是一种不错的做法。BNB在这方面的体现则是计分板的变化，因为计分板的也是作为实体而存在的，球撞到计分板的边角会产生不一样的运动反应，以及撞到计分板上会获得更大的加速。通过这点使得游戏得到了更为渐进的体验，从而提高游戏性。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　第三篇的内容显然比之一二少了很多，毕竟小游戏就是小游戏，在游戏内容上注定单一，但也可以看出蕴含不少讲究的。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/03/11/bnb_2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1871,172 +2045,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/07/21/spk_analysis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/21/spk_analysis/" itemprop="url">
-                  DNF的SPK文件解析笔记
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-21T15:57:42+08:00">
-                2017-07-21
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Analysis/" itemprop="url" rel="index">
-                    <span itemprop="name">Analysis</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/07/21/spk_analysis/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/21/spk_analysis/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/07/21/spk_analysis/" class="leancloud_visitors" data-flag-title="DNF的SPK文件解析笔记">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　SPK文件是<a href="http://dnf.qq.com" target="_blank" rel="external">DNF</a>的一种更新时所用的压缩包（国服除外），在更新时会从服务器下载这种SPK文件然后于本地解压。有时候为了获得更快的速度，以及突破墙的限制，我们通过获取到更新服务器的网址直接下载。但是此刻对于如何将SPK文件解压便是个问题了，本文遂由此而生。</p>
-<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　SPK文件的本质上是将原文件按照一定规则进行分割成多个片段，然后对这些片段使用<a href="http://www.bzip.org" target="_blank" rel="external">bzip2</a>算法进行压缩。以下是文件结构图：<img src="https://musoucrow.github.io/images/spk_analysis/1.png" alt="1"></p>
-<p>　　由于信息的不对称，导致不少地方是处于盲区的，不过这并不影响获取到关键数据。这种被压缩的片段开头标识为”BZh91AY&amp;SY”，所以只需要以此为关键字进行分割就能得出关键数据了，不过实际操作时发现除了压缩数据之外还有非压缩数据，并且会用一段48字节的数据进行分隔。且拥有非压缩数据的片段结尾也会有一段意味不明的数据，好在它们都有对应的开头标识，进行分割即可。<br>　　在得出压缩数据后使用bzip2算法进行解压缩，然后将所有解压后的数据与非压缩数据按顺序进行拼接，每个片段如此类推最后总体拼接起来即可得到完整的原文件。本次解析使用的环境是Python3.6，以下是过程代码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> sys</div><div class="line"><span class="keyword">import</span> bz2</div><div class="line"><span class="keyword">import</span> struct</div><div class="line"></div><div class="line"></div><div class="line">HEADER = <span class="string">b"BZh91AY&amp;SY"</span></div><div class="line">MARK = <span class="string">b"\x00\x00\x00\x00\x00\x10\x0e\x00\xff\xff\xff\xff\xff\xef\xf1\xff"</span></div><div class="line"><span class="comment"># 00 00 00 00 00 10 0E 00 FF FF FF FF FF EF F1 FF</span></div><div class="line">TAIL = <span class="string">b"\x01\x00\x00\x00"</span>  <span class="comment"># 01 00 00 00</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">decompress_spk</span><span class="params">(path)</span>:</span></div><div class="line">    f = open(path, <span class="string">"rb"</span>)</div><div class="line"></div><div class="line">    f.read(<span class="number">4</span>)  <span class="comment"># unknown, all files are same.</span></div><div class="line">    f.read(<span class="number">260</span>)  <span class="comment"># total 260 bits, contain name and buffer.</span></div><div class="line">    f.read(<span class="number">4</span>)  <span class="comment"># unknown, all files are same.</span></div><div class="line">    struct.unpack(<span class="string">'i'</span>, f.read(<span class="number">4</span>))[<span class="number">0</span>]  <span class="comment"># decompress_size</span></div><div class="line"></div><div class="line">    content = f.read()</div><div class="line">    parts = content.split(HEADER)</div><div class="line">    f.close()</div><div class="line"></div><div class="line">    new_content = <span class="string">b""</span></div><div class="line"></div><div class="line">    <span class="keyword">for</span> n <span class="keyword">in</span> range(<span class="number">1</span>, len(parts)):</div><div class="line">        lst = parts[n].split(MARK)</div><div class="line">        length = len(lst)</div><div class="line">        new_content = new_content + bz2.decompress(HEADER + lst[<span class="number">0</span>])</div><div class="line"></div><div class="line">        <span class="keyword">if</span> length &gt; <span class="number">1</span>:</div><div class="line">            <span class="keyword">for</span> m <span class="keyword">in</span> range(<span class="number">1</span>, length - <span class="number">1</span>):</div><div class="line">                new_content = new_content + lst[m][<span class="number">32</span>:]</div><div class="line"></div><div class="line">            pos = lst[length - <span class="number">1</span>].rfind(TAIL)</div><div class="line">            new_content = new_content + lst[length - <span class="number">1</span>][<span class="number">32</span>:pos]</div><div class="line"></div><div class="line">    f2 = open(path[:<span class="number">-4</span>], <span class="string">"wb"</span>)</div><div class="line">    f2.write(new_content)</div><div class="line">    f2.close()</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span> <span class="keyword">and</span> len(sys.argv) &gt; <span class="number">1</span>:</div><div class="line">    decompress_spk(sys.argv[<span class="number">1</span>])</div></pre></td></tr></table></figure>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　事实上这种SPK的压缩机制效果根本是微乎其微，我完全不明白Neople这么做的用意。以及片段的划分机制和诸多盲区都没搞懂，看来我得考虑学下逆向方面的知识了。不过无论如何，最终要达到的目标还是做到了。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2086,7 +2094,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

@@ -291,6 +291,172 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/07/21/spk_analysis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/07/21/spk_analysis/" itemprop="url">
+                  DNF的SPK文件解析笔记
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-21T15:57:42+08:00">
+                2017-07-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Analysis/" itemprop="url" rel="index">
+                    <span itemprop="name">Analysis</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/07/21/spk_analysis/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/07/21/spk_analysis/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/07/21/spk_analysis/" class="leancloud_visitors" data-flag-title="DNF的SPK文件解析笔记">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　SPK文件是<a href="http://dnf.qq.com" target="_blank" rel="external">DNF</a>的一种更新时所用的压缩包（国服除外），在更新时会从服务器下载这种SPK文件然后于本地解压。有时候为了获得更快的速度，以及突破墙的限制，我们通过获取到更新服务器的网址直接下载。但是此刻对于如何将SPK文件解压便是个问题了，本文遂由此而生。</p>
+<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　SPK文件的本质上是将原文件按照一定规则进行分割成多个片段，然后对这些片段使用<a href="http://www.bzip.org" target="_blank" rel="external">bzip2</a>算法进行压缩。以下是文件结构图：<img src="https://musoucrow.github.io/images/spk_analysis/1.png" alt="1"></p>
+<p>　　由于信息的不对称，导致不少地方是处于盲区的，不过这并不影响获取到关键数据。这种被压缩的片段开头标识为”BZh91AY&amp;SY”，所以只需要以此为关键字进行分割就能得出关键数据了，不过实际操作时发现除了压缩数据之外还有非压缩数据，并且会用一段48字节的数据进行分隔。且拥有非压缩数据的片段结尾也会有一段意味不明的数据，好在它们都有对应的开头标识，进行分割即可。<br>　　在得出压缩数据后使用bzip2算法进行解压缩，然后将所有解压后的数据与非压缩数据按顺序进行拼接，每个片段如此类推最后总体拼接起来即可得到完整的原文件。本次解析使用的环境是Python3.6，以下是过程代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> sys</div><div class="line"><span class="keyword">import</span> bz2</div><div class="line"><span class="keyword">import</span> struct</div><div class="line"></div><div class="line"></div><div class="line">HEADER = <span class="string">b"BZh91AY&amp;SY"</span></div><div class="line">MARK = <span class="string">b"\x00\x00\x00\x00\x00\x10\x0e\x00\xff\xff\xff\xff\xff\xef\xf1\xff"</span></div><div class="line"><span class="comment"># 00 00 00 00 00 10 0E 00 FF FF FF FF FF EF F1 FF</span></div><div class="line">TAIL = <span class="string">b"\x01\x00\x00\x00"</span>  <span class="comment"># 01 00 00 00</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">decompress_spk</span><span class="params">(path)</span>:</span></div><div class="line">    f = open(path, <span class="string">"rb"</span>)</div><div class="line"></div><div class="line">    f.read(<span class="number">4</span>)  <span class="comment"># unknown, all files are same.</span></div><div class="line">    f.read(<span class="number">260</span>)  <span class="comment"># total 260 bits, contain name and buffer.</span></div><div class="line">    f.read(<span class="number">4</span>)  <span class="comment"># unknown, all files are same.</span></div><div class="line">    struct.unpack(<span class="string">'i'</span>, f.read(<span class="number">4</span>))[<span class="number">0</span>]  <span class="comment"># decompress_size</span></div><div class="line"></div><div class="line">    content = f.read()</div><div class="line">    parts = content.split(HEADER)</div><div class="line">    f.close()</div><div class="line"></div><div class="line">    new_content = <span class="string">b""</span></div><div class="line"></div><div class="line">    <span class="keyword">for</span> n <span class="keyword">in</span> range(<span class="number">1</span>, len(parts)):</div><div class="line">        lst = parts[n].split(MARK)</div><div class="line">        length = len(lst)</div><div class="line">        new_content = new_content + bz2.decompress(HEADER + lst[<span class="number">0</span>])</div><div class="line"></div><div class="line">        <span class="keyword">if</span> length &gt; <span class="number">1</span>:</div><div class="line">            <span class="keyword">for</span> m <span class="keyword">in</span> range(<span class="number">1</span>, length - <span class="number">1</span>):</div><div class="line">                new_content = new_content + lst[m][<span class="number">32</span>:]</div><div class="line"></div><div class="line">            pos = lst[length - <span class="number">1</span>].rfind(TAIL)</div><div class="line">            new_content = new_content + lst[length - <span class="number">1</span>][<span class="number">32</span>:pos]</div><div class="line"></div><div class="line">    f2 = open(path[:<span class="number">-4</span>], <span class="string">"wb"</span>)</div><div class="line">    f2.write(new_content)</div><div class="line">    f2.close()</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span> <span class="keyword">and</span> len(sys.argv) &gt; <span class="number">1</span>:</div><div class="line">    decompress_spk(sys.argv[<span class="number">1</span>])</div></pre></td></tr></table></figure>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　事实上这种SPK的压缩机制效果根本是微乎其微，我完全不明白Neople这么做的用意。以及片段的划分机制和诸多盲区都没搞懂，看来我得考虑学下逆向方面的知识了。不过无论如何，最终要达到的目标还是做到了。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/07/16/socket_listen/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2219,7 +2385,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

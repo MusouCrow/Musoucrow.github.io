@@ -291,6 +291,227 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2021/08/29/lbbn_grass/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2021/08/29/lbbn_grass/" itemprop="url">
+                  基于模型索引图生成植被与渲染的方案
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2021-08-29T21:01:33+08:00">
+                2021-08-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2021/08/29/lbbn_grass/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2021/08/29/lbbn_grass/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2021/08/29/lbbn_grass/" class="leancloud_visitors" data-flag-title="基于模型索引图生成植被与渲染的方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p><img src="https://musoucrow.github.io/images/lbbn/0.png" alt="0"><br>　　看着这光秃秃草地，这不整点草上去像样么？之前采用的放置若干草堆装饰物点缀，效果实在捉急。于是这波决定采取GPU Instance在草地上都填满草，这可以说是PS4时代下半场以来的标配了：<br><img src="https://musoucrow.github.io/images/lbbn/1.jpeg" alt="1"><br>　　若是按照传统工作流，也许就是什么刷草编辑器走起了。可惜我们并没有这个人力去做这种事情，且对于草的放置需求也很明确：<strong>在草地及其周边铺满，并加上一定的疏密变化即可</strong>。恰好我们的地形渲染也是<a href="https://zhuanlan.zhihu.com/p/336701783" target="_blank" rel="external">自制</a>的，对于草地的所在实际上是有索引贴图控制的：<br><img src="https://musoucrow.github.io/images/lbbn/2.png" alt="2"><br>　　如上图所示，红色的部分即是草地，那么事情就变得明了了：只要能<strong>获取到贴图红色部分的坐标等信息</strong>，转换一番不就能给GPU Instance使用了？事不宜迟，这就开干！</p>
+<h3 id="索引图转换"><a href="#索引图转换" class="headerlink" title="索引图转换"></a>索引图转换</h3><p>　　在正式开动之前还需要注意一个问题：不是给草地硬生生的填满了草就完事的，需要具有一定的疏密变化，且草地与其他地块之间的过渡处也要多少有点草，不然搞得跟防火带似得。由此可见，直接使用地形的索引贴图并非是个好的选择。于是我选择开发了转换工具：<br><img src="https://musoucrow.github.io/images/lbbn/3.png" alt="3"><br>　　最后导出为黑白图：<br><img src="https://musoucrow.github.io/images/lbbn/4.png" alt="4"><br>　　其功能大致为：  </p>
+<ul>
+<li>指定转换通道(<code>Channel</code>)</li>
+<li>通道外扩（<code>Expand</code>）</li>
+<li>通道值随机（<code>Opacity Rate</code>）</li>
+<li>随机选择位置展开挖孔（<code>Dissipate</code>）</li>
+</ul>
+<p>　　如此较之地形索引图，便有了更多的变化了。</p>
+<h3 id="三角面填充"><a href="#三角面填充" class="headerlink" title="三角面填充"></a>三角面填充</h3><p>　　有了转换后的索引图，接下来便是生成了。根据uv采样贴图，得到模型对应的位置在Shader里倒是相当简单。可在CPU端进行则需多费一番功夫了：我们知道模型是由多个三角面组成，每个三角面对应三个顶点，每个顶点有着自己的坐标、法线、UV等信息。但问题在于<strong>我们无法直接获得三角面内部的这些信息</strong>，而这在Shader里是经过光栅化后所以才能取得的。换言之，我们需要自己整个<strong>软光栅</strong>。<br>　　软光栅听着玄乎，实际上在这里只是<strong>用一个单位值，在三角形内部步进，得到一系列的点</strong>罢了，详细算法可以参考市面上的<a href="https://blog.csdn.net/kakaxi2222/article/details/98853394" target="_blank" rel="external">三角形填充算法</a>，其原理并非本文内容，不作复述。<br>　　在获得了三角面内部的一个个点后，我们还需要得到它们的坐标、法线、UV等信息。这需要获取<strong>该点相对于三角面的三个顶点的距离权重</strong>，将相关信息插值得出。如何取得这个距离权重，这便又引申出另一个算法：<a href="https://blog.csdn.net/tkokof1/article/details/89367595" target="_blank" rel="external">三角形线性插值</a>。这其实便是实现软渲染的必备一环，这俩算法组合拳便能得出这个经典的RGB插值三角形了：<br><img src="https://musoucrow.github.io/images/lbbn/5.png" alt="5">  </p>
+<h3 id="多线程生成"><a href="#多线程生成" class="headerlink" title="多线程生成"></a>多线程生成</h3><p>　　有了三角面填充坐标点后，便可考虑生成的事了，首先要明确生成的策略：</p>
+<ul>
+<li>根据<code>填充单位值</code>对模型的三角面生成若干点，每个点都会记录相应信息（坐标、法线、UV、通道值），通道值根据UV采样贴图而得</li>
+<li>另外会根据点的法线值检查所在角度是否合法（不希望墙壁之类的地方也生成），对于角度不合法的点会作废处理</li>
+<li>根据合法点的通道值累加，除以一个<code>可配置的系数</code>，决定该模型能填充的草数量（草数量 = 总通道值 / 系数）</li>
+<li>在总数量的前提下，随机挑选合法点种草，最后将草数据导出即可</li>
+</ul>
+<p>　　按照这套逻辑直接开干自然是没毛病，但性能这块实在捉急（模型的三角面太多、三角形填充以及贴图采样都耗时），然而这其实是个很适合并行化的作业（以三角面为单位），以及最后的草随机生成。那么便可引入[JobSystem][<a href="https://docs.unity3d.com/Packages/com.unity.jobs@0.8/manual/index.html]搞事了，整个工作流将会变成：" target="_blank" rel="external">https://docs.unity3d.com/Packages/com.unity.jobs@0.8/manual/index.html]搞事了，整个工作流将会变成：</a></p>
+<ul>
+<li>配置模型及其转换后的索引贴图，配置相关生成参数（填充单位值、系数等）</li>
+<li>收集点信息：创建<code>CollectJob</code>，将相关数据传入（三角面、顶点、UV集合等），以模型三角面数为作业量，对每个三角面填充点，筛选掉不合法的点，导出到统一容器中</li>
+<li>遍历容器成员，将每个作业的成果导入到外部容器中</li>
+<li>生成草信息：创建<code>GenerateJob</code>，将相关数据传入（点集合、模型矩阵、随机算子等），以草生成数为作业量，随机选择点进行草数据的生成</li>
+<li>将草信息容器转换为数组导出</li>
+</ul>
+<p>　　需要注意的是，JobSystem只支持<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/builtin-types/unmanaged-types" target="_blank" rel="external">非托管类型</a>资源。也就是说我们不能直接将诸如<code>Mesh</code>、<code>Texture2D</code>之类的资源直接传入使用，得做点转换工作：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> job = <span class="keyword">new</span> CollectJob();</div><div class="line"></div><div class="line">job.vertices = <span class="keyword">new</span> NativeArray&lt;Vector3&gt;(mesh.vertices, allocator);</div><div class="line">job.uvs = <span class="keyword">new</span> NativeArray&lt;Vector2&gt;(mesh.uv, allocator);</div><div class="line">job.normals = <span class="keyword">new</span> NativeArray&lt;Vector3&gt;(mesh.normals, allocator);</div><div class="line">job.triangles = <span class="keyword">new</span> NativeArray&lt;<span class="keyword">int</span>&gt;(mesh.triangles, allocator);</div><div class="line">job.maps = <span class="keyword">new</span> NativeArray&lt;Color&gt;(texture.GetPixels(), allocator);</div><div class="line">job.texelSize = <span class="keyword">new</span> Vector2Int(texture.width, texture.height);</div></pre></td></tr></table></figure>
+<p>　　是的，就连容器都得使用Unity专门开发的<a href="https://docs.unity3d.com/Packages/com.unity.collections@1.0/manual/index.html" target="_blank" rel="external">Native Container</a>，不可以用诸如数组、<code>List</code>之流。<br>　　另外对于CollectJob的点数据导出，经过我的一番实践，想要在<strong>多个作业同时导出到同一个容器，并且没有冲突</strong>的话，最佳方式是创建一个<code>NativeArray</code>对象，<strong>为每个作业开辟一定的空间，保证每个作业之间的写入区域是相互独立</strong>的：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> job = <span class="keyword">new</span> CollectJob();</div><div class="line"></div><div class="line"><span class="comment">// length代表作业数，TRIANGLE_MAX表示每个三角形的最大可填充数量</span></div><div class="line">job.points = <span class="keyword">new</span> NativeArray&lt;Point&gt;(length * TRIANGLE_MAX, allocator, NativeArrayOptions.UninitializedMemory);</div><div class="line">job.counts = <span class="keyword">new</span> NativeArray&lt;<span class="keyword">int</span>&gt;(length, allocator); <span class="comment">// counts记录每个作业的填充数</span></div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// i, j, k表示三角面对应的三个顶点索引</span></div><div class="line"><span class="keyword">var</span> p1 = <span class="keyword">new</span> Vector2(<span class="keyword">this</span>.vertices[i].x, <span class="keyword">this</span>.vertices[i].z);</div><div class="line"><span class="keyword">var</span> p2 = <span class="keyword">new</span> Vector2(<span class="keyword">this</span>.vertices[j].x, <span class="keyword">this</span>.vertices[j].z);</div><div class="line"><span class="keyword">var</span> p3 = <span class="keyword">new</span> Vector2(<span class="keyword">this</span>.vertices[k].x, <span class="keyword">this</span>.vertices[k].z);</div><div class="line"></div><div class="line"><span class="comment">// 填充三角面</span></div><div class="line">NativeList&lt;Vector2&gt; vertices = Triangles.FillTriangle(p1, p2, p3, <span class="keyword">this</span>.precision);</div><div class="line"><span class="keyword">this</span>.counts[index] = <span class="number">0</span>;</div><div class="line"></div><div class="line"><span class="comment">// 遍历顶点，构建点数据</span></div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> n = <span class="number">0</span>; n &lt; vertices.Length; n++) &#123;</div><div class="line">    <span class="comment">// 超出上限则取消</span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.counts[index] &gt; TRIANGLE_MAX) &#123;</div><div class="line">        <span class="keyword">break</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="comment">// 获取相对三个顶点的距离权重</span></div><div class="line">    Vector3 rates = Triangles.GetTriangleRates(vertices[n], p1, p2, p3);</div><div class="line">    </div><div class="line">    <span class="comment">// 根据距离权重，获取点各项数据</span></div><div class="line">    Vector3 position = <span class="keyword">this</span>.vertices[i] * rates[<span class="number">0</span>] + <span class="keyword">this</span>.vertices[j] * rates[<span class="number">1</span>] + <span class="keyword">this</span>.vertices[k] * rates[<span class="number">2</span>];</div><div class="line">    Vector2 uv = <span class="keyword">this</span>.uvs[i] * rates.x + <span class="keyword">this</span>.uvs[j] * rates.y + <span class="keyword">this</span>.uvs[k] * rates.z;</div><div class="line">    Vector3 normal = <span class="keyword">this</span>.normals[i] * rates.x + <span class="keyword">this</span>.normals[j] * rates.y + <span class="keyword">this</span>.normals[k] * rates.z;</div><div class="line">    <span class="keyword">float</span> weight = <span class="keyword">this</span>.SampleTexture(uv);</div><div class="line">    <span class="keyword">float</span> angle = Vector3.Angle(Vector3.up, normal);</div><div class="line"></div><div class="line">    <span class="comment">// 拥有通道值且角度合法的点方可加入</span></div><div class="line">    <span class="keyword">if</span> (weight &gt; <span class="number">0</span> &amp;&amp; math.abs(angle) &lt; <span class="keyword">this</span>.angleMax) &#123;</div><div class="line">        <span class="comment">// 保证各作业的写入位置是独立的</span></div><div class="line">        <span class="keyword">var</span> point = <span class="keyword">new</span> Point() &#123;position = position, uv = uv, normal = normal, weight = weight + weight * weight&#125;;</div><div class="line">        <span class="keyword">this</span>.points[index * TRIANGLE_MAX + <span class="keyword">this</span>.counts[index]] = point;</div><div class="line">        <span class="keyword">this</span>.counts[index]++;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如此最后便可将容器内的数据导出到外部容器了：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> List&lt;Point&gt; <span class="title">PackPoints</span>(<span class="params"><span class="keyword">in</span> NativeArray&lt;Point&gt; points, <span class="keyword">in</span> NativeArray&lt;<span class="keyword">int</span>&gt; counts</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> list = <span class="keyword">new</span> List&lt;Point&gt;();</div><div class="line">    </div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; counts.Length; i++) &#123;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; counts[i]; j++) &#123;</div><div class="line">            <span class="keyword">var</span> point = points[i * TRIANGLE_MAX + j];</div><div class="line">            list.Add(point);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> list;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　生成草数据部分的GenerateJob则更为简单，由于它的生成数量是一开始便定好的，所以构造作业量长度的容器即可：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">float</span> weight = <span class="number">0</span>;</div><div class="line"></div><div class="line"><span class="comment">// 取得总通道值</span></div><div class="line"><span class="keyword">foreach</span> (<span class="keyword">var</span> point <span class="keyword">in</span> points) &#123;</div><div class="line">    weight += point.weight;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 获取生成数量</span></div><div class="line"><span class="keyword">int</span> count = (<span class="keyword">int</span>)(weight / <span class="keyword">group</span>.opacity);</div><div class="line">count = count &gt; points.Count ? points.Count : count;</div><div class="line"></div><div class="line"><span class="keyword">var</span> job = <span class="keyword">new</span> GenerateJob();</div><div class="line">job.units = <span class="keyword">new</span> NativeArray&lt;Unit&gt;(count, allocator);</div><div class="line">job.points = points.ToNativeArray(allocator);</div><div class="line"></div><div class="line"><span class="comment">// 草坐标与模型矩阵有关</span></div><div class="line">job.matrix = <span class="keyword">group</span>.gameObject.transform.localToWorldMatrix;</div><div class="line"></div><div class="line"><span class="comment">// Job内使用的随机数需要来自Unity.Mathematics</span></div><div class="line">job.random = <span class="keyword">new</span> Random();</div><div class="line">job.random.InitState();</div><div class="line"></div><div class="line"><span class="keyword">var</span> handle = job.Schedule(count, <span class="number">1</span>);</div><div class="line">handle.Complete();</div></pre></td></tr></table></figure>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"><span class="keyword">int</span> index</span>) </span>&#123;</div><div class="line">    <span class="comment">// 从points随机选择生成unit</span></div><div class="line">    <span class="keyword">int</span> idx = <span class="keyword">this</span>.random.NextInt(<span class="keyword">this</span>.points.Length);</div><div class="line">    Point point = <span class="keyword">this</span>.points[idx];</div><div class="line">    <span class="keyword">this</span>.units[index] = <span class="keyword">this</span>.NewUnit(point);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> Unit <span class="title">NewUnit</span>(<span class="params"><span class="keyword">in</span> Point point</span>) </span>&#123;</div><div class="line">    <span class="comment">// 构建矩阵，与模型矩阵结合，获得正确的坐标点</span></div><div class="line">    <span class="keyword">var</span> matrix = <span class="keyword">new</span> Matrix4x4();</div><div class="line">    matrix.SetTRS(point.position, Quaternion.identity, Vector3.one);</div><div class="line">    matrix = <span class="keyword">this</span>.matrix * matrix;</div><div class="line"></div><div class="line">    <span class="comment">// 为了节省内存，草的数据实际上只有坐标，其余部分在Shader随机生成</span></div><div class="line">    <span class="keyword">var</span> unit = <span class="keyword">new</span> Unit() &#123;</div><div class="line">        position = <span class="keyword">new</span> Vector3(matrix.m03, matrix.m13, matrix.m23)</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> unit;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="渲染支持"><a href="#渲染支持" class="headerlink" title="渲染支持"></a>渲染支持</h3><p>　　有了数据之后，接下来便是将它们渲染出来了：我们会使用一个<code>MonoBehavior</code>，在<code>LateUpdate</code>时调用<a href="https://docs.unity3d.com/cn/current/ScriptReference/Graphics.DrawMeshInstancedIndirect.html" target="_blank" rel="external">Graphics.DrawMeshInstancedIndirect</a>进行草的批量绘制。为此需要两个关键的<a href="https://docs.unity3d.com/cn/current/ScriptReference/ComputeBuffer.html" target="_blank" rel="external">Compute Buffer</a>：<code>argsBuffer</code>与<code>unitBuffer</code>，一者作为绘制API的参数，提供绘制模型的相关信息以及数量。另者即是草的数据集封装，传入材质属性供Shader使用：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line">[ExecuteAlways]</div><div class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GrassSolution</span> : <span class="title">MonoBehaviour</span> &#123;</div><div class="line">    [Serializable]</div><div class="line">    <span class="keyword">public</span> <span class="keyword">struct</span> Unit &#123;</div><div class="line">        <span class="keyword">public</span> Vector3 position;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">public</span> Mesh mesh;</div><div class="line">    <span class="keyword">public</span> Material material;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> ComputeBuffer argsBuffer;</div><div class="line">    <span class="keyword">private</span> ComputeBuffer unitBuffer;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitUnits</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// ComputeBuffer的核心数据属于非托管资源，需要手动释放</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.unitBuffer != <span class="literal">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.unitBuffer.Release();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 将草数据集传入</span></div><div class="line">        <span class="keyword">this</span>.unitBuffer = <span class="keyword">new</span> ComputeBuffer(<span class="keyword">this</span>.units.Length, <span class="keyword">sizeof</span>(Unit));</div><div class="line">        <span class="keyword">this</span>.unitBuffer.SetData(<span class="keyword">this</span>.units);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitArgs</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// 构建所需参数</span></div><div class="line">        <span class="keyword">var</span> args = <span class="keyword">new</span> <span class="keyword">uint</span>[] &#123;</div><div class="line">            <span class="keyword">this</span>.mesh.GetIndexCount(<span class="number">0</span>),</div><div class="line">            (<span class="keyword">uint</span>)<span class="keyword">this</span>.units.Length,</div><div class="line">            <span class="keyword">this</span>.mesh.GetIndexStart(<span class="number">0</span>),</div><div class="line">            <span class="keyword">this</span>.mesh.GetBaseVertex(<span class="number">0</span>),</div><div class="line">            <span class="number">0</span></div><div class="line">        &#125;;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.argsBuffer != <span class="literal">null</span>) &#123;</div><div class="line">            <span class="keyword">this</span>.argsBuffer.Release();</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 传入参数信息</span></div><div class="line">        <span class="keyword">this</span>.argsBuffer = <span class="keyword">new</span> ComputeBuffer(<span class="number">1</span>, <span class="keyword">sizeof</span>(<span class="keyword">uint</span>) * <span class="number">5</span>, ComputeBufferType.IndirectArguments);</div><div class="line">        <span class="keyword">this</span>.argsBuffer.SetData(args);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// 初始化ComputeBuffer</span></div><div class="line">        <span class="keyword">this</span>.InitUnits();</div><div class="line">        <span class="keyword">this</span>.InitArgs();</div><div class="line"></div><div class="line">        <span class="comment">// 将unitBuffer数据传入Shader</span></div><div class="line">        <span class="keyword">this</span>.material.SetBuffer(<span class="string">"_Units"</span>, <span class="keyword">this</span>.unitBuffer);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">LateUpdate</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="comment">// 指定模型与材质，每帧绘制</span></div><div class="line">        Graphics.DrawMeshInstancedIndirect(<span class="keyword">this</span>.mesh, <span class="number">0</span>, <span class="keyword">this</span>.material, <span class="keyword">this</span>.bounds, <span class="keyword">this</span>.argsBuffer);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　到了Shader层面，还需要对接草的坐标信息，才能渲染到正确的位置：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 定义草的数据结构</span></div><div class="line"><span class="keyword">struct</span> Unit</div><div class="line">&#123;</div><div class="line">    float3 position;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">// ComputeBuffer容器，对应this.unitBuffer</span></div><div class="line">StructuredBuffer&lt;Unit&gt; _Units;</div><div class="line"></div><div class="line"><span class="function">Varyings <span class="title">Vert</span><span class="params">(Attributes input, uint instanceID : SV_InstanceID)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// 根据instanceID获取对应的草数据</span></div><div class="line">    Unit unit = _Units[instanceID];</div><div class="line">    <span class="comment">// 赋予坐标</span></div><div class="line">    input.positionOS.xyz += unit.position;</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="视矩剔除"><a href="#视矩剔除" class="headerlink" title="视矩剔除"></a>视矩剔除</h3><p>　　如此一来草的渲染自然不是问题了：<br><img src="https://musoucrow.github.io/images/lbbn/6.png" alt="6"><br>　　但可以看到，整个场景一眼望去，草的数量还是不少的。并且在视野内能看到的充其量就一个地块而已，为了保证性能，还需要引入视矩剔除。<br>　　本方案采取的视矩剔除方案相当简单：在空间中根据<strong>草所在之处划分出一个个格子，每个格子记录所包含草的索引集以及格子的中心坐标</strong>，就像这样：<br><img src="https://musoucrow.github.io/images/lbbn/7.png" alt="7"><br>　　格子的生成可在先前的草数据生成后再追加一步：遍历草坐标，将其划分到对应的格子对象中，将格子数据也一并导出即可。但仅此而已还不够完美：这样需要让格子对象存储所辖草的索引集，数据量较大。所以我们可以先将草数据分类到不同的格子容器中，最后将格子容器的草数据一一重写回草的容器中，以此确保<strong>每个格子所辖的草索引是连续的</strong>，如此只需要为每个格子记录<strong>索引起始值以及数量</strong>即可：</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> List&lt;Cell&gt; <span class="title">GenerateCells</span>(<span class="params">List&lt;Unit&gt; units</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> unitsMap = <span class="keyword">new</span> Dictionary&lt;Vector3Int, List&lt;Unit&gt;&gt;();</div><div class="line"></div><div class="line">    <span class="comment">// 将每根草划分到对应的格子容器中</span></div><div class="line">    <span class="keyword">foreach</span> (<span class="keyword">var</span> unit <span class="keyword">in</span> units) &#123;</div><div class="line">        <span class="keyword">var</span> pos = unit.position;</div><div class="line">        <span class="keyword">var</span> cellPos = ToCellPos(pos);</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!unitsMap.ContainsKey(cellPos)) &#123;</div><div class="line">            unitsMap.Add(cellPos, <span class="keyword">new</span> List&lt;Unit&gt;());</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        unitsMap[cellPos].Add(unit);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 清空草容器</span></div><div class="line">    units.Clear();</div><div class="line"></div><div class="line">    <span class="comment">// 根据格子容器将草重新写回草容器中</span></div><div class="line">    <span class="keyword">foreach</span> (<span class="keyword">var</span> iter <span class="keyword">in</span> unitsMap) &#123;</div><div class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> unit <span class="keyword">in</span> iter.Value) &#123;</div><div class="line">            units.Add(unit);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 构建格子数据集</span></div><div class="line">    <span class="keyword">var</span> cells = <span class="keyword">new</span> List&lt;Cell&gt;();</div><div class="line">    <span class="keyword">var</span> count = <span class="number">0</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 构建格子数据，记录格子的草索引起始、数量、格子中心坐标</span></div><div class="line">    <span class="keyword">foreach</span> (<span class="keyword">var</span> iter <span class="keyword">in</span> unitsMap) &#123;</div><div class="line">        <span class="keyword">var</span> cell = <span class="keyword">new</span> Cell() &#123;</div><div class="line">            center = ToCellCenter(iter.Key),</div><div class="line">            begin = count,</div><div class="line">            count = iter.Value.Count</div><div class="line">        &#125;;</div><div class="line"></div><div class="line">        cells.Add(cell);</div><div class="line">        count += iter.Value.Count;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> cells;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　有了数据之后，接下来便是剔除了：  </p>
+<ul>
+<li>构建格子的ComputeBuffer（<code>cellBuffer</code>），以及构建一个存储草的可视索引集ComputeBuffer(<code>visibleIdBuffer</code>)</li>
+<li>编写ComputeShader，以格子数量为作业量，判断每个格子是否在摄像机视矩体内，若存在则将格子所辖的草索引传入visibleIdBuffer中</li>
+<li>Compute Shader运行完毕后，将visibleIdBuffer的成员数通过<a href="https://docs.unity3d.com/cn/current/ScriptReference/ComputeBuffer.CopyCount.html" target="_blank" rel="external">ComputeBuffer.CopyCount</a>传入argsBuffer的第二项（用于控制渲染数量）</li>
+<li>最后在Shader通过<code>visibleIdBuffer[instanceID]</code>获取草的索引值，由此间接取得草的数据</li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line">[Serializable]</div><div class="line"><span class="keyword">public</span> <span class="keyword">struct</span> Cell &#123;</div><div class="line">    <span class="keyword">public</span> Vector3 center;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> begin;</div><div class="line">    <span class="keyword">public</span> <span class="keyword">int</span> count;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 构建cellBuffer</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitCells</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.cellBuffer != <span class="literal">null</span>) &#123;</div><div class="line">        <span class="keyword">this</span>.cellBuffer.Release();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">this</span>.cellBuffer = <span class="keyword">new</span> ComputeBuffer(<span class="keyword">this</span>.cells.Length, <span class="keyword">sizeof</span>(Cell));</div><div class="line">    <span class="keyword">this</span>.cellBuffer.SetData(<span class="keyword">this</span>.cells);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 构建visibleIdBuffer</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitVisbleId</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.visibleIdBuffer != <span class="literal">null</span>) &#123;</div><div class="line">        <span class="keyword">this</span>.visibleIdBuffer.Release();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 它的最大长度为草数据的长度，ComputeBufferType.Append表明它是个可填充容器</span></div><div class="line">    <span class="keyword">this</span>.visibleIdBuffer = <span class="keyword">new</span> ComputeBuffer(<span class="keyword">this</span>.units.Length, <span class="keyword">sizeof</span>(<span class="keyword">int</span>), ComputeBufferType.Append);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Cull</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">// Compute Shader一次并行32组</span></div><div class="line">    <span class="keyword">int</span> patch = Mathf.CeilToInt(<span class="keyword">this</span>.cells.Length / <span class="number">32.0</span>f);</div><div class="line"></div><div class="line">    <span class="comment">// 获得当前视图下的投影矩阵</span></div><div class="line">    <span class="keyword">var</span> camera = Camera.main;</div><div class="line">    <span class="keyword">var</span> vp = camera.projectionMatrix * camera.worldToCameraMatrix;</div><div class="line"></div><div class="line">    <span class="comment">// 清空容器</span></div><div class="line">    <span class="keyword">this</span>.visibleIdBuffer.SetCounterValue(<span class="number">0</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 传递所需数据，开始作业</span></div><div class="line">    <span class="keyword">this</span>.shader.SetBuffer(id, <span class="string">"_VisibleIds"</span>, <span class="keyword">this</span>.visibleIdBuffer);</div><div class="line">    <span class="keyword">this</span>.shader.SetBuffer(id, <span class="string">"_Cells"</span>, <span class="keyword">this</span>.cellBuffer);</div><div class="line">    <span class="keyword">this</span>.shader.SetInt(<span class="string">"_Count"</span>, <span class="keyword">this</span>.cells.Length);</div><div class="line">    <span class="keyword">this</span>.shader.SetMatrix(<span class="string">"_VPMatrix"</span>, vp);</div><div class="line">    <span class="keyword">this</span>.shader.Dispatch(id, patch, <span class="number">1</span>, <span class="number">1</span>);</div><div class="line"></div><div class="line">    <span class="comment">// 将visibleIdBuffer的数量传递给argsBuffer，决定渲染数量</span></div><div class="line">    ComputeBuffer.CopyCount(<span class="keyword">this</span>.visibleIdBuffer, <span class="keyword">this</span>.argsBuffer, <span class="keyword">sizeof</span>(<span class="keyword">uint</span>));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Compute Shader</span></div><div class="line"><span class="meta">#<span class="meta-keyword">pragma</span> kernel CSMain</span></div><div class="line"></div><div class="line"><span class="keyword">struct</span> Cell</div><div class="line">&#123;</div><div class="line">    float3 center;</div><div class="line">    <span class="keyword">int</span> begin;</div><div class="line">    <span class="keyword">int</span> count;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">StructuredBuffer&lt;Cell&gt; _Cells;</div><div class="line">AppendStructuredBuffer&lt;<span class="keyword">int</span>&gt; _VisibleIds;</div><div class="line">float4x4 _VPMatrix;</div><div class="line"><span class="keyword">int</span> _Count;</div><div class="line"></div><div class="line">[numthreads(<span class="number">32</span>, <span class="number">1</span>, <span class="number">1</span>)]</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">CSMain</span> <span class="params">(uint3 groupID : SV_GroupID, <span class="keyword">int</span> index : SV_GroupIndex)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// 获取当前作业对应的格子id</span></div><div class="line">    <span class="keyword">int</span> n = groupID.x * <span class="number">32</span> + index;</div><div class="line"></div><div class="line">    <span class="comment">// 确保处理的格子是在范围内的</span></div><div class="line">    <span class="keyword">if</span> (n &lt; _Count)</div><div class="line">    &#123;</div><div class="line">        <span class="comment">// 获取格子中心坐标</span></div><div class="line">        float3 posWS = _Cells[n].center;</div><div class="line"></div><div class="line">        <span class="comment">// 将格子坐标转换到裁剪空间</span></div><div class="line">        float4 absPosCS = <span class="built_in">abs</span>(mul(_VPMatrix, float4(posWS, <span class="number">1.0</span>)));</div><div class="line">        </div><div class="line">        <span class="keyword">float</span> range = absPosCS.w;</div><div class="line">        </div><div class="line">        <span class="comment">// 判断格子坐标是否在视矩体内</span></div><div class="line">        <span class="comment">// 由于格子比较大，肯定会有一部分元素在视矩体之外，所以要扩大点范围</span></div><div class="line">        <span class="keyword">if</span> (absPosCS.x &lt;= range * <span class="number">1.5</span> &amp;&amp; absPosCS.y &lt;= range * <span class="number">1.6</span>)</div><div class="line">        &#123;</div><div class="line">            <span class="comment">// 将格子所辖的草索引加入容器中</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; _Cells[n].count; i++) &#123;</div><div class="line">                _VisibleIds.Append(_Cells[n].begin + i);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Shader</span></div><div class="line">StructuredBuffer&lt;Unit&gt; _Units;</div><div class="line">StructuredBuffer&lt;<span class="keyword">int</span>&gt; _VisibleIds;</div><div class="line"></div><div class="line"><span class="function">Varyings <span class="title">Vert</span><span class="params">(Attributes input, uint instanceID : SV_InstanceID)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="comment">// 间接获得草数据</span></div><div class="line">    <span class="keyword">int</span> idx = _VisibleIds[instanceID];</div><div class="line">    Unit unit = _Units[idx];</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如此，将Cull函数放到适当的场合运行，草的剔除便算完成了：<br><img src="https://musoucrow.github.io/images/lbbn/8.gif" alt="8">  </p>
+<h3 id="渲染效果"><a href="#渲染效果" class="headerlink" title="渲染效果"></a>渲染效果</h3><p>　　终于可以聊点开心的东西了，毕竟渲染效果这种东西是最直观的了，直接上效果：<br><img src="https://musoucrow.github.io/images/lbbn/9.png" alt="9"><br>　　本方案使用的草属于面片草，它通过一个面片模型，选择若干草的图片，使用AlphaClip剔除透明度进行渲染：<br><img src="https://musoucrow.github.io/images/lbbn/10.png" alt="10"><br>　　之所以使用AlphaClip而非正统的2D半透明AlphaBlend，是因为在<strong>不写入深度的前提下，Instance渲染的次序需要自己把控</strong>。然而在使用了剔除之后还要兼顾排序属实有点麻烦，并且哪怕如此也无法达到像素级别的排序：<br><img src="https://musoucrow.github.io/images/lbbn/11.png" alt="11"><br>　　那么只好AlphaClip顶硬上了，这样的缺点是边缘会出现狗牙，连MSAA都救不了：<br><img src="https://musoucrow.github.io/images/lbbn/12.png" alt="12"><br>　　当然狗牙也就狗牙了，游戏视角下看起来凑合的话就还好，在不考虑太过风骚的操作下，可通过提升贴图精度以及提高渲染分辨率缓解，就这样吧。<br>　　渲染的本身部分首当其冲的便是<strong>随机的缩放与旋转，以及颜色</strong>了。为了节省内存，在CPU端提供的数据只有坐标，其余部分则在Shader内通过随机而成：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">int</span> _ColorMax; <span class="comment">// 颜色上限</span></div><div class="line">float2 _ScaleW; <span class="comment">// 缩放宽度的范围</span></div><div class="line">float2 _ScaleH; <span class="comment">// 缩放高度的范围</span></div><div class="line">float2 _AngleY; <span class="comment">// 旋转Y轴的范围</span></div><div class="line">float2 _AngleXZ; <span class="comment">// 旋转XZ轴的范围</span></div><div class="line"></div><div class="line">float4 _Colors[<span class="number">5</span>]; <span class="comment">// 颜色数组</span></div><div class="line"></div><div class="line"><span class="comment">// 构建矩阵</span></div><div class="line"><span class="function">float4x4 <span class="title">MakeMatrix</span><span class="params">(Unit unit, uint instanceID)</span> </span>&#123;</div><div class="line">    float3 pos = unit.position;</div><div class="line"></div><div class="line">    <span class="comment">// 随机取值</span></div><div class="line">    <span class="keyword">float</span> scaleW = lerp(_ScaleW.x, _ScaleW.y, Random(float2(pos.x, pos.y)));</div><div class="line">    <span class="keyword">float</span> scaleH = lerp(_ScaleH.x, _ScaleH.y, Random(float2(pos.y, pos.z)));</div><div class="line">    <span class="keyword">float</span> angleY = lerp(_AngleY.x, _AngleY.y, Random(float2(instanceID, pos.z)));</div><div class="line">    <span class="keyword">float</span> angleXZ = lerp(_AngleXZ.x, _AngleXZ.y, Random(float2(pos.x, instanceID)));</div><div class="line"></div><div class="line">    <span class="comment">// 确定缩放与旋转，生成矩阵</span></div><div class="line">    float3 scale = float3(scaleW, scaleH, scaleW);</div><div class="line">    float3 angle = float3(angleXZ, angleY, angleXZ);</div><div class="line">    float4x4 mat = SetTRS(pos, scale, radians(angle));</div><div class="line"></div><div class="line">    <span class="keyword">return</span> mat;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 随机颜色</span></div><div class="line"><span class="function">float4 <span class="title">GetColor</span><span class="params">(Unit unit, uint instanceID)</span> </span>&#123;</div><div class="line">    float3 pos = unit.position;</div><div class="line">    <span class="keyword">float</span> rate = Random(float2(instanceID, pos.y));</div><div class="line">    <span class="keyword">int</span> index = lerp(<span class="number">0</span>, _ColorMax - <span class="number">1</span>, rate);</div><div class="line">    </div><div class="line">    <span class="keyword">return</span> _Colors[index];</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function">Varyings <span class="title">Vert</span><span class="params">(Attributes input, uint instanceID : SV_InstanceID)</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">int</span> idx = _VisibleIds[instanceID];</div><div class="line">    Unit unit = _Units[idx];</div><div class="line"></div><div class="line">    float4x4 mat = MakeMatrix(unit, idx);</div><div class="line">    </div><div class="line">    <span class="comment">// 实装草的坐标、缩放、旋转、颜色</span></div><div class="line">    input.positionOS.xyz = mul(mat, input.positionOS).xyz;</div><div class="line">    output.color = GetColor(unit, idx);</div><div class="line"></div><div class="line">    <span class="comment">// ...</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　贴图的随机化也是以此类推，贴图使用<a href="https://docs.unity3d.com/cn/current/Manual/class-Texture2DArray.html" target="_blank" rel="external">TextureArray</a>，随机取得一个贴图索引后采样相应贴图。对于随机的算法选择参考<a href="https://docs.unity3d.com/Packages/com.unity.shadergraph@7.1/manual/Gradient-Noise-Node.html?q=Noise" target="_blank" rel="external">各类噪声算法</a>即可。<br>　　在做完以上工作后也只有初步的样子而已，仍需进一步加料：<br><img src="https://musoucrow.github.io/images/lbbn/13.png" alt="13"><br>　　目前的效果还是太平了，我们给它来加个渐变：  </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 赋予矩阵前的y坐标</span></div><div class="line"><span class="keyword">float</span> py = input.positionOS.y;</div><div class="line"></div><div class="line"><span class="keyword">float</span> gradient = lerp(_Gradient.x, _Gradient.y, py);</div><div class="line">output.color.rgb = output.color.rgb * gradient;</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn/14.png" alt="14"><br>　　这样多少有点意思了，但颜色给人总体到处都是差不多的，缺乏总体变化感，也许在其他做法里会考虑加入一张全局的颜色贴图，但我们做了<a href="https://zhuanlan.zhihu.com/p/390648011" target="_blank" rel="external">全局光照</a>，不如……？  </p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">float</span> gradient = lerp(_Gradient.x, _Gradient.y, py);</div><div class="line"></div><div class="line"><span class="comment">// 采样GI底部颜色</span></div><div class="line">float3 gi = GIBottom(vertexInput.positionWS);</div><div class="line"></div><div class="line"><span class="comment">// 控制GI颜色比例</span></div><div class="line">output.color = float4(lerp(output.color.rgb, gi, <span class="number">0.25</span>) * gradient, <span class="number">1</span>);</div></pre></td></tr></table></figure>
+<p><img src="https://musoucrow.github.io/images/lbbn/15.png" alt="15"><br>　　不错不错，而且出于草的位置关系以及性能考虑，我们只需要采样AmbientCube的底部方向的颜色即可。可谓一次有机的结合了。  </p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　本方案实际仍有不少细节，限于篇幅，只能写到这里了。这应是我有史以来写的最长的一篇文章了吧，但实在是不想拆成多篇来写了。本文限于篇幅，诸多细节未能列出，纯当外行看个热闹，内行看点门道吧。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2021/07/17/irradiance_volume/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1883,184 +2104,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/04/07/snake_cpp/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2020/04/07/snake_cpp/" itemprop="url">
-                  移植贪吃蛇——从C#到C++
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-04-07T15:30:33+08:00">
-                2020-04-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Teach/" itemprop="url" rel="index">
-                    <span itemprop="name">Teach</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2020/04/07/snake_cpp/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/04/07/snake_cpp/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2020/04/07/snake_cpp/" class="leancloud_visitors" data-flag-title="移植贪吃蛇——从C#到C++">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　因为某些机缘巧合，引起了我对C++的重视。一时兴起，决定将两年前用Unity写的<a href="https://github.com/MusouCrow/Snake" target="_blank" rel="external">Snake</a>进行移植。经过两周的抽空，总算是<a href="https://github.com/MusouCrow/SnakeCPP" target="_blank" rel="external">完成</a>了。项目采用现代C++标准编写，采用<a href="https://cmake.org" target="_blank" rel="external">CMake</a>构建，图形库为<a href="http://www.libsdl.org" target="_blank" rel="external">SDL</a>。由于本次的重点不在于图形这块，所以没有使用原版的素材，采用矩形代替。<br>　　在工程实现上除了基本的业务外，还实现了C#的<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/event" target="_blank" rel="external">event</a>以及的Unity的GameObject与Component。<br>　　本文将从C#开发者的角度出发比较C++的不同点，最后总结其思想。由于本人在此之前<strong>从未有</strong>C++的工程经验，对于许多特性在此之前也是一知半解，对于一些事物的理解若有误还请指教。</p>
-<h2 id="低成本封装"><a href="#低成本封装" class="headerlink" title="低成本封装"></a>低成本封装</h2><p>　　首先最引我瞩目的便是C++的参数传递，形如这般的函数：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Init</span><span class="params">(<span class="keyword">const</span> <span class="built_in">string</span>&amp; title, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span></span>;</div></pre></td></tr></table></figure></p>
-<p>　　由于C++的引用参数<code>string&amp;</code>性质，将值传入时不会发生拷贝，而是等于直接使用原变量。可以有效<strong>降低封装抽象的成本</strong>，加上<code>const</code>字段是为使得形如<code>&quot;123&quot;</code>这样的<strong>常量区对象</strong>也能传入。<br>　　当然这在C#也并不是没有，<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/ref" target="_blank" rel="external">ref</a>便是如此。但这在C#并不会下意识去用，毕竟在C++若是不用指针或引用作为参数的话可是会直接<strong>拷贝新对象</strong>的，而在C#直接使用也不会造成很大的负担（值类型直接拷贝，引用类型用指针）。<br>　　其次便是C++的内联函数了，作为函数宏的替代品之一。可以在编译时将函数展开为具体的内容，节省了一次函数调用的消耗。但内联函数需写在头文件中，若是关联项多，修改后便会增加编译时长。且展开量过大也会增大代码量，增加编译时长。但不失为一个降低封装成本的手段。</p>
-<h2 id="明确的内存"><a href="#明确的内存" class="headerlink" title="明确的内存"></a>明确的内存</h2><p>　　其次与C#最大的不同便是对象的创建了，C++有着以下两种形式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">A a = A();</div><div class="line">A* a = <span class="keyword">new</span> A();</div></pre></td></tr></table></figure></p>
-<p>　　了解C++的自然晓得，前者在<strong>当前内存域下申请</strong>，后者<strong>在堆申请</strong>。而在C#则隐去了这个细节，而是设立固定的规则：</p>
-<ul>
-<li>引用对象使用指针，原则上在堆申请，若对象的生命周期存在于申请的函数里，则在栈申请——是为<strong>逃逸分析</strong>。</li>
-<li>值对象在当前内存域下申请，且由于不是指针，变量传递会产生<strong>拷贝</strong>。除非使用ref、in、out等参数关键字。</li>
-</ul>
-<p>　　而C++的内存申请机制则带来了<strong>明确感</strong>，如在函数里申请生命周期只存在函数里的对象，需要明确的使用<code>A a = A();</code>方式。且在构建类的时候，对于那些不使用<code>A* a = new A();</code>创建方式的成员变量，其内存占用是<strong>明确的</strong>，在类对象申请内存的时候会一并申请，即这些成员变量在内存布局上可能是<strong>连续的</strong>。从这点来说可比C#要牛逼多了。</p>
-<h2 id="相似的容器"><a href="#相似的容器" class="headerlink" title="相似的容器"></a>相似的容器</h2><p>　　在容器方面，C++与C#大体看起来是相似的，当然在API的爽度而言还是C#更胜一筹（C++17拉近了不少）。但实际上还是存在一些细节上的不同，就比如我们常用的Key-Value容器：C++的<a href="https://zh.cppreference.com/w/cpp/container/map" target="_blank" rel="external">std::map</a>与C#的<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.dictionary-2?view=netcore-3.1" target="_blank" rel="external">Dictionary</a>在实现乃至功能上就不一样。实际上std::map对应C#的应该是<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.sorteddictionary-2?view=netcore-3.1" target="_blank" rel="external">SortedDictionary</a>：它们都是基于红黑树实现，都是有序存储的表。而Dictionary则是基于哈希实现的，即我们俗称的哈希表，与之对应的是<a href="https://zh.cppreference.com/w/cpp/container/unordered_map" target="_blank" rel="external">std::unordered_map</a>。<br>　　通过命名能看出两种语言在这方面的倾向性：红黑树<strong>占用的内存更小</strong>，但查找和删除的时间复杂度都是<em>O(logn)</em>，而哈希查找和删除的时间复杂度都是<em>O(1)</em>。实际使用的时候感觉还是得权衡利弊，不能贪图方便就一直用一套。<a href="https://zh.cppreference.com/w/cpp/container/set" target="_blank" rel="external">std::set</a>与<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.hashset-1?view=netcore-3.1" target="_blank" rel="external">HashSet</a>这边也是类似的对应，以此类推。<br>　　在序列容器方面的对应倒是工整：<a href="https://zh.cppreference.com/w/cpp/container/vector" target="_blank" rel="external">std::vector</a>对应<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.list-1?view=netcore-3.1" target="_blank" rel="external">List</a>，都是不断扩容的数组容器。链表方面则是<a href="https://zh.cppreference.com/w/cpp/container/list" target="_blank" rel="external">std::list</a>对应<a href="https://docs.microsoft.com/zh-cn/dotnet/api/system.collections.generic.linkedlist-1?view=netcore-3.1" target="_blank" rel="external">LinkedList</a>。但<a href="https://zh.cppreference.com/w/cpp/container/array" target="_blank" rel="external">std::array</a>却无对应了，硬要说的话就是与C#的原生数组对应，毕竟这个容器出现的意义就是弥补与C语言兼容的原生数组。<br>　　顺带一提，在使用std::vector时由于会出现<strong>扩容复制</strong>的问题，需要考虑好成员对象的拷贝方案，乃至于内存泄漏的问题。</p>
-<h2 id="智能的指针"><a href="#智能的指针" class="headerlink" title="智能的指针"></a>智能的指针</h2><p>　　内存管理是所有编程语言都无法绕开的点，绝大多数编程语言对于堆内存的管理都是采用垃圾回收的方式。而在C++的鸿蒙时代则与C语言一样，需要手动管理<strong>指向堆内存</strong>的指针。尽管也有<a href="https://zh.cppreference.com/w/cpp/memory/auto_ptr" target="_blank" rel="external">std::auto_ptr</a>这样的东西，但在功能上还不够全面。而手动管理内存将难以解决对象在多处被引用时将如何安全销毁的问题，为了实现这种机制也得做出不少妥协。<br>　　所幸随着时代的发展，现代C++迎来了<a href="https://docs.microsoft.com/zh-cn/cpp/cpp/smart-pointers-modern-cpp?view=vs-2019" target="_blank" rel="external">智能指针</a>，它基于引用计数的规则，将裸指针包装起来，当符合销毁条件后便可自动回收。智能指针有着几种具体的类实现，而其中最常用的是<a href="https://zh.cppreference.com/w/cpp/memory/shared_ptr" target="_blank" rel="external">std::share_ptr</a>，当它持有指针时将增加计数，反之同理将减少计数，最终归0销毁。但其较之垃圾回收有个致命的缺陷：<strong>相互引用</strong>时将一直保持计数，无法销毁。为此C++引入了<a href="https://zh.cppreference.com/w/cpp/memory/weak_ptr" target="_blank" rel="external">std::weak_ptr</a>：它不会增加计数，在计数归0时持有指针也随之销毁。如此对于相互引用的情况下，分清主次，合理分配share_ptr与weak_ptr即可解决无法销毁的问题。<br>　　智能指针在使用上总有一种外挂的感觉，需要成体系的去使用。不如内置的垃圾回收式语言来的方便，且写起来还是有一定的心智负担（相互引用），不过在性能而言较之垃圾回收更为优越（回收对象与时机都很明确，且是被动进行的）。</p>
-<h2 id="模板与泛型"><a href="#模板与泛型" class="headerlink" title="模板与泛型"></a>模板与泛型</h2><p>　　C++的模板与C#的泛型表面上用起来很是相似，实则有所不同。以下对比两者的差异：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">class</span> T, <span class="keyword">int</span> x&gt; <span class="comment">// C++支持模板参数，可填写整型或指针</span></div></pre></td></tr></table></figure></p>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GenericList&lt;T&gt; <span class="keyword">where</span> T : Employee <span class="comment">// 使用System.Object不支持的方法时，需进行类型约束指定基类</span></div></pre></td></tr></table></figure>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 这么骚的操作见过么？</span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> x)</span></span>;</div><div class="line"></div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> ... Args&gt;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">Do</span><span class="params">(Args... args)</span> </span>&#123;</div><div class="line">    f(args ...);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
-<p>　　从实际使用体验与两者的命名可以看出，「模板」的本质是<strong>参数化代码生成</strong>，而「泛型」则是<strong>类型参数化</strong>。即泛型只是模板功能的一部分而已。模板能实现的其他功能，在C#则以其他方式代替了（如变长参数<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/params" target="_blank" rel="external">params</a>）。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　从以上种种便能看出C++与C#在设计哲学上的不同，C#通过<strong>约束开发者行为</strong>从而达到<strong>更稳定健壮的结果</strong>，哪怕会失去一定的<strong>性能与灵活性</strong>，而C++则更依赖开发者<strong>自身的素质</strong>（如C++支持多重继承而C#仅仅支持单类+多接口继承）。<br>　　从个人的使用体验来看，现代C++并非不能作为业务开发语言。只是对开发者的素质要求较之一般语言更高，从招聘成本与项目稳定性而言是个问题。如此来看，除非有必要的性能敏感且需要一定封装的核心层（如游戏引擎），否则用C + 脚本语言或者C#/Java这类可上可下的语言是个更好的选择。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2110,7 +2153,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-count">50</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
