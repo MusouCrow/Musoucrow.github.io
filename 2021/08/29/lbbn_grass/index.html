@@ -113,7 +113,7 @@
 <meta property="og:image" content="https://musoucrow.github.io/images/lbbn/13.png">
 <meta property="og:image" content="https://musoucrow.github.io/images/lbbn/14.png">
 <meta property="og:image" content="https://musoucrow.github.io/images/lbbn/15.png">
-<meta property="og:updated_time" content="2021-08-29T13:05:29.263Z">
+<meta property="og:updated_time" content="2021-08-29T13:13:32.713Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于模型索引图生成植被与渲染的方案">
 <meta name="twitter:description" content="欢迎参与讨论，转载请注明出处。      
@@ -438,7 +438,7 @@
 <li>随机选择位置展开挖孔（<code>Dissipate</code>）</li>
 </ul>
 <p>　　如此较之地形索引图，便有了更多的变化了。</p>
-<h3 id="三角面填充"><a href="#三角面填充" class="headerlink" title="三角面填充"></a>三角面填充</h3><p>　　有了转换后的索引图，接下来便是生成了。根据uv采样贴图，得到模型对应的位置在Shader里倒是相当简单。可在CPU端进行则需多费一番功夫了：我们知道模型是由多个三角面组成，每个三角面对应三个顶点，每个顶点有着自己的坐标、法线、UV等信息。但问题在于<strong>我们无法直接获得三角面内部的这些信息</strong>，而这在Shader里是经过光栅化后所以才能取得的。换言之，我们需要自己整个<strong>软光栅</strong>。<br>　　软光栅听着玄乎，实际上在这里只是<strong>用一个单位值，在三角形内部步进，得到一系列的点</strong>罢了，详细算法可以参考市面上的<a href="https://blog.csdn.net/kakaxi2222/article/details/98853394" target="_blank" rel="external">三角形填充算法</a>，其原理并非本文内容，不作复述。<br>　　在获得了三角面内部的一个个点后，我们还需要得到它们的坐标、法线、UV等信息。这需要获取<strong>该点相对于三角面的三个顶点的距离权重</strong>，将相关信息插值得出。如何取得这个距离权重，这便又引申出另一个算法：<a href="https://blog.csdn.net/tkokof1/article/details/89367595" target="_blank" rel="external">三角形线性插值</a>。这其实便是实现软渲染的必备一环，这俩算法组合拳便能得出这个经典的RGB插值三角形了：<br><img src="https://musoucrow.github.io/images/lbbn/5.png" alt="5">  </p>
+<h3 id="三角面填充"><a href="#三角面填充" class="headerlink" title="三角面填充"></a>三角面填充</h3><p>　　有了转换后的索引图，接下来便是生成了。根据uv采样贴图，得到模型对应的位置在Shader里倒是相当简单。可在CPU端进行则需多费一番功夫了：我们知道模型是由多个三角面组成，每个三角面对应三个顶点，每个顶点有着自己的坐标、法线、UV等信息。但问题在于<strong>我们无法直接获得三角面内部的这些信息</strong>，而这在Shader里是经过光栅化后所以才能取得的。换言之，我们需要自己整个<strong>软光栅</strong>。<br>　　这软光栅听着玄乎，实际上在这里只是<strong>用一个单位值，在三角形内部步进，得到一系列的点</strong>罢了，详细算法可以参考市面上的<a href="https://blog.csdn.net/kakaxi2222/article/details/98853394" target="_blank" rel="external">三角形填充算法</a>，其原理并非本文内容，不作复述。<br>　　在获得了三角面内部的一个个点后，我们还需要得到它们的坐标、法线、UV等信息。这需要获取<strong>该点相对于三角面的三个顶点的距离权重</strong>，将相关信息插值得出。如何取得这个距离权重，这便又引申出另一个算法：<a href="https://blog.csdn.net/tkokof1/article/details/89367595" target="_blank" rel="external">三角形线性插值</a>。这其实便是实现软渲染的必备一环，这俩算法组合拳便能得出这个经典的RGB插值三角形了：<br><img src="https://musoucrow.github.io/images/lbbn/5.png" alt="5">  </p>
 <h3 id="多线程生成"><a href="#多线程生成" class="headerlink" title="多线程生成"></a>多线程生成</h3><p>　　有了三角面填充坐标点后，便可考虑生成的事了，首先要明确生成的策略：</p>
 <ul>
 <li>根据<code>填充单位值</code>对模型的三角面生成若干点，每个点都会记录相应信息（坐标、法线、UV、通道值），通道值根据UV采样贴图而得</li>
@@ -446,7 +446,7 @@
 <li>根据合法点的通道值累加，除以一个<code>可配置的系数</code>，决定该模型能填充的草数量（草数量 = 总通道值 / 系数）</li>
 <li>在总数量的前提下，随机挑选合法点种草，最后将草数据导出即可</li>
 </ul>
-<p>　　按照这套逻辑直接开干自然是没毛病，但性能这块实在捉急（模型的三角面太多、三角形填充以及贴图采样都耗时），然而这其实是个很适合并行化的作业（以三角面为单位），以及最后的草随机生成。那么便可引入[JobSystem][<a href="https://docs.unity3d.com/Packages/com.unity.jobs@0.8/manual/index.html]搞事了，整个工作流将会变成：" target="_blank" rel="external">https://docs.unity3d.com/Packages/com.unity.jobs@0.8/manual/index.html]搞事了，整个工作流将会变成：</a></p>
+<p>　　按照这套逻辑直接开干自然是没毛病，但性能这块实在捉急（模型的三角面太多、三角形填充以及贴图采样都耗时），然而这其实是个很适合并行化的作业（以三角面为单位），以及最后的草随机生成。那么便可引入<a href="https://docs.unity3d.com/Packages/com.unity.jobs@0.8/manual/index.html" target="_blank" rel="external">JobSystem</a>搞事了，整个工作流将会变成：</p>
 <ul>
 <li>配置模型及其转换后的索引贴图，配置相关生成参数（填充单位值、系数等）</li>
 <li>收集点信息：创建<code>CollectJob</code>，将相关数据传入（三角面、顶点、UV集合等），以模型三角面数为作业量，对每个三角面填充点，筛选掉不合法的点，导出到统一容器中</li>
