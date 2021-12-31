@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://musoucrow.github.io/"/>
-  <updated>2021-08-29T18:16:38.250Z</updated>
+  <updated>2021-12-31T14:44:40.513Z</updated>
   <id>https://musoucrow.github.io/</id>
   
   <author>
@@ -14,6 +14,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>2021年度总结</title>
+    <link href="https://musoucrow.github.io/2021/12/31/summary_2021/"/>
+    <id>https://musoucrow.github.io/2021/12/31/summary_2021/</id>
+    <published>2021-12-31T12:39:33.000Z</published>
+    <updated>2021-12-31T14:44:40.513Z</updated>
+    
+    <content type="html"><![CDATA[<p>　　2021年终于也领来了终结，又到了写年度总结的时候了。今年在文章产出这块挺拉的，也就写了<strong>3篇</strong>，其中一篇还是<a href="https://zhuanlan.zhihu.com/p/365472093" target="_blank" rel="external">游戏发布</a>。回首下来颇为汗颜——<strong>没想到这么少</strong>。<br>　　但实际上也有心态与见识的转变，随着工作的深入，我愈发觉得很多方案是需要时间的沉淀的——在开发当初可能觉得没问题的设计，随着后续落地迭代可能会完全变了样。这块在Gameplay会更明显：<strong>没有一定程度的业务去喂，很多方案只能说是做了而已</strong>。事实上哪怕目前文章写的东西也会因为后续情况而有所更改。所以哪怕今年整了不少活，也不太好意思写了。当然文章贵精不在多，本质便是为了分享。将东西沉淀一下后再发出，也是对质量的负责。<br>　　除此之外今年最大的收货便是《拉维瓦纳》第一版Demo的<a href="https://www.bilibili.com/video/BV1864y1S7TG" target="_blank" rel="external">发布</a>，该项目可以说是我进军3D游戏开发的钥匙，也是最大的文章素材（笑）。与美术朋友一同将3D游戏相关的点滴一步一步走了过来，也在年底迎来了新的伙伴。如今也开启了下一版Demo的计划，它将包含了该游戏想要表达的<strong>完整核心玩法与相关功能</strong>。希望明年能够如期完成吧。<br>　　同时也因为这个Demo，以及对接下来游戏行业的趋势判断，让我选择逃离了<a href="https://zhuanlan.zhihu.com/p/26947266" target="_blank" rel="external">科韵路</a>。在经过了一番面试酣战，迎来了职业发展的十字路口：<strong>Gameplay or Graphics</strong>。在综合各项情况考虑之后，选择了Graphics，选择了TA的道路。核心原因在于：个人的职业发展方向还是更偏全面，致力于<strong>能够独立做出游戏</strong>来。所以以补全自身的短板为佳。毕竟Gameplay对我而言开发游戏还算够用，并且通过项目可以持续实践精进。<br>　　实际做了TA之后，我便不再对图程与TA的区别有所疑惑了：<strong>两者的本质差别不在于具体做的事情，而是担当的职责</strong>。TA的职责在于作为技术与美术的桥梁、为美术提供技术支持、甚至是作为一名会技术的美术。图程的核心职责还是在于引擎与渲染管线的开发与维护及其相关工具链，<strong>两者在做的事情上可能会相同，但其出发点是不一样的</strong>。也因为做了TA后，让我彻底明白不会选择往图程的方向了。TA较之Gameplay，会有一种与项目隔层纱的感觉，而图程更是在此之外：有种不像是在做游戏，而是做引擎/管线了。说实话我并不太喜欢这种感觉，目前已是能接受的极限了。<br>　　来到漕河泾之后见识到了不少新的事物，能很明显感受到原神造成的影响，手游进入了军备竞赛的阶段。大家都需要赶紧跟上，做一些从未做过的事。无论是技术还是美术都有了新的要求，要说压力是肯定有的，虽然不是加班的压力（笑）。但与此同时也迎来了充分的进步，只能说好好迎接这个时代，做个弄潮儿吧。<br>　　这次说的较之前些年有些多了，确实是有不少感触。以上便是本人的2021年度总结了，且待明年的Blog吧。<br>　　无双草泥马<br>　　2021.12.31</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;　　2021年终于也领来了终结，又到了写年度总结的时候了。今年在文章产出这块挺拉的，也就写了&lt;strong&gt;3篇&lt;/strong&gt;，其中一篇还是&lt;a href=&quot;https://zhuanlan.zhihu.com/p/365472093&quot; target=&quot;_blank&quot; 
+    
+    </summary>
+    
+      <category term="Talk" scheme="https://musoucrow.github.io/categories/Talk/"/>
+    
+    
+      <category term="Talk" scheme="https://musoucrow.github.io/tags/Talk/"/>
+    
+  </entry>
   
   <entry>
     <title>基于模型索引图生成植被与渲染的方案</title>
@@ -880,62 +903,6 @@
       <category term="Development" scheme="https://musoucrow.github.io/tags/Development/"/>
     
       <category term="DFQ" scheme="https://musoucrow.github.io/tags/DFQ/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>在macOS搭建LÖVE for iOS平台</title>
-    <link href="https://musoucrow.github.io/2019/03/01/build_love_ios/"/>
-    <id>https://musoucrow.github.io/2019/03/01/build_love_ios/</id>
-    <published>2019-02-28T16:09:12.000Z</published>
-    <updated>2021-07-17T12:41:21.491Z</updated>
-    
-    <content type="html"><![CDATA[<p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　继上回<a href="https://musoucrow.github.io/2018/08/24/build_love_android/">在macOS搭建LÖVE for Android平台</a>后，这次买了新的iPhone，对iOS平台的发布自然也要开始了。如上回一般，也发现了不少实操中会遇到的问题，特此记录，以便后人。</p>
-<h2 id="实机调试"><a href="#实机调试" class="headerlink" title="实机调试"></a>实机调试</h2><p>　　LÖVE for iOS的编译可谓相当容易，前提是你必须拥有一台macOS以及iOS设备，并且安装了Xcode。如<a href="http://love2d.org/wiki/Getting_Started#iOS" target="_blank" rel="external">官方教程</a>所言般进行便是，大致上就是下载LÖVE源码工程，并且用Xcode打开<code>love/platform/xcode/love.xcodeproj</code>，然后选择love-ios项目、连上iOS设备、设置签名、然后Build就完事了。<br><img src="https://musoucrow.github.io/images/build_love_ios/0.png" alt="0"><br>　　如上图所示那便是签名的设置了，需要登录Apple账号作为Personal Team，并确保这是<strong>iOS设备所使用的账号</strong>。<br><img src="https://musoucrow.github.io/images/build_love_ios/1.png" alt="1"><br>　　签名设置完成无错误提示后，那便如上图所示般选择、执行即可。请确保iOS设备与macOS设备是处于<strong>连接</strong>状态的，过会便可见到iOS设备已将LÖVE安装完毕。此时尚无法直接运行，需要执行<code>设置→通用→设备管理→Apple账号→信任love</code>。<br>　　刚装好的LÖVE仍是空空如也，你可以选择打包好一个项目作为<code>test.love</code>，使用Apple的<em>隔空投送（AirDrop）</em>功能进行快速传输，如下图所示：<br><img src="https://musoucrow.github.io/images/build_love_ios/2.png" alt="2"><br>　　投送完毕后，iOS会精确的识别到这是LÖVE所需要的文件，于是你可以在LÖVE里见到它了，如下图所示：<br><img src="https://musoucrow.github.io/images/build_love_ios/3.png" alt="3"></p>
-<h2 id="画面适配"><a href="#画面适配" class="headerlink" title="画面适配"></a>画面适配</h2><p>　　我所测试的项目的功能很简单：显示一张图片、该图片会拉伸至窗口大小。直接运行的效果如下图所示：<br><img src="https://musoucrow.github.io/images/build_love_ios/4.png" alt="4"><br>　　很明显可以得出两个问题：画面并不是水平的，以及顶部的状态栏没去掉。解决它俩的方法很简单，想要画面是水平的，就得在编译设置里进行更改，如下图所示：<br><img src="https://musoucrow.github.io/images/build_love_ios/5.png" alt="5"><br>　　如此即可，至于顶部的状态栏的去除，选择编译设置里的<code>Hide status bar</code>是无效的，因为LÖVE在游戏运行时又做了一次设置。而这个设置则是与引擎的<code>love.window.setFullscreen(fullscreen)</code>这个API有关，只需要在游戏运行时设置为全屏即可关闭状态栏。如此便没毛病了，如下图所示：<br><img src="https://musoucrow.github.io/images/build_love_ios/6.png" alt="6"></p>
-<h2 id="开发调试"><a href="#开发调试" class="headerlink" title="开发调试"></a>开发调试</h2><p>　　在开发过程中需要不断地进行实机调试时，每次都对项目进行打包那效率未免也太低了。然而鉴于iOS的沙盒机制，又做不到如同Android般使用Git来进行同步工程。好在<code>*.love</code>文件本质上就是<code>*.zip</code>文件，如此开发一个对压缩包进行增量更新的脚本即可。如以下代码所示，用到了zip命令，脚本版本为Python3：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> os</div><div class="line"><span class="keyword">import</span> datetime</div><div class="line"><span class="keyword">import</span> zipfile</div><div class="line"><span class="keyword">from</span> os.path <span class="keyword">import</span> realpath, dirname</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">listdir</span><span class="params">(path)</span>:</span></div><div class="line">    paths = []</div><div class="line">    lst = path.split(<span class="string">'/'</span>)</div><div class="line">    tree = file_tree</div><div class="line"></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(lst) - <span class="number">1</span>):</div><div class="line">        tree = tree[lst[i]]</div><div class="line"></div><div class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> tree:</div><div class="line">        v = tree[k]</div><div class="line">        p = k <span class="keyword">if</span> v <span class="keyword">is</span> <span class="keyword">True</span> <span class="keyword">else</span> k + <span class="string">'/'</span></div><div class="line">        paths.append(p)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> paths</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">zip</span><span class="params">(code)</span>:</span></div><div class="line">    os.system(<span class="string">"zip %s %s"</span> % (file_name, code))</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync</span><span class="params">(path)</span>:</span></div><div class="line">    is_file_a = os.path.isfile(path)</div><div class="line">    is_dir_a = os.path.isdir(path)</div><div class="line"></div><div class="line">    info = path <span class="keyword">in</span> name_set <span class="keyword">and</span> zip_file.getinfo(path)</div><div class="line">    is_file_b = info <span class="keyword">and</span> <span class="keyword">not</span> info.is_dir()</div><div class="line">    is_dir_b = info <span class="keyword">and</span> <span class="keyword">not</span> is_file_b</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> is_file_a:</div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            zip(<span class="string">'-d %s'</span> % path)</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> is_file_b:</div><div class="line">            time_a = os.stat(path).st_mtime</div><div class="line">            time_b = datetime.datetime(*info.date_time).timestamp()</div><div class="line"></div><div class="line">            <span class="keyword">if</span> abs(time_a - time_b) &gt; <span class="number">1</span>:</div><div class="line">                zip(path)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            zip(path)</div><div class="line">    <span class="keyword">elif</span> is_dir_a:</div><div class="line">        <span class="keyword">if</span> is_file_b:</div><div class="line">            zip(<span class="string">'-d %s'</span> % path)</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            list_a = os.listdir(path)</div><div class="line">            </div><div class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> range(len(list_a)):</div><div class="line">                <span class="keyword">if</span> os.path.isdir(path + list_a[i]):</div><div class="line">                    list_a[i] = list_a[i] + <span class="string">'/'</span></div><div class="line"></div><div class="line">            list_b = listdir(path)</div><div class="line">            list_merger = list(set(list_a + list_b))</div><div class="line"></div><div class="line">            <span class="keyword">for</span> p <span class="keyword">in</span> list_merger:</div><div class="line">                sync(path + p)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            zip(path)</div><div class="line">            zip(<span class="string">'-r %s*'</span> % path)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            zip(<span class="string">'-d %s*'</span> % path)</div><div class="line">        <span class="keyword">elif</span> is_file_b:</div><div class="line">            zip(<span class="string">'-d %s'</span> % path)</div><div class="line"></div><div class="line">cwd = dirname(realpath(__file__))</div><div class="line">os.chdir(cwd)</div><div class="line"></div><div class="line">file_name = <span class="string">'game.love'</span></div><div class="line">zip_file = zipfile.ZipFile(file_name, <span class="string">'a'</span>)</div><div class="line">zip_file.close()</div><div class="line">name_set = set(zip_file.namelist())</div><div class="line">file_tree = &#123;&#125;</div><div class="line"></div><div class="line"><span class="keyword">for</span> p <span class="keyword">in</span> name_set:</div><div class="line">    ls = p.split(<span class="string">'/'</span>)</div><div class="line">    tree = file_tree</div><div class="line">    length = len(ls)</div><div class="line"></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(length):</div><div class="line">        s = ls[i]</div><div class="line"></div><div class="line">        <span class="keyword">if</span> len(s) &gt; <span class="number">0</span>:</div><div class="line">            <span class="keyword">if</span> s <span class="keyword">not</span> <span class="keyword">in</span> tree:</div><div class="line">                tree[s] = <span class="keyword">True</span> <span class="keyword">if</span> i == length - <span class="number">1</span> <span class="keyword">else</span> &#123;&#125;</div><div class="line">            tree = tree[s]</div><div class="line"></div><div class="line">sync(<span class="string">'asset/'</span>)</div><div class="line">sync(<span class="string">'source/'</span>)</div><div class="line"><span class="comment"># ...</span></div></pre></td></tr></table></figure></p>
-<h2 id="IPA发布"><a href="#IPA发布" class="headerlink" title="IPA发布"></a>IPA发布</h2><p>　　以上只能本机运行而已，若是想分享给他人，便要解决新的问题了。iOS的安装包为<em>.ipa</em>文件，你需要提供正式的<strong>开发者账号</strong>作为签名，方可生成之。开发者账号分为以下三种：</p>
-<ul>
-<li>个人账号<ul>
-<li>只能提供单人使用</li>
-<li>其他人若想运行ipa文件，需要注册其UDID</li>
-<li>99美元/年</li>
-</ul>
-</li>
-<li>公司账号<ul>
-<li>允许多个开发者使用</li>
-<li>需要填写公司的<strong>邓百氏编码(D-U-N-S Number)</strong></li>
-<li>其他人若想运行ipa文件，需要注册其UDID</li>
-<li>99美元/年</li>
-</ul>
-</li>
-<li>企业账号<ul>
-<li>允许多个开发者使用</li>
-<li>需要填写公司的<strong>邓百氏编码(D-U-N-S Number)</strong></li>
-<li>该账号下的APP<strong>不能</strong>发布到App Store</li>
-<li>299美元/年</li>
-</ul>
-</li>
-</ul>
-<p>也就是说，除了企业账号以外，想轻松分享给他人是比较麻烦的。这方面可以考虑诸如<a href="https://www.pgyer.com" target="_blank" rel="external">蒲公英</a>一般的第三方签名平台，会更方便。<br>　　IPA的生成方式为Xcode下<code>Product→Archive</code>，然后根据指示进行即可。顺带一提，在编译设置中将<code>game.love</code>文件加入到APP资源里，变会默认直接运行该项目，以达到发布的效果。如下图所示：<br><img src="https://musoucrow.github.io/images/build_love_ios/7.png" alt="7"></p>
-<h2 id="LuaJIT"><a href="#LuaJIT" class="headerlink" title="LuaJIT"></a>LuaJIT</h2><p>　　还有一个需要注意的问题是：Lua代码若是需要转为LuaJIT字节码，所选择的版本得是<code>LuaJIT 2.1.0-beta2 64bit</code>（在LÖVE 0.10.2下）。重点在于这个64位，由于Apple现行规定APP必须得是64位，于是连LuaJIT的字节码也必须同步。而想要生成64位的字节码，则必须编译出64位的LuaJIT，而这需要在编译时填写参数：<code>make CFLAGS=-DLUAJIT_ENABLE_GC64</code>。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　总的来说iOS平台较之Android在编译方面更为简单，毕竟是很稳定的平台与设施嘛。但在开发方面则有更多的繁文缛节，也算是福兮祸兮吧。</p>
-]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;　　&lt;strong&gt;欢迎参与讨论，转载请注明出处。&lt;/strong&gt;&lt;/p&gt;
-&lt;h2 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h2&gt;&lt;p&gt;　　继上回&lt;a href=&quot;https://musouc
-    
-    </summary>
-    
-      <category term="Teach" scheme="https://musoucrow.github.io/categories/Teach/"/>
-    
-    
-      <category term="LÖVE" scheme="https://musoucrow.github.io/tags/LOVE/"/>
-    
-      <category term="iOS" scheme="https://musoucrow.github.io/tags/iOS/"/>
     
   </entry>
   

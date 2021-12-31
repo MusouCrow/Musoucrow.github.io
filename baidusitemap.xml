@@ -4,6 +4,26 @@
 
     
   <url>
+    <loc>https://musoucrow.github.io/2021/12/31/summary_2021/</loc>
+    <lastmod>2021-12-31T14:44:40.513Z</lastmod>
+    <data>
+        <display>
+        <title>2021年度总结</title>
+        <pubTime>2021-12-31T12:39:33.000Z</pubTime>
+        
+        <tag>Talk</tag>
+         
+         
+           
+             
+              <breadCrumb title="Talk" url="https://musoucrow.github.io/categories/Talk/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://musoucrow.github.io/2021/08/29/lbbn_grass/</loc>
     <lastmod>2021-08-29T18:16:38.250Z</lastmod>
     <data>
@@ -145,28 +165,6 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2017/06/16/mvc_thinking/</loc>
-    <lastmod>2021-07-17T12:41:21.493Z</lastmod>
-    <data>
-        <display>
-        <title>关于MVC框架的一点体悟</title>
-        <pubTime>2017-06-16T07:29:44.000Z</pubTime>
-        
-        <tag>ProgramDesign</tag>
-         
-        <tag>MVC</tag>
-         
-         
-           
-             
-              <breadCrumb title="ProgramDesign" url="https://musoucrow.github.io/categories/ProgramDesign/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://musoucrow.github.io/2018/04/17/lua_local/</loc>
     <lastmod>2021-07-17T12:41:21.493Z</lastmod>
     <data>
@@ -189,21 +187,21 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2020/03/08/shader_graph/</loc>
+    <loc>https://musoucrow.github.io/2017/06/16/mvc_thinking/</loc>
     <lastmod>2021-07-17T12:41:21.493Z</lastmod>
     <data>
         <display>
-        <title>Shader Graph踩坑实录</title>
-        <pubTime>2020-03-08T09:41:18.000Z</pubTime>
+        <title>关于MVC框架的一点体悟</title>
+        <pubTime>2017-06-16T07:29:44.000Z</pubTime>
         
-        <tag>Unity</tag>
+        <tag>ProgramDesign</tag>
          
-        <tag>Graphics</tag>
+        <tag>MVC</tag>
          
          
            
              
-              <breadCrumb title="Teach" url="https://musoucrow.github.io/categories/Teach/"/>
+              <breadCrumb title="ProgramDesign" url="https://musoucrow.github.io/categories/ProgramDesign/"/>
           
         </display>
     </data>
@@ -221,6 +219,48 @@
         <tag>GameDesign</tag>
          
         <tag>PNG</tag>
+         
+         
+           
+             
+              <breadCrumb title="Teach" url="https://musoucrow.github.io/categories/Teach/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://musoucrow.github.io/2017/03/03/research_awesomenauts/</loc>
+    <lastmod>2021-07-17T12:41:21.493Z</lastmod>
+    <data>
+        <display>
+        <title>王牌英雄(Awesomenauts)研究报告</title>
+        <pubTime>2017-03-03T12:13:40.000Z</pubTime>
+        
+        <tag>Awesomenauts</tag>
+         
+         
+           
+             
+              <breadCrumb title="Research" url="https://musoucrow.github.io/categories/Research/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://musoucrow.github.io/2020/03/08/shader_graph/</loc>
+    <lastmod>2021-07-17T12:41:21.493Z</lastmod>
+    <data>
+        <display>
+        <title>Shader Graph踩坑实录</title>
+        <pubTime>2020-03-08T09:41:18.000Z</pubTime>
+        
+        <tag>Unity</tag>
+         
+        <tag>Graphics</tag>
          
          
            
@@ -275,39 +315,21 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2018/12/31/summary_2018/</loc>
+    <loc>https://musoucrow.github.io/2017/07/21/spk_analysis/</loc>
     <lastmod>2021-07-17T12:41:21.493Z</lastmod>
     <data>
         <display>
-        <title>2018年度总结</title>
-        <pubTime>2018-12-31T14:04:28.000Z</pubTime>
+        <title>DNF的SPK文件解析笔记</title>
+        <pubTime>2017-07-21T07:57:42.000Z</pubTime>
         
-        <tag>Talk</tag>
+        <tag>Analysis</tag>
+         
+        <tag>DNF</tag>
          
          
            
              
-              <breadCrumb title="Talk" url="https://musoucrow.github.io/categories/Talk/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://musoucrow.github.io/2017/03/03/research_awesomenauts/</loc>
-    <lastmod>2021-07-17T12:41:21.493Z</lastmod>
-    <data>
-        <display>
-        <title>王牌英雄(Awesomenauts)研究报告</title>
-        <pubTime>2017-03-03T12:13:40.000Z</pubTime>
-        
-        <tag>Awesomenauts</tag>
-         
-         
-           
-             
-              <breadCrumb title="Research" url="https://musoucrow.github.io/categories/Research/"/>
+              <breadCrumb title="Analysis" url="https://musoucrow.github.io/categories/Analysis/"/>
           
         </display>
     </data>
@@ -335,21 +357,19 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2017/07/21/spk_analysis/</loc>
+    <loc>https://musoucrow.github.io/2018/12/31/summary_2018/</loc>
     <lastmod>2021-07-17T12:41:21.493Z</lastmod>
     <data>
         <display>
-        <title>DNF的SPK文件解析笔记</title>
-        <pubTime>2017-07-21T07:57:42.000Z</pubTime>
+        <title>2018年度总结</title>
+        <pubTime>2018-12-31T14:04:28.000Z</pubTime>
         
-        <tag>Analysis</tag>
-         
-        <tag>DNF</tag>
+        <tag>Talk</tag>
          
          
            
              
-              <breadCrumb title="Analysis" url="https://musoucrow.github.io/categories/Analysis/"/>
+              <breadCrumb title="Talk" url="https://musoucrow.github.io/categories/Talk/"/>
           
         </display>
     </data>
@@ -397,28 +417,6 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2018/10/29/dfq_ui/</loc>
-    <lastmod>2021-07-17T12:41:21.492Z</lastmod>
-    <data>
-        <display>
-        <title>《DFQ》开发随录——界面</title>
-        <pubTime>2018-10-29T13:02:54.000Z</pubTime>
-        
-        <tag>Development</tag>
-         
-        <tag>DFQ</tag>
-         
-         
-           
-             
-              <breadCrumb title="Development" url="https://musoucrow.github.io/categories/Development/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://musoucrow.github.io/2018/07/27/dfq_res/</loc>
     <lastmod>2021-07-17T12:41:21.492Z</lastmod>
     <data>
@@ -447,6 +445,28 @@
         <display>
         <title>《DFQ》开发随录——图集</title>
         <pubTime>2018-06-23T14:11:23.000Z</pubTime>
+        
+        <tag>Development</tag>
+         
+        <tag>DFQ</tag>
+         
+         
+           
+             
+              <breadCrumb title="Development" url="https://musoucrow.github.io/categories/Development/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://musoucrow.github.io/2018/10/29/dfq_ui/</loc>
+    <lastmod>2021-07-17T12:41:21.492Z</lastmod>
+    <data>
+        <display>
+        <title>《DFQ》开发随录——界面</title>
+        <pubTime>2018-10-29T13:02:54.000Z</pubTime>
         
         <tag>Development</tag>
          
@@ -551,6 +571,32 @@
 
     
   <url>
+    <loc>https://musoucrow.github.io/2018/03/11/for_loop/</loc>
+    <lastmod>2021-07-17T12:41:21.492Z</lastmod>
+    <data>
+        <display>
+        <title>一次移植代码时关于For循环的发现</title>
+        <pubTime>2018-03-10T16:51:33.000Z</pubTime>
+        
+        <tag>ProgramDesign</tag>
+         
+        <tag>Python</tag>
+         
+        <tag>ForLoop</tag>
+         
+        <tag>C++</tag>
+         
+         
+           
+             
+              <breadCrumb title="ProgramDesign" url="https://musoucrow.github.io/categories/ProgramDesign/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://musoucrow.github.io/2017/08/26/frame_sync/</loc>
     <lastmod>2021-07-17T12:41:21.492Z</lastmod>
     <data>
@@ -595,32 +641,6 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2018/03/11/for_loop/</loc>
-    <lastmod>2021-07-17T12:41:21.492Z</lastmod>
-    <data>
-        <display>
-        <title>一次移植代码时关于For循环的发现</title>
-        <pubTime>2018-03-10T16:51:33.000Z</pubTime>
-        
-        <tag>ProgramDesign</tag>
-         
-        <tag>Python</tag>
-         
-        <tag>ForLoop</tag>
-         
-        <tag>C++</tag>
-         
-         
-           
-             
-              <breadCrumb title="ProgramDesign" url="https://musoucrow.github.io/categories/ProgramDesign/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://musoucrow.github.io/2020/06/07/lbbn_tile/</loc>
     <lastmod>2021-07-17T12:41:21.492Z</lastmod>
     <data>
@@ -647,12 +667,12 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2020/05/10/lbbn_shading/</loc>
+    <loc>https://musoucrow.github.io/2020/09/06/lbbn_water/</loc>
     <lastmod>2021-07-17T12:41:21.492Z</lastmod>
     <data>
         <display>
-        <title>Demo的卡通渲染方案</title>
-        <pubTime>2020-05-10T02:01:34.000Z</pubTime>
+        <title>在URP实现水面效果</title>
+        <pubTime>2020-09-06T12:21:34.000Z</pubTime>
         
         <tag>Unity</tag>
          
@@ -669,12 +689,12 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2020/09/06/lbbn_water/</loc>
+    <loc>https://musoucrow.github.io/2020/05/10/lbbn_shading/</loc>
     <lastmod>2021-07-17T12:41:21.492Z</lastmod>
     <data>
         <display>
-        <title>在URP实现水面效果</title>
-        <pubTime>2020-09-06T12:21:34.000Z</pubTime>
+        <title>Demo的卡通渲染方案</title>
+        <pubTime>2020-05-10T02:01:34.000Z</pubTime>
         
         <tag>Unity</tag>
          
@@ -732,6 +752,28 @@
            
              
               <breadCrumb title="Development" url="https://musoucrow.github.io/categories/Development/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://musoucrow.github.io/2017/03/29/brew_changing/</loc>
+    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
+    <data>
+        <display>
+        <title>更换Homebrew的更新源</title>
+        <pubTime>2017-03-29T09:31:46.000Z</pubTime>
+        
+        <tag>Homebrew</tag>
+         
+        <tag>Git</tag>
+         
+         
+           
+             
+              <breadCrumb title="Teach" url="https://musoucrow.github.io/categories/Teach/"/>
           
         </display>
     </data>
@@ -829,6 +871,28 @@
 
     
   <url>
+    <loc>https://musoucrow.github.io/2017/04/21/caller/</loc>
+    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
+    <data>
+        <display>
+        <title>观察者模式的一种实现——Caller</title>
+        <pubTime>2017-04-21T08:55:56.000Z</pubTime>
+        
+        <tag>ProgramDesign</tag>
+         
+        <tag>Lua</tag>
+         
+         
+           
+             
+              <breadCrumb title="ProgramDesign" url="https://musoucrow.github.io/categories/ProgramDesign/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://musoucrow.github.io/2019/05/31/dfq_ai/</loc>
     <lastmod>2021-07-17T12:41:21.491Z</lastmod>
     <data>
@@ -844,6 +908,28 @@
            
              
               <breadCrumb title="Development" url="https://musoucrow.github.io/categories/Development/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://musoucrow.github.io/2017/12/07/dfq_building/</loc>
+    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
+    <data>
+        <display>
+        <title>游戏测试同步于Android设备的解决方案</title>
+        <pubTime>2017-12-06T21:33:42.000Z</pubTime>
+        
+        <tag>Git</tag>
+         
+        <tag>Python</tag>
+         
+         
+           
+             
+              <breadCrumb title="Teach" url="https://musoucrow.github.io/categories/Teach/"/>
           
         </display>
     </data>
@@ -873,56 +959,34 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2017/04/21/caller/</loc>
-    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
-    <data>
-        <display>
-        <title>观察者模式的一种实现——Caller</title>
-        <pubTime>2017-04-21T08:55:56.000Z</pubTime>
-        
-        <tag>ProgramDesign</tag>
-         
-        <tag>Lua</tag>
-         
-         
-           
-             
-              <breadCrumb title="ProgramDesign" url="https://musoucrow.github.io/categories/ProgramDesign/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://musoucrow.github.io/2017/03/29/brew_changing/</loc>
-    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
-    <data>
-        <display>
-        <title>更换Homebrew的更新源</title>
-        <pubTime>2017-03-29T09:31:46.000Z</pubTime>
-        
-        <tag>Git</tag>
-         
-        <tag>Homebrew</tag>
-         
-         
-           
-             
-              <breadCrumb title="Teach" url="https://musoucrow.github.io/categories/Teach/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://musoucrow.github.io/2018/12/27/dfq_ecs/</loc>
     <lastmod>2021-07-17T12:41:21.491Z</lastmod>
     <data>
         <display>
         <title>《DFQ》开发随录——ECS</title>
         <pubTime>2018-12-26T16:56:09.000Z</pubTime>
+        
+        <tag>Development</tag>
+         
+        <tag>DFQ</tag>
+         
+         
+           
+             
+              <breadCrumb title="Development" url="https://musoucrow.github.io/categories/Development/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://musoucrow.github.io/2019/04/30/dfq_hit/</loc>
+    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
+    <data>
+        <display>
+        <title>《DFQ》开发随录——打击感</title>
+        <pubTime>2019-04-30T06:28:38.000Z</pubTime>
         
         <tag>Development</tag>
          
@@ -983,38 +1047,16 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2019/04/30/dfq_hit/</loc>
-    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
+    <loc>https://musoucrow.github.io/2017/10/13/about_strtok/</loc>
+    <lastmod>2021-07-17T12:41:21.490Z</lastmod>
     <data>
         <display>
-        <title>《DFQ》开发随录——打击感</title>
-        <pubTime>2019-04-30T06:28:38.000Z</pubTime>
+        <title>关于C语言函数strtok引发的思考</title>
+        <pubTime>2017-10-13T08:03:33.000Z</pubTime>
         
-        <tag>Development</tag>
+        <tag>ProgramDesign</tag>
          
-        <tag>DFQ</tag>
-         
-         
-           
-             
-              <breadCrumb title="Development" url="https://musoucrow.github.io/categories/Development/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://musoucrow.github.io/2017/12/07/dfq_building/</loc>
-    <lastmod>2021-07-17T12:41:21.491Z</lastmod>
-    <data>
-        <display>
-        <title>游戏测试同步于Android设备的解决方案</title>
-        <pubTime>2017-12-06T21:33:42.000Z</pubTime>
-        
-        <tag>Git</tag>
-         
-        <tag>Python</tag>
+        <tag>C</tag>
          
          
            
@@ -1049,28 +1091,6 @@
 
     
   <url>
-    <loc>https://musoucrow.github.io/2017/10/13/about_strtok/</loc>
-    <lastmod>2021-07-17T12:41:21.490Z</lastmod>
-    <data>
-        <display>
-        <title>关于C语言函数strtok引发的思考</title>
-        <pubTime>2017-10-13T08:03:33.000Z</pubTime>
-        
-        <tag>ProgramDesign</tag>
-         
-        <tag>C</tag>
-         
-         
-           
-             
-              <breadCrumb title="Teach" url="https://musoucrow.github.io/categories/Teach/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://musoucrow.github.io/2018/03/09/bnb_1/</loc>
     <lastmod>2021-07-17T12:41:21.490Z</lastmod>
     <data>
@@ -1082,9 +1102,9 @@
          
         <tag>Development</tag>
          
-        <tag>Brick&amp;Ball</tag>
-         
         <tag>NetworkSync</tag>
+         
+        <tag>Brick&amp;Ball</tag>
          
          
            
