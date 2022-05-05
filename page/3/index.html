@@ -291,6 +291,178 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2019/03/31/dfq_drop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2019/03/31/dfq_drop/" itemprop="url">
+                  《DFQ》开发随录——随机掉落
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-31T14:39:46+08:00">
+                2019-03-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/03/31/dfq_drop/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/03/31/dfq_drop/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/03/31/dfq_drop/" class="leancloud_visitors" data-flag-title="《DFQ》开发随录——随机掉落">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　随机掉落可谓时下RPG的流行设定，DFQ自然也不例外。而掉落业务自然也有其值得细说之处，不然也就不会有本文了（笑）。接下来将一步步引申出随机掉落的实现演进。</p>
+<h2 id="粗劣的实现"><a href="#粗劣的实现" class="headerlink" title="粗劣的实现"></a>粗劣的实现</h2><p>　　在以往的开发生涯中，对于掉落业务，我采取了很粗劣的实现：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> random = <span class="built_in">math</span>.random() <span class="comment">-- 0-1</span></div><div class="line"><span class="keyword">local</span> pool <span class="comment">-- drop pool</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> (random &lt; <span class="number">0.1</span>) <span class="keyword">then</span></div><div class="line">    pool = pools.normal</div><div class="line"><span class="keyword">elseif</span> (random &lt; <span class="number">0.3</span>) <span class="keyword">then</span></div><div class="line">    pool = pools.rare</div><div class="line"><span class="keyword">else</span></div><div class="line">    pool = pools.other</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> index = <span class="built_in">math</span>.random(<span class="number">1</span>, #pool) <span class="comment">-- Choice one.</span></div><div class="line"><span class="keyword">local</span> item = pool[index] <span class="comment">-- Get an item.</span></div></pre></td></tr></table></figure></p>
+<p>　　这种实现的槽点可谓数不胜数：掉落池的选取可谓暴力代码，而池中的道具也只能通过塞入相同的多份来扩充概率，对于概率的控制度很生硬。哪怕是将掉落池采取与道具相同的做法（将pools做成list）以去除暴力代码，对于概率控制度的问题依旧没有解决。且进行了两次取随机数，从概率而言并不纯粹。实际效果而言也导致了经常重复掉落，并不可取。</p>
+<h2 id="Alias-Method"><a href="#Alias-Method" class="headerlink" title="Alias Method"></a>Alias Method</h2><p>　　那么如果选择将多个掉落池合而为一，使之只有一个list呢？<br>　　如此确实能让概率纯粹了，但是对于道具概率的控制度依然很差。这个问题可以通过构建道具概率表（<code>{a = 0.1, b = 0.5, ...}</code>）以生成掉落池（<code>{a, b, b, b,...}</code>）解决。但这样生成的掉落池未免也太大了（最后可能会达上千个元素），这太不环保了，那怎么办呢？<br>　　长达廿二年的人生经验告诉我：<em>我们做的绝大多数事情都是前人做过的，遇到不会的问题看看前人是怎么做的就对了</em>。果不其然，这就遇上了个合适的算法：<a href="https://blog.csdn.net/qq_33765907/article/details/79182355" target="_blank" rel="external">Alias Method</a>。<br>　　本文并不打算详解其中的奥妙，这是愚蠢的复读机行为。直接上代码：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- items: A list of probability of item.</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Alias</span><span class="params">(items)</span></span></div><div class="line">    <span class="keyword">local</span> len = #items</div><div class="line">    <span class="keyword">local</span> alias = &#123;&#125;</div><div class="line">    <span class="keyword">local</span> probs = &#123;&#125;</div><div class="line">    <span class="keyword">local</span> small = &#123;&#125;</div><div class="line">    <span class="keyword">local</span> large = &#123;&#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> n=<span class="number">1</span>, len <span class="keyword">do</span></div><div class="line">        items[n] = items[n] * len</div><div class="line">        <span class="keyword">local</span> tab = items[n] &lt; <span class="number">1</span> <span class="keyword">and</span> small <span class="keyword">or</span> large</div><div class="line">        <span class="built_in">table</span>.insert(tab, n)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">while</span> (#small &gt; <span class="number">0</span> <span class="keyword">and</span> #large &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">        <span class="keyword">local</span> less = <span class="built_in">table</span>.pop(small) <span class="comment">-- Remove the first element of list and return it.</span></div><div class="line">        <span class="keyword">local</span> more = <span class="built_in">table</span>.pop(large)</div><div class="line"></div><div class="line">        probs[less] = items[less]</div><div class="line">        alias[less] = more</div><div class="line">        items[more] = items[more] - (<span class="number">1</span> - items[less])</div><div class="line"></div><div class="line">        <span class="keyword">local</span> tab = items[more] &lt; <span class="number">1</span> <span class="keyword">and</span> small <span class="keyword">or</span> large</div><div class="line">        <span class="built_in">table</span>.insert(tab, more)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">while</span> (#small &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">        probs[<span class="built_in">table</span>.pop(small)] = <span class="number">1</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">while</span> (#large &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">        probs[<span class="built_in">table</span>.pop(large)] = <span class="number">1</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> alias, probs</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
+<p>　　算法的代码量并不多，也就三十多行，输入参数<code>items</code>为道具的的概率list（<code>{0.1, 0.1, 0.5, ...}</code>），即代表需要配套的<code>paths</code>来表示对应的道具标识（<code>{&quot;stone&quot;, &quot;potion&quot;, &quot;gold&quot;, ...}</code>）。至于返回值<code>alias, probs</code>，先来看看获取随机掉落的代码：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> index = <span class="built_in">math</span>.random(<span class="number">1</span>, #paths) <span class="comment">--- 1-n</span></div><div class="line">index = <span class="built_in">math</span>.random() &lt; probs[index] <span class="keyword">and</span> index <span class="keyword">or</span> alias[index]</div><div class="line"><span class="keyword">local</span> path = paths[index] <span class="comment">--- Item's path.</span></div></pre></td></tr></table></figure></p>
+<p>　　以上代码很好理解，首先随机获取一个道具的索引，根据索引获取到<code>probs[index]</code>的值，与随机数（0-1）比较，由此可见probs存放的是一种运算后的概率值。若是随机数大于概率值，索引则改为<code>alias[index]</code>，由此可见alias存放的是一种与原索引相对应的新索引，而新的索引自然会有对应的道具。<br>　　如此我们便可理解这套算法的做法了：为每个道具设置一个概率值以及相对应的另一个道具，随机到一个道具后，仍需二次随机进行二选一。这么做很好理解，就是<strong>将一些高概率的道具填充到一些低概率的道具里</strong>：<br><img src="https://musoucrow.github.io/images/dfq_drop/example.png" alt="example"></p>
+<p>　　如图所示的第二项紫色的占比（概率）为1，表示不需要进行二次随机了，如此即可保证整个掉落池的概率是可以平分干净的（多出的部分就作为1概率项）。不得不说这种做法十分绝妙，完美解决了先前做法中掉落池元素过大的问题，美中不足在于需要进行二次随机，相对破坏了概率的纯粹性，但由于只是二选一，实际上效果是可接受的。</p>
+<h2 id="掉落池的维护"><a href="#掉落池的维护" class="headerlink" title="掉落池的维护"></a>掉落池的维护</h2><p>　　虽说Alias Method方案的掉落池配置变得相当容易，只需如此这般填写概率值即可，再分别生成items与paths：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    [<span class="string">"equipment/weapon/sword"</span>] = <span class="number">0.3</span>,</div><div class="line">    [<span class="string">"equipment/weapon/knife"</span>] = <span class="number">0.3</span>,</div><div class="line">    [<span class="string">"equipment/weapon/katana"</span>] = <span class="number">0.3</span>,</div><div class="line">    [<span class="string">"skill/flash"</span>] = <span class="number">0.1</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　然而实际上掉落项的种类与数量都相当的多，并且会时常更改。所以这般直接的配置是无法满足需求的，于是演进为：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    skill = &#123;</div><div class="line">        prob = <span class="number">0</span>,</div><div class="line">        item = &#123;</div><div class="line">            flash = <span class="number">1</span></div><div class="line">        &#125;</div><div class="line">    &#125;,</div><div class="line">    [<span class="string">"equipment/weapon"</span>] = &#123;</div><div class="line">        prob = <span class="number">0.9</span>,</div><div class="line">        item = &#123;</div><div class="line">            sword = <span class="number">0</span>,</div><div class="line">            knife = <span class="number">0</span>,</div><div class="line">            katana = <span class="number">0</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>　　新配置明显就方便了不少，若是概率填写为0则表示<strong>剩余总概率的平均值</strong>（<code>sword=0 =&gt; 0.9/3 =&gt; 0.3</code>），且填写的概率是<strong>相对于本层</strong>的（skill的总概率为0.1，故<code>flash=1 =&gt; 0.1</code>）。算是基于原配置进行了一波封装，可维护性大幅提升，如此便可面对变化频繁的需求了。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　本文所展示的掉落业务只是基础，在业界会有复杂度远超于此的需求（与时间、职业等因素挂钩，掉落池数量等），但DFQ的需求也仅此而已，期待日后能接触到更主流的设计。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2019/03/01/build_love_ios/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1901,208 +2073,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/04/17/lua_local/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2018/04/17/lua_local/" itemprop="url">
-                  Lua的local变量探究
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-17T14:20:33+08:00">
-                2018-04-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ProgramDesign/" itemprop="url" rel="index">
-                    <span itemprop="name">ProgramDesign</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/17/lua_local/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/17/lua_local/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2018/04/17/lua_local/" class="leancloud_visitors" data-flag-title="Lua的local变量探究">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　先前看到<a href="https://blog.uwa4d.com/archives/usparkle_luajit.html" target="_blank" rel="external">用好Lua+Unity，让性能飞起来—LuaJIT性能坑详解</a>一文中提到：</p>
-<pre><code>3.2 寄存器分配失败-&gt;减少local变量、避免过深的调用层次
-很不幸的一点是，arm中可用的寄存器比x86少。LuaJIT为了速度，会尽可能用寄存器存储local变量，但是如果local变量太多，寄存器不够用，目前JIT的做法是：放弃治疗（有兴趣可以看看源码中asm_head_side函数的注释）。因此，我们能做的，只有按照官方优化指引说的，避免过多的local变量，或者通过do end来限制local变量的生命周期。
-</code></pre><p>　　对此自然是可以理解的，哪怕是一般语言，local变量过多也会有堆栈溢出的问题。不过我对此一直有个隐忧：<strong>Lua是拥有模块级local变量的，不知是否也受此规则影响？</strong>尽管有此隐忧，却一直没有去做相关的探究。恰逢今日遇到相关话题，便来个刨根问底吧。</p>
-<h2 id="200限制"><a href="#200限制" class="headerlink" title="200限制"></a>200限制</h2><p>　　首先的发现是：一段过程下最多拥有200个local变量，且<code>do end</code>不算。类似这样：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> Class = &#123;&#125;</div><div class="line"></div><div class="line"><span class="keyword">local</span> test1 = <span class="number">1</span></div><div class="line"><span class="keyword">local</span> test2 = <span class="number">2</span></div><div class="line">... <span class="comment">--to 199</span></div><div class="line"></div><div class="line"><span class="keyword">return</span> Class</div></pre></td></tr></table></figure>
-<p>　　如果超过199，则会报出<code>main function has more than 200 local variables</code>的错误。当然这里说的是一段过程，所以函数是另算的，同样一个函数的过程最多也不能超过200个local变量（调用函数则算转入下一个过程了）。<br>　　这个限制是Lua与LuaJIT共有的，显然是想限制local数量的泛滥。</p>
-<h2 id="函数嵌套调用"><a href="#函数嵌套调用" class="headerlink" title="函数嵌套调用"></a>函数嵌套调用</h2><p>　　接下来便是试试函数嵌套调用了：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Class.Do</span><span class="params">(v)</span></span></div><div class="line">    <span class="keyword">if</span> (v &gt; n) <span class="keyword">then</span> <span class="comment">--n is a custom value</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> test1 = <span class="number">1</span></div><div class="line">    ... <span class="comment">-- to 199</span></div><div class="line"></div><div class="line">    Class.Do(v + <span class="number">1</span>)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
-<p>　　注意参数v也算是local变量的一员，所以test变量最多只能延伸到199个。以此进行递归调用的话，根据实验结果来看：</p>
-<table>
-<thead>
-<tr>
-<th>版本</th>
-<th>嵌套上限</th>
-<th>local变量上限</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>LuaJIT</td>
-<td>325</td>
-<td>65000</td>
-</tr>
-<tr>
-<td>Lua5.3</td>
-<td>4975</td>
-<td>995000</td>
-</tr>
-</tbody>
-</table>
-<p>　　测试的环境为macOS x86-64，LuaJIT方面无论JIT开启与否结果皆一致。根据前文所言来看，到了ARM环境这个数量将会进一步下降。虽然从对比来看差距有点大，但实际上在函数调用方面也算够用了。</p>
-<h2 id="模块级local变量"><a href="#模块级local变量" class="headerlink" title="模块级local变量"></a>模块级local变量</h2><p>　　接下来便是我最关心的一点了：以上local变量上限是否会影响到模块级local变量？所谓模块级local变量即作用域为整个文件：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--test.lua</span></div><div class="line"><span class="keyword">local</span> Class = &#123;&#125;</div><div class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">Func</span><span class="params">()</span></span></div><div class="line"><span class="keyword">end</span></div><div class="line">...</div><div class="line"></div><div class="line"><span class="keyword">return</span> Class</div></pre></td></tr></table></figure>
-<p>　　这种模块级local变量在Lua开发的应用还是很广泛的，它能有效的做到信息分隔的效果。但若是这些变量也受之前的上限规则影响，咁就扑街了！</p>
-<p>　　首先是测试加载多个满载local变量的模块：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> n=<span class="number">1</span>, <span class="number">5000</span> <span class="keyword">do</span></div><div class="line">    <span class="built_in">require</span>(<span class="string">"test"</span> .. n)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
-<p>　　天可怜见，无论读取多少个文件，都不会存在上限问题。可见对于模块级local变量的处理是不一样的。到了这里基本上可以放心了，不过为防万一，我还做了模块的嵌套引用实验：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">---test1.lua</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> Class = &#123;&#125;</div><div class="line"><span class="built_in">print</span>(<span class="string">"1"</span>)</div><div class="line"><span class="keyword">local</span> Next = <span class="built_in">require</span>(<span class="string">"test2"</span>)</div><div class="line"><span class="keyword">local</span> test1 = <span class="number">1</span></div><div class="line"><span class="keyword">local</span> test2 = <span class="number">2</span></div><div class="line">... <span class="comment">--to max</span></div><div class="line"><span class="keyword">return</span> Class</div></pre></td></tr></table></figure>
-<p>　　以这种形式生成了5000个文件，以此进行嵌套引用，结果也是成功通过了。由此可见，对于模块级local变量是可以放心地去使用了。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　尽管模块级local变量是可以随便用了，但是也要考虑到热更新方面的问题：若是选择使用模块级local变量去存储模块的数据，那么在热更新方面的处理将会变得十分麻烦。从这点考虑的话，模块级local变量最好只是用于引用别的模块为妙。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2152,7 +2122,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -2170,7 +2140,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-count">37</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
@@ -2239,7 +2209,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

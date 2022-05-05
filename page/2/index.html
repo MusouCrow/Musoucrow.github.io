@@ -291,6 +291,172 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/06/07/lbbn_tile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2020/06/07/lbbn_tile/" itemprop="url">
+                  3D瓦片地图采坑录
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-06-07T21:26:33+08:00">
+                2020-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/06/07/lbbn_tile/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/07/lbbn_tile/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/06/07/lbbn_tile/" class="leancloud_visitors" data-flag-title="3D瓦片地图采坑录">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>     </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　由于Demo的场景风格主打像素风格（这里的像素风格指具备一定精度的风格，而非时下流行的马赛克），故决定使用瓦片(Tile)地图来实现。也就是这种东西：<br><img src="https://musoucrow.github.io/images/lbbn_tile/0.jpeg" alt="0"><br>　　游戏地图将由一个个规范化的单位图片拼接而成，是为<strong>瓦片</strong>。在早期的像素风格游戏可谓相当流行，因其构造成本低（无论从技术上还是美术上），而却能灵活拼接出各种各样的地图。于是我们也打算如此，但是在3D游戏下搞瓦片地图确是罕见得很。于是便开始了采坑之旅，遂成本文。</p>
+<h2 id="Sprytile"><a href="#Sprytile" class="headerlink" title="Sprytile"></a>Sprytile</h2><p>　　首先我们想到了在3D游戏下最接近瓦片地图思想的方案：<a href="https://docs.unity3d.com/Manual/CreatingEnvironments.html" target="_blank" rel="external">Terrain</a>，一般3D大地图都用类似方案：对一张平面地图进行各种揉捏形成地形，并在此之上涂抹各种图素。但可惜对于瓦片地图而言未免杀鸡用牛刀了，且在各方面都不能做到最适化，遂不考虑。<br>　　其次便是Unity官方自带的<a href="https://docs.unity3d.com/Manual/class-Tilemap.html" target="_blank" rel="external">2D Tilemap Editor</a>，对瓦片方面的需求倒是满足了，可惜3D瓦片并不只是在一张平面上进行，而通过多张平面旋转组成场景未免勉强，遂放弃。<br>　　既然在Unity这边行不通，那么便考虑生产端的Blender有什么合适的插件了。果不其然找到了<a href="https://chemikhazi.itch.io/sprytile" target="_blank" rel="external">Sprytile</a>，一看就明白，就是它了：<br><img src="https://musoucrow.github.io/images/lbbn_tile/1.png" alt="1"><br>　　使用准备好的tile图集，划分格子，在Blender以格子为单位进行填涂，每个格子将会是一个面，支持XYZ三个平面进行，在填涂完成后可作为正常模型进行各种操作。一切看起来是那么的美好，然后一路到了游戏后……</p>
+<h2 id="过滤之殇"><a href="#过滤之殇" class="headerlink" title="过滤之殇"></a>过滤之殇</h2><p>　　以<a href="http://musoucrow.github.io/2020/05/10/lbbn_shading/">前篇</a>的截图便可看出问题所在：<br><img src="https://musoucrow.github.io/images/lbbn_tile/2.png" alt="2"><br>　　可以看到地板之间存在奇怪的黑线：<br><img src="https://musoucrow.github.io/images/lbbn_tile/3.png" alt="3"><br>　　根据插件文档提供的<a href="https://docs.sprytile.xyz/unity-settings/" target="_blank" rel="external">Unity导出说明</a>来看，必须要将地图贴图的过滤模式设置为<code>Point</code>，即邻近过滤：<br><img src="https://musoucrow.github.io/images/lbbn_tile/4.png" alt="4"><br>　　嗯，黑线果然消失了。那么问题便出在图片的过滤模式了，回去复习了下<a href="https://learnopengl-cn.github.io/01%20Getting%20started/06%20Textures/#_3" target="_blank" rel="external">纹理过滤</a>，答案昭然若揭：<br><img src="https://musoucrow.github.io/images/lbbn_tile/5.png" alt="5"><br>　　由于瓦片地图的习惯会将相关图素集成一块，形成连续的图块：<br><img src="https://musoucrow.github.io/images/lbbn_tile/6.png" alt="6"><br>　　那么在线性过滤下，图块的边缘像素在采样的时候将会<strong>混进相邻图块的颜色</strong>，于是那些奇怪的黑线便是这么来的。<br>　　也许读者会认为：不用线性过滤不就得了，毕竟插件作者也是这么认为的。可惜我们做的风格并不适合用邻近过滤，那将显得与人物画风差异过大且马赛克：<br><img src="https://musoucrow.github.io/images/lbbn_tile/7.png" alt="7"><br>　　细心观察上图底部，这是开启抗锯齿（MSAA）导致的。查阅资料后发现这是MSAA的特点导致，如此哪怕我们想靠邻近过滤解决也是没门……当然也考虑过更换为其他抗锯齿的方式，但是效果都不甚喜人，于是开始寻觅解决之道。</p>
+<h2 id="无奈的解法"><a href="#无奈的解法" class="headerlink" title="无奈的解法"></a>无奈的解法</h2><p>　　首先考虑对tile图片进行下手：既然边缘会采样到相邻图块的像素，那么将它们隔开不就得了，如此：<br><img src="https://musoucrow.github.io/images/lbbn_tile/8.png" alt="8"><br>　　当然这么做的话要让Sprytile有所支持才行，好在它是<a href="https://github.com/ChemiKhazi/Sprytile" target="_blank" rel="external">开源</a>的。Blender的插件改起来也还算容易，毕竟会在界面提示标识好功能函数名。结果还是翻车了：<br><img src="https://musoucrow.github.io/images/lbbn_tile/9.jpg" alt="9"><br>　　瓦片之间出现了奇怪的透明点，仔细一想便明白了：<strong>透明像素一样会被采样到</strong>，所以会影响到透明度。于是迅速想到下个方案：让每个图块外扩边缘1像素，这样边缘的采样只会<strong>采样到相同颜色</strong>的像素：<br><img src="https://musoucrow.github.io/images/lbbn_tile/10.png" alt="10"><br>　　很不错，黑线什么的都消失了，哪怕是开着MSAA。同时美术也在Blender琢磨出了一种方法：在不做任何处理的贴图的基础上，将瓦片地图模型的UV全部缩小一点（参考值：0.96），如此便不会直接采样到边缘像素，从而以牺牲了一点点边缘效果解决了问题。<br>　　两者的效果最终是差不多的，但都是不完美的，在编辑器里便一目了然：<br><img src="https://musoucrow.github.io/images/lbbn_tile/11.png" alt="11"><br>　　可以看得出，格子之间的边界可谓泾渭分明，这是因为每个格子都是独立的mesh，它们并不是作为一个整体去渲染，也就不存在视为一个整体去采样。也就无法达到真正意义上2D游戏里要达到的效果（格子之间彻底融为一体）。要这么做有两种方式：第一种是根据瓦片地图的填涂情况最终生成大贴图与新模型，但这种方式相当不优化，并且会急剧增大包体。其次是仿照以前的2D游戏做法：游戏本身使用邻近过滤渲染，最后将渲染成图进行拉伸放大（放大方式采用线性过滤），但这是牺牲画面分辨率带来的。<br>　　经过以上总结可以看出，基本不存在非常完美的解决方案，只能矮子里拔大个了：UV缩小的方案从工序上最为简单，且显示效果也能接受（没对比过原版基本看不出太多异样）。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　一开始我们觉得这种瓦片地图1个格子就占2个三角形，面数会不会太高了。结果在参考其他游戏的情况时发现《闪之轨迹3》的一组垃圾桶的面数……<br><img src="https://musoucrow.github.io/images/lbbn_tile/12.jpg" alt="12"><br>　　嗯，一组垃圾桶的面数都完爆我整个瓦片地图模型了，法老控牛逼！<br>　　顺带一提的是，刚才提到的格子边界问题在Unity官方的2D Tilemap Editor也是存在的，只能说是瓦片地图的局限性了，好在离得远也看不太出。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/05/10/lbbn_shading/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1907,178 +2073,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2019/03/31/dfq_drop/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2019/03/31/dfq_drop/" itemprop="url">
-                  《DFQ》开发随录——随机掉落
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-03-31T14:39:46+08:00">
-                2019-03-31
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Development/" itemprop="url" rel="index">
-                    <span itemprop="name">Development</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2019/03/31/dfq_drop/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2019/03/31/dfq_drop/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2019/03/31/dfq_drop/" class="leancloud_visitors" data-flag-title="《DFQ》开发随录——随机掉落">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　随机掉落可谓时下RPG的流行设定，DFQ自然也不例外。而掉落业务自然也有其值得细说之处，不然也就不会有本文了（笑）。接下来将一步步引申出随机掉落的实现演进。</p>
-<h2 id="粗劣的实现"><a href="#粗劣的实现" class="headerlink" title="粗劣的实现"></a>粗劣的实现</h2><p>　　在以往的开发生涯中，对于掉落业务，我采取了很粗劣的实现：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> random = <span class="built_in">math</span>.random() <span class="comment">-- 0-1</span></div><div class="line"><span class="keyword">local</span> pool <span class="comment">-- drop pool</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> (random &lt; <span class="number">0.1</span>) <span class="keyword">then</span></div><div class="line">    pool = pools.normal</div><div class="line"><span class="keyword">elseif</span> (random &lt; <span class="number">0.3</span>) <span class="keyword">then</span></div><div class="line">    pool = pools.rare</div><div class="line"><span class="keyword">else</span></div><div class="line">    pool = pools.other</div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> index = <span class="built_in">math</span>.random(<span class="number">1</span>, #pool) <span class="comment">-- Choice one.</span></div><div class="line"><span class="keyword">local</span> item = pool[index] <span class="comment">-- Get an item.</span></div></pre></td></tr></table></figure></p>
-<p>　　这种实现的槽点可谓数不胜数：掉落池的选取可谓暴力代码，而池中的道具也只能通过塞入相同的多份来扩充概率，对于概率的控制度很生硬。哪怕是将掉落池采取与道具相同的做法（将pools做成list）以去除暴力代码，对于概率控制度的问题依旧没有解决。且进行了两次取随机数，从概率而言并不纯粹。实际效果而言也导致了经常重复掉落，并不可取。</p>
-<h2 id="Alias-Method"><a href="#Alias-Method" class="headerlink" title="Alias Method"></a>Alias Method</h2><p>　　那么如果选择将多个掉落池合而为一，使之只有一个list呢？<br>　　如此确实能让概率纯粹了，但是对于道具概率的控制度依然很差。这个问题可以通过构建道具概率表（<code>{a = 0.1, b = 0.5, ...}</code>）以生成掉落池（<code>{a, b, b, b,...}</code>）解决。但这样生成的掉落池未免也太大了（最后可能会达上千个元素），这太不环保了，那怎么办呢？<br>　　长达廿二年的人生经验告诉我：<em>我们做的绝大多数事情都是前人做过的，遇到不会的问题看看前人是怎么做的就对了</em>。果不其然，这就遇上了个合适的算法：<a href="https://blog.csdn.net/qq_33765907/article/details/79182355" target="_blank" rel="external">Alias Method</a>。<br>　　本文并不打算详解其中的奥妙，这是愚蠢的复读机行为。直接上代码：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- items: A list of probability of item.</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Alias</span><span class="params">(items)</span></span></div><div class="line">    <span class="keyword">local</span> len = #items</div><div class="line">    <span class="keyword">local</span> alias = &#123;&#125;</div><div class="line">    <span class="keyword">local</span> probs = &#123;&#125;</div><div class="line">    <span class="keyword">local</span> small = &#123;&#125;</div><div class="line">    <span class="keyword">local</span> large = &#123;&#125;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> n=<span class="number">1</span>, len <span class="keyword">do</span></div><div class="line">        items[n] = items[n] * len</div><div class="line">        <span class="keyword">local</span> tab = items[n] &lt; <span class="number">1</span> <span class="keyword">and</span> small <span class="keyword">or</span> large</div><div class="line">        <span class="built_in">table</span>.insert(tab, n)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">while</span> (#small &gt; <span class="number">0</span> <span class="keyword">and</span> #large &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">        <span class="keyword">local</span> less = <span class="built_in">table</span>.pop(small) <span class="comment">-- Remove the first element of list and return it.</span></div><div class="line">        <span class="keyword">local</span> more = <span class="built_in">table</span>.pop(large)</div><div class="line"></div><div class="line">        probs[less] = items[less]</div><div class="line">        alias[less] = more</div><div class="line">        items[more] = items[more] - (<span class="number">1</span> - items[less])</div><div class="line"></div><div class="line">        <span class="keyword">local</span> tab = items[more] &lt; <span class="number">1</span> <span class="keyword">and</span> small <span class="keyword">or</span> large</div><div class="line">        <span class="built_in">table</span>.insert(tab, more)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">while</span> (#small &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">        probs[<span class="built_in">table</span>.pop(small)] = <span class="number">1</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">while</span> (#large &gt; <span class="number">0</span>) <span class="keyword">do</span></div><div class="line">        probs[<span class="built_in">table</span>.pop(large)] = <span class="number">1</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">return</span> alias, probs</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
-<p>　　算法的代码量并不多，也就三十多行，输入参数<code>items</code>为道具的的概率list（<code>{0.1, 0.1, 0.5, ...}</code>），即代表需要配套的<code>paths</code>来表示对应的道具标识（<code>{&quot;stone&quot;, &quot;potion&quot;, &quot;gold&quot;, ...}</code>）。至于返回值<code>alias, probs</code>，先来看看获取随机掉落的代码：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> index = <span class="built_in">math</span>.random(<span class="number">1</span>, #paths) <span class="comment">--- 1-n</span></div><div class="line">index = <span class="built_in">math</span>.random() &lt; probs[index] <span class="keyword">and</span> index <span class="keyword">or</span> alias[index]</div><div class="line"><span class="keyword">local</span> path = paths[index] <span class="comment">--- Item's path.</span></div></pre></td></tr></table></figure></p>
-<p>　　以上代码很好理解，首先随机获取一个道具的索引，根据索引获取到<code>probs[index]</code>的值，与随机数（0-1）比较，由此可见probs存放的是一种运算后的概率值。若是随机数大于概率值，索引则改为<code>alias[index]</code>，由此可见alias存放的是一种与原索引相对应的新索引，而新的索引自然会有对应的道具。<br>　　如此我们便可理解这套算法的做法了：为每个道具设置一个概率值以及相对应的另一个道具，随机到一个道具后，仍需二次随机进行二选一。这么做很好理解，就是<strong>将一些高概率的道具填充到一些低概率的道具里</strong>：<br><img src="https://musoucrow.github.io/images/dfq_drop/example.png" alt="example"></p>
-<p>　　如图所示的第二项紫色的占比（概率）为1，表示不需要进行二次随机了，如此即可保证整个掉落池的概率是可以平分干净的（多出的部分就作为1概率项）。不得不说这种做法十分绝妙，完美解决了先前做法中掉落池元素过大的问题，美中不足在于需要进行二次随机，相对破坏了概率的纯粹性，但由于只是二选一，实际上效果是可接受的。</p>
-<h2 id="掉落池的维护"><a href="#掉落池的维护" class="headerlink" title="掉落池的维护"></a>掉落池的维护</h2><p>　　虽说Alias Method方案的掉落池配置变得相当容易，只需如此这般填写概率值即可，再分别生成items与paths：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    [<span class="string">"equipment/weapon/sword"</span>] = <span class="number">0.3</span>,</div><div class="line">    [<span class="string">"equipment/weapon/knife"</span>] = <span class="number">0.3</span>,</div><div class="line">    [<span class="string">"equipment/weapon/katana"</span>] = <span class="number">0.3</span>,</div><div class="line">    [<span class="string">"skill/flash"</span>] = <span class="number">0.1</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>　　然而实际上掉落项的种类与数量都相当的多，并且会时常更改。所以这般直接的配置是无法满足需求的，于是演进为：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    skill = &#123;</div><div class="line">        prob = <span class="number">0</span>,</div><div class="line">        item = &#123;</div><div class="line">            flash = <span class="number">1</span></div><div class="line">        &#125;</div><div class="line">    &#125;,</div><div class="line">    [<span class="string">"equipment/weapon"</span>] = &#123;</div><div class="line">        prob = <span class="number">0.9</span>,</div><div class="line">        item = &#123;</div><div class="line">            sword = <span class="number">0</span>,</div><div class="line">            knife = <span class="number">0</span>,</div><div class="line">            katana = <span class="number">0</span></div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>　　新配置明显就方便了不少，若是概率填写为0则表示<strong>剩余总概率的平均值</strong>（<code>sword=0 =&gt; 0.9/3 =&gt; 0.3</code>），且填写的概率是<strong>相对于本层</strong>的（skill的总概率为0.1，故<code>flash=1 =&gt; 0.1</code>）。算是基于原配置进行了一波封装，可维护性大幅提升，如此便可面对变化频繁的需求了。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　本文所展示的掉落业务只是基础，在业界会有复杂度远超于此的需求（与时间、职业等因素挂钩，掉落池数量等），但DFQ的需求也仅此而已，期待日后能接触到更主流的设计。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2128,7 +2122,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -2146,7 +2140,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-count">37</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
@@ -2215,7 +2209,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

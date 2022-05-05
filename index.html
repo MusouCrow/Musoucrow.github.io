@@ -291,6 +291,222 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2022/05/05/blueprint/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2022/05/05/blueprint/" itemprop="url">
+                  基于xNode构造的蓝图方案
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-05-05T07:13:33+08:00">
+                2022-05-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2022/05/05/blueprint/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2022/05/05/blueprint/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2022/05/05/blueprint/" class="leancloud_visitors" data-flag-title="基于xNode构造的蓝图方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　经历两月的上海疫情风波，过完了一个毫无实感的五一假期后蓦然回首今年居然还没写博客。恰好现有的一套方案也刚好历时半年以上的验证了，也到了该分享的时候了，也作为Gameplay相关分享的回归开幕。<br>　　有过Gameplay相关经验的朋友应该对于业务开发流程都有自己的一套，每个项目可能都不尽相同。相比的《DFQ》的纯代码硬磕、相关参数读取配置的方案，《拉维瓦纳》选择的是导出关键API、围绕蓝图组织逻辑与数据的方案。这样不仅存在让策划深度参与的可能性、也使得逻辑与数据的隔阂被打破——甚至可以说蓝图就是一种<strong>具有逻辑表达能力的数据</strong>。<br>　　为此我们起先选择了<a href="https://flowcanvas.paradoxnotion.com" target="_blank" rel="external">FlowCanvas</a>作为蓝图的解决方案，如果只是如此的话倒也没什么可说的。经过<a href="https://zhuanlan.zhihu.com/p/365472093" target="_blank" rel="external">技术性Demo</a>发布后，随着日益增长的需求，FlowCanvas凸显出其在性能方面的不足。主要体现在<strong>创建蓝图时的开销较大，且存在居高不下的GC Allow</strong>，再结合源码复杂度高难以修改、编辑器与运行时捆绑较强等问题，于是乎决定自己造了个轮子：<a href="https://github.com/MusouCrow/xNodeGraph" target="_blank" rel="external">xNodeGraph</a>  </p>
+<p><img src="https://musoucrow.github.io/images/blueprint/0.png" alt="0"><br><img src="https://musoucrow.github.io/images/blueprint/1.png" alt="1">  </p>
+<p>　　以上两图分别为FlowCanvas与xNodeGraph对同一业务的对比，可以看出后者除却支持中文、摆的好看了点，大体上是大差不差的。然而FlowCanvas作为<strong>商业销售</strong>的插件，在功能上是大而全的。而我们实际上用不到那么多功能，只保证满足核心需求即可：</p>
+<ul>
+<li>一款能够编辑节点、组织数据结构的编辑器</li>
+<li>一款简洁高效、提供蓝图资源即可运作的运行时</li>
+<li>提供便捷的API导出节点的方案</li>
+</ul>
+<p>　　如此，基于一款基于<a href="https://github.com/Siccity/xNode" target="_blank" rel="external">xNode</a>作为节点编辑器、自行编写运行时及相关工具链的解决方案便呼之欲出了。</p>
+<h2 id="xNode-amp-Odin"><a href="#xNode-amp-Odin" class="headerlink" title="xNode &amp; Odin"></a>xNode &amp; Odin</h2><p><img src="https://user-images.githubusercontent.com/6402525/53689100-3821e680-3d4e-11e9-8440-e68bd802bfd9.png" alt="xNode">  </p>
+<p>　　入上图所示，xNode是一款<strong>纯粹的节点编辑器</strong>解决方案，并且你可以在不修改源码的前提下高自由度地定制界面形式。且定义了节点数据最基本的抽象（Graph、Node），并将它们组织了起来。在Unity的层面来说就是一个个<a href="https://docs.unity.cn/cn/current/ScriptReference/ScriptableObject.html" target="_blank" rel="external">ScriptableObject</a>：  </p>
+<p><img src="https://musoucrow.github.io/images/blueprint/2.png" alt="2">  </p>
+<p>　　说到界面定制，就不得不提xNode的好搭档<a href="https://odininspector.com" target="_blank" rel="external">Odin</a>了。多数情况下无需编写<a href="https://docs.unity.cn/cn/current/Manual/GUIScriptingGuide.html" target="_blank" rel="external">IMGUI</a>是它最大的优势，但这并非我要引入的重点。关键在于Odin本身集成一些成熟的界面形式且xNode本身与之结合良好：  </p>
+<p><img src="https://musoucrow.github.io/images/blueprint/3.png" alt="3">  </p>
+<p>　　如上图的节点选择菜单便是使用Odin自带的<a href="https://odininspector.com/documentation/sirenix.odininspector.editor.genericselector-1" target="_blank" rel="external">GenericSelector</a>实现的。当然使用Odin与否在某些团队是个路线之争，这个便因地制宜了。</p>
+<h2 id="数据流-or-代码流"><a href="#数据流-or-代码流" class="headerlink" title="数据流 or 代码流"></a>数据流 or 代码流</h2><p>　　说完界面部分，便到了运行时的首要抉择：<em>蓝图的最终运行形式是怎样的</em>？关于这块的方案业界有不少实现：有类似虚拟机运行节点触发逻辑的、有将蓝图转换为Lua代码的、有直接生成C#代码的（致天国的Bolt2）、甚至还有UE那般虚拟机与代码生成都提供的。<br>　　xNodeGraph最终选择了虚拟机方案，最核心的原因是蓝图的部分并非性能热点，用虚拟机也可以接受。且真正实现了一种<strong>具有逻辑表达的资源</strong>，若是代码生成还要多一层转换。<br>　　在决定了虚拟机方案后，我决定在xNode的节点数据结构上直接填充逻辑，这虽然不太优雅（运行时与xNode绑定了），但我不想整太多抽象转换之类的事了，反正xNode本身足够轻量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">// LogNode.cs</div><div class="line"></div><div class="line">[CreateNodeMenuAttribute(&quot;调试输出&quot;)]</div><div class="line">public class LogNode : FlowNode &#123;</div><div class="line">    public override string Title &#123;</div><div class="line">        get &#123;</div><div class="line">            return &quot;调试输出&quot;;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public override string Note &#123;</div><div class="line">        get &#123;</div><div class="line">            return @&quot;打印输出结果&quot;;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    [Input(connectionType = ConnectionType.Override)]</div><div class="line">    public string value;</div><div class="line">    private BaseNode valueNode;</div><div class="line"></div><div class="line">    protected override void Init() &#123;</div><div class="line">        base.Init();</div><div class="line"></div><div class="line">        this.valueNode = this.GetPortNode(&quot;value&quot;);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 核心逻辑函数</div><div class="line">    public override object Run(Runtime runtime, int id) &#123;</div><div class="line">        var value = this.GetValue&lt;object&gt;(this.value, this.valueNode, runtime);</div><div class="line">        Debug.Log(value.ToString());</div><div class="line"></div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　以上是最简单的调试输出节点的代码实现，如此也能看出这套虚拟机运行时的本质便是调用一个个节点对象的<code>Run</code>函数以实现逻辑驱动。</p>
+<h2 id="运行时"><a href="#运行时" class="headerlink" title="运行时"></a>运行时</h2><p>　　从上文代码也能看出节点运行逻辑时有着名为<code>runtime</code>的参数，那便是驱动蓝图运行的对象，我们可以在需要运作蓝图的地方创建runtime对象，还可传递一些变量进去供蓝图使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">// GraphBehaviour.cs</div><div class="line"></div><div class="line">public class GraphBehaviour : MonoBehaviour &#123;</div><div class="line">    public BaseGraph graph;</div><div class="line">    public BlackBoard blackBoard;</div><div class="line"></div><div class="line">    private Runtime runtime;</div><div class="line"></div><div class="line">    protected void Awake() &#123;</div><div class="line">        this.runtime = new Runtime(this.graph, this.blackBoard);</div><div class="line">        this.runtime.SetVariable(&quot;gameObject&quot;, this.gameObject);</div><div class="line">        this.runtime.RunFunc(&quot;Awake&quot;);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如代码所示，这便是在一个<code>MonoBehavior</code>的基础上通过外部提供的蓝图资源创建运行时，并将自身的<code>gameObject</code>作为变量传递到了蓝图，最终调用蓝图内定义的<code>Awake</code>函数，将gameObject输出：  </p>
+<p><img src="https://musoucrow.github.io/images/blueprint/4.png" alt="4">  </p>
+<p>　　从上述例子也能大致看出运行时除了根据Func作为入口点按序调用节点之外，还包括变量的存储、以及避免提供数据的节点反复运算的缓存，对于需要重复进行新计算的结果的节点，选择复制多一份节点即可：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">// Runtime.cs</div><div class="line"></div><div class="line">public class Runtime &#123;</div><div class="line">    private BaseGraph graph;</div><div class="line">    public Dictionary&lt;BaseNode, object&gt; cache;</div><div class="line">    public Dictionary&lt;string, object&gt; variable;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　从上文节点可看出节点分为供应节点与流程节点，流程节点具有<code>In</code>和<code>Out</code>两个插槽，而供应节点则必定有返回值插槽（否则就没有意义了）。流程节点也可以有返回值插槽，而且由于缓存机制的原因不会导致重复调用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">// Runtime.cs</div><div class="line"></div><div class="line">public void RunNode(BaseNode node, int id) &#123;</div><div class="line">    // 判断当前流程是否已执行完毕</div><div class="line">    if (this.exitIdSet.Contains(id) || this.IsExit) &#123;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 调用节点的核心逻辑</div><div class="line">    node.Run(this, id);</div><div class="line"></div><div class="line">    // 获取Out插槽指向的In插槽节点</div><div class="line">    var next = node.NextNode;</div><div class="line"></div><div class="line">    if (next) &#123;</div><div class="line">        this.RunNode(next, id);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// BaseNode.cs</div><div class="line"></div><div class="line">public T GetValue&lt;T&gt;(T value, BaseNode node, Runtime runtime) &#123;</div><div class="line">    if (node) &#123;</div><div class="line">        // 判断缓存内是否有该节点的返回值</div><div class="line">        if (runtime.cache.ContainsKey(node)) &#123;</div><div class="line">            return (T)runtime.cache[node];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        // 调用核心逻辑获得数据，并在核心逻辑内将返回值数据缓存</div><div class="line">        return (T)node.Run(runtime, 0);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 若是该值来源不通过节点则使用自身数据</div><div class="line">    return value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　从上述代码还可看出有着名为<code>id</code>的参数，且它与判断流程是否执行完毕有关。在同步执行下这本来应该不是问题，毕竟整个流程的执行过程都是阻塞的，不过一口气执行到结尾罢了，根本没有判断的必要。这显然是为了异步的情况而生的：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line">// Runtime.cs</div><div class="line"></div><div class="line">private HashSet&lt;int&gt; exitIdSet;</div><div class="line"></div><div class="line">// 异步执行函数</div><div class="line">public async Task RunFuncWaitting(string func, int id=0, BaseGraph graph=null) &#123;</div><div class="line">    graph = graph == null ? this.graph : graph;</div><div class="line"></div><div class="line">    if (!graph.funcMap.ContainsKey(func)) &#123;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    var f = graph.funcMap[func];</div><div class="line">    id = id &gt; 0 ? id : func.GetHashCode(); // 若未提供id，则使用func名称的哈希码</div><div class="line"></div><div class="line">    if (id &gt; 0 &amp;&amp; this.exitIdSet.Contains(id)) &#123;</div><div class="line">        this.exitIdSet.Remove(id);</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    // 根据该流程是否为异步决定执行</div><div class="line">    if (f.async) &#123;</div><div class="line">        await this.RunNodeAsync(f.node, id);</div><div class="line">    &#125;</div><div class="line">    else &#123;</div><div class="line">        this.RunNode(f.node, id);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// RunNode的异步版</div><div class="line">public async Task RunNodeAsync(BaseNode node, int id=0) &#123;</div><div class="line">    if (this.exitIdSet.Contains(id) || this.IsExit) &#123;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 调用节点的逻辑函数异步版</div><div class="line">    await node.RunAsync(this, id);</div><div class="line"></div><div class="line">    var next = node.NextNode;</div><div class="line">    </div><div class="line">    if (next) &#123;</div><div class="line">        await this.RunNodeAsync(next, id);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 结束流程，将id登记到exitIdSet</div><div class="line">public void ExitFunc(int id) &#123;</div><div class="line">    if (id &gt; 0) &#123;</div><div class="line">        this.exitIdSet.Add(id);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// 当然也提供无id的版本</div><div class="line">public void ExitFunc(string func) &#123;</div><div class="line">    this.ExitFunc(func.GetHashCode());</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　从上述代码可见，运行时使用的异步方案是C#的<a href="https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/concepts/async/" target="_blank" rel="external">Async/Await</a>，这套方案最大的缺点在于<strong>外部无法很方便的直接中断异步</strong>的执行，于是采用了通过id作为标识符的方式、逐节点检查的方式进行流程中断控制。<br>　　由于异步传染的问题，每个节点都要实现对应的同步与异步两个版本函数（RunFunc/RunFuncAsync），每个Func节点会检查所属流程中是否含有异步节点（这件事会在编辑器端进行并保存为数据，也就是前文提到的<code>f.async</code>），理论上可以只保留异步版本也没关系，但实际测试下来异步的调用堆栈会比同步的要深以及略微的GC Allow，为了提升一点性能故选择了分离的做法。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">// LogNode.cs</div><div class="line"></div><div class="line">// Log节点的异步版本</div><div class="line">public async override Task&lt;object&gt; RunAsync(Runtime runtime, int id) &#123;</div><div class="line">    var value = await this.GetValueAsync&lt;object&gt;(this.value, this.valueNode, runtime);</div><div class="line">    Debug.Log(value.ToString());</div><div class="line"></div><div class="line">    return null;</div><div class="line">&#125;</div><div class="line"></div><div class="line">// BaseNode.cs</div><div class="line"></div><div class="line">// 获取数据的异步版</div><div class="line">public async Task&lt;T&gt; GetValueAsync&lt;T&gt;(T value, BaseNode node, Runtime runtime) &#123;</div><div class="line">    if (node) &#123;</div><div class="line">        if (runtime.cache.ContainsKey(node)) &#123;</div><div class="line">            return (T)runtime.cache[node];</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        var v = await node.RunAsync(runtime, 0);</div><div class="line"></div><div class="line">        return (T)v;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    return value;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="节点生成"><a href="#节点生成" class="headerlink" title="节点生成"></a>节点生成</h2><p>　　从上述LogNode可以看出复杂度还是有不少的，一些特殊节点倒也罢了，若是每个节点都如此手写那可真是太手工业了。于是乎节点代码生成势在必行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">// Math.cs</div><div class="line"></div><div class="line">public static class Math &#123;</div><div class="line">    [Node(&quot;数学-向量相加&quot;, &quot;a + b&quot;, false)]</div><div class="line">    public static Vector3 AddVec(Vector3 a, Vector3 b) &#123;</div><div class="line">        return a + b;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　节点生成需要对函数做标记，那么使用C#的Attribute特性便很自然了，通过提供函数的节点名称、说明、是否为流程节点自动生成类文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div></pre></td><td class="code"><pre><div class="line">// Generated/Graph/Game/Lib/Math/AddVecNode.cs</div><div class="line"></div><div class="line">namespace Generated.Graph.GGame.Lib.Math_ &#123;</div><div class="line">    [CreateNodeMenuAttribute(&quot;数学-向量相加&quot;)]</div><div class="line">    public class AddVecNode : BaseNode &#123;</div><div class="line">        public override string Title &#123;</div><div class="line">            get &#123;</div><div class="line">                return &quot;数学-向量相加&quot;;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public override string Note &#123;</div><div class="line">            get &#123;</div><div class="line">                return &quot;a + b&quot;;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public override bool Async &#123;</div><div class="line">            get &#123;</div><div class="line">                return false;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        [Input(connectionType = ConnectionType.Override)]</div><div class="line">        public Game.Graph.Vec3 a;</div><div class="line">        private BaseNode aNode;</div><div class="line">        </div><div class="line">        [Input(connectionType = ConnectionType.Override)]</div><div class="line">        public Game.Graph.Vec3 b;</div><div class="line">        private BaseNode bNode;</div><div class="line">        </div><div class="line">        [Output]public Game.Graph.Vec3 ret;</div><div class="line"></div><div class="line">        protected override void Init() &#123;</div><div class="line">            base.Init();</div><div class="line">            </div><div class="line">            this.aNode = this.GetPortNode(&quot;a&quot;);</div><div class="line">            this.bNode = this.GetPortNode(&quot;b&quot;);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public override object Run(Runtime runtime, int id) &#123;</div><div class="line">            var a = this.GetValue&lt;Game.Graph.Vec3&gt;(this.a, this.aNode, runtime);</div><div class="line">            var b = this.GetValue&lt;Game.Graph.Vec3&gt;(this.b, this.bNode, runtime);</div><div class="line">            this.ret.value = Game.Lib.Math.AddVec(a.value, b.value);</div><div class="line"></div><div class="line">            return this.ret;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public async override Task&lt;object&gt; RunAsync(Runtime runtime, int id) &#123;</div><div class="line">            var a = await this.GetValueAsync&lt;Game.Graph.Vec3&gt;(this.a, this.aNode, runtime);</div><div class="line">            var b = await this.GetValueAsync&lt;Game.Graph.Vec3&gt;(this.b, this.bNode, runtime);</div><div class="line">            this.ret.value = Game.Lib.Math.AddVec(a.value, b.value);</div><div class="line">            await Task.CompletedTask;</div><div class="line"></div><div class="line">            return this.ret;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　这生成的还挺人模狗样的，原理倒也不复杂，便是通过在菜单点击代码生成的按钮后，遍历所有标记了<code>NodeAttribute</code>的函数，通过反射API获取函数的各项属性（名称、返回值、参数、是否异步等），基于代码模板生成文件即可：  </p>
+<p><img src="https://musoucrow.github.io/images/blueprint/5.png" alt="5">  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div></pre></td><td class="code"><pre><div class="line">// GenerateNodes.cs</div><div class="line"></div><div class="line">public static class GenerateNodes &#123;</div><div class="line">private const string CODE = @&quot;using System.Threading.Tasks;</div><div class="line">using Game.Graph;</div><div class="line"></div><div class="line">namespace Generated.Graph.&#123;Namespace&#125;_ &#123;</div><div class="line">    [CreateNodeMenuAttribute(&apos;&#123;Title&#125;&apos;)]</div><div class="line">    public class &#123;ClassName&#125; : &#123;ParentNode&#125; &#123;</div><div class="line">        public override string Title &#123;</div><div class="line">            get &#123;</div><div class="line">                return &apos;&#123;Title&#125;&apos;;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public override string Note &#123;</div><div class="line">            get &#123;</div><div class="line">                return &apos;&#123;Note&#125;&apos;;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public override bool Async &#123;</div><div class="line">            get &#123;</div><div class="line">                return &#123;Async&#125;;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">&#123;Defines&#125;</div><div class="line"></div><div class="line">        protected override void Init() &#123;</div><div class="line">            base.Init();</div><div class="line">            </div><div class="line">&#123;Init&#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public override object Run(Runtime runtime, int id) &#123;</div><div class="line">&#123;Call&#125;</div><div class="line">            return &#123;ReturnRun&#125;;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        public async override Task&lt;object&gt; RunAsync(Runtime runtime, int id) &#123;</div><div class="line">&#123;CallAsync&#125;</div><div class="line">            return &#123;ReturnRun&#125;;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">        &quot;;</div><div class="line"></div><div class="line">    // 类型转换映射</div><div class="line">    public static Dictionary&lt;Type, Type&gt; TypeMapping = new Dictionary&lt;Type, Type&gt;() &#123;</div><div class="line">        &#123;typeof(System.Single), typeof(Number)&#125;,</div><div class="line">        &#123;typeof(System.Int32), typeof(Number)&#125;,</div><div class="line">        &#123;typeof(System.Boolean), typeof(Bool)&#125;,</div><div class="line">        &#123;typeof(UnityEngine.Vector3), typeof(Vec3)&#125;,</div><div class="line">        &#123;typeof(UnityEngine.Quaternion), typeof(Quat)&#125;,</div><div class="line">        &#123;typeof(System.Object), typeof(Obj)&#125;,</div><div class="line">        &#123;typeof(UnityEngine.Color), typeof(Col)&#125;,</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    [MenuItem(&quot;Tools/Generate Nodes&quot;)]</div><div class="line">    public static void Menu() &#123;</div><div class="line">        ClearFolder();</div><div class="line">        Generates();</div><div class="line">        EditorUtility.RequestScriptReload();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private static void Generates() &#123;</div><div class="line">        var types = typeof(NodeAttribute).Assembly.GetExportedTypes();</div><div class="line"></div><div class="line">        foreach (var t in types) &#123;</div><div class="line">            var methods = t.GetMethods(BindingFlags.Static | BindingFlags.Public);</div><div class="line">            </div><div class="line">            foreach (var m in methods) &#123;</div><div class="line">                var attr = m.GetCustomAttribute&lt;NodeAttribute&gt;();</div><div class="line"></div><div class="line">                if (attr != null) &#123;</div><div class="line">                    GenerateNode(t, m, attr);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　当然注意某些变量类型要转换为对应的形式，这个下文会详解原因。</p>
+<h2 id="变量与黑板"><a href="#变量与黑板" class="headerlink" title="变量与黑板"></a>变量与黑板</h2><p>　　从上文代码看得出，由于通用性问题，变量的传递需要通过转换为<code>object</code>类型进行传递。而值类型涉及与object的互转时会出现<strong>装箱拆箱</strong>成本，导致GC Allow，这个是需要避免的。所以专门为一系列用到的值类型实现了对应的包装：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">// Variable.cs</div><div class="line"></div><div class="line">public class Variables&lt;T&gt; &#123;</div><div class="line">    public T value;</div><div class="line"></div><div class="line">    public override string ToString() &#123;</div><div class="line">        return this.value.ToString();</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">[Serializable]</div><div class="line">public class Obj : Variables&lt;object&gt; &#123;&#125;</div><div class="line"></div><div class="line">[Serializable]</div><div class="line">public class Number : Variables&lt;float&gt; &#123;&#125;</div><div class="line"></div><div class="line">[Serializable]</div><div class="line">public class Bool : Variables&lt;bool&gt; &#123;&#125;</div><div class="line"></div><div class="line">[Serializable]</div><div class="line">public class Vec3 : Variables&lt;Vector3&gt; &#123;&#125;</div><div class="line"></div><div class="line">[Serializable]</div><div class="line">public class Col : Variables&lt;Color&gt; &#123;&#125;</div><div class="line"></div><div class="line">[Serializable]</div><div class="line">public class Quat : Variables&lt;Quaternion&gt; &#123;&#125;</div></pre></td></tr></table></figure>
+<p>　　这也是上文提到节点代码生成时要进行类型转换的原因，如此基本避免了运行时会产生GC Allow，相关数据都聚集在蓝图资源上，没有即时创建的情况（哪怕返回值也是提前创建好了）。唯一需要注意的是在外界传变量的时候要使用包装类型：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">this.runtime.SetVariable(&quot;count&quot;, new Number() &#123;value = 3&#125;);</div></pre></td></tr></table></figure>
+<p>　　说完变量部分再来聊聊<strong>黑板(Blackboard)</strong>，这个词源于FlowCanvas，意思是变量配置池：  </p>
+<p><img src="https://musoucrow.github.io/images/blueprint/6.png" alt="6">  </p>
+<p>　　这玩意的实现非常粗暴，把诸类型堆砌一块就完事了：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">// Blackboard.cs</div><div class="line">[Serializable]</div><div class="line">public class Blackboard &#123;</div><div class="line">    [Serializable]</div><div class="line">    public class Unit &#123;</div><div class="line">        public string type;</div><div class="line">        public string name;</div><div class="line">        public Number number;</div><div class="line">        public Bool boolean;</div><div class="line">        public string text;</div><div class="line">        public Vec3 vec3;</div><div class="line">        public Col col;</div><div class="line">        public Object obj;</div><div class="line"></div><div class="line">        public object GetValue() &#123;</div><div class="line">            if (this.type == typeof(Number).ToString()) &#123;</div><div class="line">                return this.number;</div><div class="line">            &#125;</div><div class="line">            else if (this.type == typeof(Bool).ToString()) &#123;</div><div class="line">                return this.boolean;</div><div class="line">            &#125;</div><div class="line">            else if (this.type == typeof(string).ToString()) &#123;</div><div class="line">                return this.text;</div><div class="line">            &#125;</div><div class="line">            else if (this.type == typeof(Col).ToString()) &#123;</div><div class="line">                return this.col;</div><div class="line">            &#125;</div><div class="line">            else if (this.type == typeof(Vec3).ToString()) &#123;</div><div class="line">                return this.vec3;</div><div class="line">            &#125;</div><div class="line">            </div><div class="line">            return this.obj;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public Unit[] values;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　黑板可在运行时创建时传参，这个在上文也有体现，在运行时将会把黑板的数据批量赋值为变量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">// Runtime.cs</div><div class="line"></div><div class="line">public void SetBlackboard(Blackboard blackboard) &#123;</div><div class="line">    if (blackboard == null || blackboard.values == null) &#123;</div><div class="line">        return;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    foreach (var unit in blackboard.values) &#123;</div><div class="line">        var value = unit.GetValue();</div><div class="line">        this.SetVariable(unit.name, value);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　变量的用途可谓相当广泛，除了在蓝图层面的获取/设置之外，还可以在函数登记时标记哪些参数会自动调用对应变量，减少连线的复杂度：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[Node(&quot;移动-锁定转向&quot;, &quot;锁定移动时的方向切换&quot;, true, &quot;body&quot;)]</div><div class="line">public static void LockTurn(Body body, bool enable) &#123;</div><div class="line">    body.lockTurn = enable;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　如上代码的<code>body</code>参数便会自动获取名为body的变量，无需填写：  </p>
+<p><img src="https://musoucrow.github.io/images/blueprint/7.png" alt="7">  </p>
+<p>　　除此之外还可以在函数直接与变量交互，实现通过变量名达到索引的效果，减少连接复杂度：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">[Node(&quot;工具-创建定时器&quot;, &quot;创建定时器，使用名称登记，可选择填写时间结束后的功能名&quot;, true, &quot;rt&quot;)]</div><div class="line">public static void NewTimer(Runtime rt, string val, string func) &#123;</div><div class="line">    var timer = new Timer();</div><div class="line">    rt.variable[val] = timer;</div><div class="line"></div><div class="line">    if (func != &quot;&quot;) &#123;</div><div class="line">        timer.Func = () =&gt; &#123;</div><div class="line">            rt.RunFunc(func);</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">[Node(&quot;工具-启动定时器&quot;, &quot;启动定时器，填写时间与是否循环&quot;, true, &quot;rt&quot;)]</div><div class="line">public static void EnterTimer(Runtime rt, string val, float time, bool isLoop) &#123;</div><div class="line">    var timer = rt.variable[val] as Timer;</div><div class="line">    timer.Enter(time, null, isLoop);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　目前这套方案对于子蓝图（有明确的输入输出）的支持还不算完善，只支持正常的跨蓝图函数调用，但对于现状而言也算够用了。这就是造非普世的轮子的局限性，只满足自我的需求便足矣。故而这份实现仅供参考，不推荐直接使用（除非你的需求也完美贴合）。另外也感谢秃头鼓励师、烟雨迷离半世殇提供的相关参考与支持。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2021/12/31/summary_2021/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1913,172 +2129,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2020/06/07/lbbn_tile/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2020/06/07/lbbn_tile/" itemprop="url">
-                  3D瓦片地图采坑录
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2020-06-07T21:26:33+08:00">
-                2020-06-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Teach/" itemprop="url" rel="index">
-                    <span itemprop="name">Teach</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2020/06/07/lbbn_tile/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2020/06/07/lbbn_tile/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2020/06/07/lbbn_tile/" class="leancloud_visitors" data-flag-title="3D瓦片地图采坑录">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>     </p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　由于Demo的场景风格主打像素风格（这里的像素风格指具备一定精度的风格，而非时下流行的马赛克），故决定使用瓦片(Tile)地图来实现。也就是这种东西：<br><img src="https://musoucrow.github.io/images/lbbn_tile/0.jpeg" alt="0"><br>　　游戏地图将由一个个规范化的单位图片拼接而成，是为<strong>瓦片</strong>。在早期的像素风格游戏可谓相当流行，因其构造成本低（无论从技术上还是美术上），而却能灵活拼接出各种各样的地图。于是我们也打算如此，但是在3D游戏下搞瓦片地图确是罕见得很。于是便开始了采坑之旅，遂成本文。</p>
-<h2 id="Sprytile"><a href="#Sprytile" class="headerlink" title="Sprytile"></a>Sprytile</h2><p>　　首先我们想到了在3D游戏下最接近瓦片地图思想的方案：<a href="https://docs.unity3d.com/Manual/CreatingEnvironments.html" target="_blank" rel="external">Terrain</a>，一般3D大地图都用类似方案：对一张平面地图进行各种揉捏形成地形，并在此之上涂抹各种图素。但可惜对于瓦片地图而言未免杀鸡用牛刀了，且在各方面都不能做到最适化，遂不考虑。<br>　　其次便是Unity官方自带的<a href="https://docs.unity3d.com/Manual/class-Tilemap.html" target="_blank" rel="external">2D Tilemap Editor</a>，对瓦片方面的需求倒是满足了，可惜3D瓦片并不只是在一张平面上进行，而通过多张平面旋转组成场景未免勉强，遂放弃。<br>　　既然在Unity这边行不通，那么便考虑生产端的Blender有什么合适的插件了。果不其然找到了<a href="https://chemikhazi.itch.io/sprytile" target="_blank" rel="external">Sprytile</a>，一看就明白，就是它了：<br><img src="https://musoucrow.github.io/images/lbbn_tile/1.png" alt="1"><br>　　使用准备好的tile图集，划分格子，在Blender以格子为单位进行填涂，每个格子将会是一个面，支持XYZ三个平面进行，在填涂完成后可作为正常模型进行各种操作。一切看起来是那么的美好，然后一路到了游戏后……</p>
-<h2 id="过滤之殇"><a href="#过滤之殇" class="headerlink" title="过滤之殇"></a>过滤之殇</h2><p>　　以<a href="http://musoucrow.github.io/2020/05/10/lbbn_shading/">前篇</a>的截图便可看出问题所在：<br><img src="https://musoucrow.github.io/images/lbbn_tile/2.png" alt="2"><br>　　可以看到地板之间存在奇怪的黑线：<br><img src="https://musoucrow.github.io/images/lbbn_tile/3.png" alt="3"><br>　　根据插件文档提供的<a href="https://docs.sprytile.xyz/unity-settings/" target="_blank" rel="external">Unity导出说明</a>来看，必须要将地图贴图的过滤模式设置为<code>Point</code>，即邻近过滤：<br><img src="https://musoucrow.github.io/images/lbbn_tile/4.png" alt="4"><br>　　嗯，黑线果然消失了。那么问题便出在图片的过滤模式了，回去复习了下<a href="https://learnopengl-cn.github.io/01%20Getting%20started/06%20Textures/#_3" target="_blank" rel="external">纹理过滤</a>，答案昭然若揭：<br><img src="https://musoucrow.github.io/images/lbbn_tile/5.png" alt="5"><br>　　由于瓦片地图的习惯会将相关图素集成一块，形成连续的图块：<br><img src="https://musoucrow.github.io/images/lbbn_tile/6.png" alt="6"><br>　　那么在线性过滤下，图块的边缘像素在采样的时候将会<strong>混进相邻图块的颜色</strong>，于是那些奇怪的黑线便是这么来的。<br>　　也许读者会认为：不用线性过滤不就得了，毕竟插件作者也是这么认为的。可惜我们做的风格并不适合用邻近过滤，那将显得与人物画风差异过大且马赛克：<br><img src="https://musoucrow.github.io/images/lbbn_tile/7.png" alt="7"><br>　　细心观察上图底部，这是开启抗锯齿（MSAA）导致的。查阅资料后发现这是MSAA的特点导致，如此哪怕我们想靠邻近过滤解决也是没门……当然也考虑过更换为其他抗锯齿的方式，但是效果都不甚喜人，于是开始寻觅解决之道。</p>
-<h2 id="无奈的解法"><a href="#无奈的解法" class="headerlink" title="无奈的解法"></a>无奈的解法</h2><p>　　首先考虑对tile图片进行下手：既然边缘会采样到相邻图块的像素，那么将它们隔开不就得了，如此：<br><img src="https://musoucrow.github.io/images/lbbn_tile/8.png" alt="8"><br>　　当然这么做的话要让Sprytile有所支持才行，好在它是<a href="https://github.com/ChemiKhazi/Sprytile" target="_blank" rel="external">开源</a>的。Blender的插件改起来也还算容易，毕竟会在界面提示标识好功能函数名。结果还是翻车了：<br><img src="https://musoucrow.github.io/images/lbbn_tile/9.jpg" alt="9"><br>　　瓦片之间出现了奇怪的透明点，仔细一想便明白了：<strong>透明像素一样会被采样到</strong>，所以会影响到透明度。于是迅速想到下个方案：让每个图块外扩边缘1像素，这样边缘的采样只会<strong>采样到相同颜色</strong>的像素：<br><img src="https://musoucrow.github.io/images/lbbn_tile/10.png" alt="10"><br>　　很不错，黑线什么的都消失了，哪怕是开着MSAA。同时美术也在Blender琢磨出了一种方法：在不做任何处理的贴图的基础上，将瓦片地图模型的UV全部缩小一点（参考值：0.96），如此便不会直接采样到边缘像素，从而以牺牲了一点点边缘效果解决了问题。<br>　　两者的效果最终是差不多的，但都是不完美的，在编辑器里便一目了然：<br><img src="https://musoucrow.github.io/images/lbbn_tile/11.png" alt="11"><br>　　可以看得出，格子之间的边界可谓泾渭分明，这是因为每个格子都是独立的mesh，它们并不是作为一个整体去渲染，也就不存在视为一个整体去采样。也就无法达到真正意义上2D游戏里要达到的效果（格子之间彻底融为一体）。要这么做有两种方式：第一种是根据瓦片地图的填涂情况最终生成大贴图与新模型，但这种方式相当不优化，并且会急剧增大包体。其次是仿照以前的2D游戏做法：游戏本身使用邻近过滤渲染，最后将渲染成图进行拉伸放大（放大方式采用线性过滤），但这是牺牲画面分辨率带来的。<br>　　经过以上总结可以看出，基本不存在非常完美的解决方案，只能矮子里拔大个了：UV缩小的方案从工序上最为简单，且显示效果也能接受（没对比过原版基本看不出太多异样）。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　一开始我们觉得这种瓦片地图1个格子就占2个三角形，面数会不会太高了。结果在参考其他游戏的情况时发现《闪之轨迹3》的一组垃圾桶的面数……<br><img src="https://musoucrow.github.io/images/lbbn_tile/12.jpg" alt="12"><br>　　嗯，一组垃圾桶的面数都完爆我整个瓦片地图模型了，法老控牛逼！<br>　　顺带一提的是，刚才提到的格子边界问题在Unity官方的2D Tilemap Editor也是存在的，只能说是瓦片地图的局限性了，好在离得远也看不太出。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2128,7 +2178,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -2146,7 +2196,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-count">37</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
@@ -2215,7 +2265,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

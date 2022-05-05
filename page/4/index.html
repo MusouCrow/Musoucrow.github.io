@@ -291,6 +291,208 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/04/17/lua_local/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/04/17/lua_local/" itemprop="url">
+                  Lua的local变量探究
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-17T14:20:33+08:00">
+                2018-04-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ProgramDesign/" itemprop="url" rel="index">
+                    <span itemprop="name">ProgramDesign</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/17/lua_local/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/04/17/lua_local/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/04/17/lua_local/" class="leancloud_visitors" data-flag-title="Lua的local变量探究">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　先前看到<a href="https://blog.uwa4d.com/archives/usparkle_luajit.html" target="_blank" rel="external">用好Lua+Unity，让性能飞起来—LuaJIT性能坑详解</a>一文中提到：</p>
+<pre><code>3.2 寄存器分配失败-&gt;减少local变量、避免过深的调用层次
+很不幸的一点是，arm中可用的寄存器比x86少。LuaJIT为了速度，会尽可能用寄存器存储local变量，但是如果local变量太多，寄存器不够用，目前JIT的做法是：放弃治疗（有兴趣可以看看源码中asm_head_side函数的注释）。因此，我们能做的，只有按照官方优化指引说的，避免过多的local变量，或者通过do end来限制local变量的生命周期。
+</code></pre><p>　　对此自然是可以理解的，哪怕是一般语言，local变量过多也会有堆栈溢出的问题。不过我对此一直有个隐忧：<strong>Lua是拥有模块级local变量的，不知是否也受此规则影响？</strong>尽管有此隐忧，却一直没有去做相关的探究。恰逢今日遇到相关话题，便来个刨根问底吧。</p>
+<h2 id="200限制"><a href="#200限制" class="headerlink" title="200限制"></a>200限制</h2><p>　　首先的发现是：一段过程下最多拥有200个local变量，且<code>do end</code>不算。类似这样：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">local</span> Class = &#123;&#125;</div><div class="line"></div><div class="line"><span class="keyword">local</span> test1 = <span class="number">1</span></div><div class="line"><span class="keyword">local</span> test2 = <span class="number">2</span></div><div class="line">... <span class="comment">--to 199</span></div><div class="line"></div><div class="line"><span class="keyword">return</span> Class</div></pre></td></tr></table></figure>
+<p>　　如果超过199，则会报出<code>main function has more than 200 local variables</code>的错误。当然这里说的是一段过程，所以函数是另算的，同样一个函数的过程最多也不能超过200个local变量（调用函数则算转入下一个过程了）。<br>　　这个限制是Lua与LuaJIT共有的，显然是想限制local数量的泛滥。</p>
+<h2 id="函数嵌套调用"><a href="#函数嵌套调用" class="headerlink" title="函数嵌套调用"></a>函数嵌套调用</h2><p>　　接下来便是试试函数嵌套调用了：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Class.Do</span><span class="params">(v)</span></span></div><div class="line">    <span class="keyword">if</span> (v &gt; n) <span class="keyword">then</span> <span class="comment">--n is a custom value</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> test1 = <span class="number">1</span></div><div class="line">    ... <span class="comment">-- to 199</span></div><div class="line"></div><div class="line">    Class.Do(v + <span class="number">1</span>)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　注意参数v也算是local变量的一员，所以test变量最多只能延伸到199个。以此进行递归调用的话，根据实验结果来看：</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>嵌套上限</th>
+<th>local变量上限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LuaJIT</td>
+<td>325</td>
+<td>65000</td>
+</tr>
+<tr>
+<td>Lua5.3</td>
+<td>4975</td>
+<td>995000</td>
+</tr>
+</tbody>
+</table>
+<p>　　测试的环境为macOS x86-64，LuaJIT方面无论JIT开启与否结果皆一致。根据前文所言来看，到了ARM环境这个数量将会进一步下降。虽然从对比来看差距有点大，但实际上在函数调用方面也算够用了。</p>
+<h2 id="模块级local变量"><a href="#模块级local变量" class="headerlink" title="模块级local变量"></a>模块级local变量</h2><p>　　接下来便是我最关心的一点了：以上local变量上限是否会影响到模块级local变量？所谓模块级local变量即作用域为整个文件：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">--test.lua</span></div><div class="line"><span class="keyword">local</span> Class = &#123;&#125;</div><div class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">Func</span><span class="params">()</span></span></div><div class="line"><span class="keyword">end</span></div><div class="line">...</div><div class="line"></div><div class="line"><span class="keyword">return</span> Class</div></pre></td></tr></table></figure>
+<p>　　这种模块级local变量在Lua开发的应用还是很广泛的，它能有效的做到信息分隔的效果。但若是这些变量也受之前的上限规则影响，咁就扑街了！</p>
+<p>　　首先是测试加载多个满载local变量的模块：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> n=<span class="number">1</span>, <span class="number">5000</span> <span class="keyword">do</span></div><div class="line">    <span class="built_in">require</span>(<span class="string">"test"</span> .. n)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<p>　　天可怜见，无论读取多少个文件，都不会存在上限问题。可见对于模块级local变量的处理是不一样的。到了这里基本上可以放心了，不过为防万一，我还做了模块的嵌套引用实验：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">---test1.lua</span></div><div class="line"></div><div class="line"><span class="keyword">local</span> Class = &#123;&#125;</div><div class="line"><span class="built_in">print</span>(<span class="string">"1"</span>)</div><div class="line"><span class="keyword">local</span> Next = <span class="built_in">require</span>(<span class="string">"test2"</span>)</div><div class="line"><span class="keyword">local</span> test1 = <span class="number">1</span></div><div class="line"><span class="keyword">local</span> test2 = <span class="number">2</span></div><div class="line">... <span class="comment">--to max</span></div><div class="line"><span class="keyword">return</span> Class</div></pre></td></tr></table></figure>
+<p>　　以这种形式生成了5000个文件，以此进行嵌套引用，结果也是成功通过了。由此可见，对于模块级local变量是可以放心地去使用了。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　尽管模块级local变量是可以随便用了，但是也要考虑到热更新方面的问题：若是选择使用模块级local变量去存储模块的数据，那么在热更新方面的处理将会变得十分麻烦。从这点考虑的话，模块级local变量最好只是用于引用别的模块为妙。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/03/19/ecs_first/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1862,179 +2064,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/10/13/about_strtok/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/10/13/about_strtok/" itemprop="url">
-                  关于C语言函数strtok引发的思考
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-13T16:03:33+08:00">
-                2017-10-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Teach/" itemprop="url" rel="index">
-                    <span itemprop="name">Teach</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/10/13/about_strtok/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/13/about_strtok/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/10/13/about_strtok/" class="leancloud_visitors" data-flag-title="关于C语言函数strtok引发的思考">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　近期遇到个C语言的课题作业，要求完成parse功能（以空格、回车、TAB为分割符分割字符串，输出结果且返回数组。）该功能涉及到strtok函数的一些问题，特此开贴记录。</p>
-<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　以下为程序源码：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">struct</span> ListNode &#123;</div><div class="line">	<span class="keyword">char</span> * value;</div><div class="line">	<span class="keyword">struct</span> ListNode * next;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">char</span> ** <span class="title">parse</span><span class="params">(<span class="keyword">char</span> * line)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (line == <span class="literal">NULL</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> <span class="keyword">char</span> delim[] = <span class="string">" \t\n"</span>; <span class="comment">/* SPACE or TAB or NL */</span></div><div class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</div><div class="line">    <span class="keyword">char</span> * token;</div><div class="line">    <span class="keyword">char</span> ** newArgv;</div><div class="line">    <span class="keyword">char</span> str[<span class="built_in">strlen</span>(line)];</div><div class="line">    </div><div class="line">    <span class="built_in">strcpy</span>(str, line);</div><div class="line">    token = strtok(str, delim);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (token == <span class="literal">NULL</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">struct</span> ListNode * head = (<span class="keyword">struct</span> ListNode *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ListNode));</div><div class="line">    <span class="keyword">struct</span> ListNode * cur = head;</div><div class="line">    cur-&gt;value = token;</div><div class="line">    count ++;</div><div class="line">    </div><div class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</div><div class="line">        token = strtok(<span class="literal">NULL</span>, delim);</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (token == <span class="literal">NULL</span>) &#123;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        cur-&gt;next = (<span class="keyword">struct</span> ListNode *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ListNode));</div><div class="line">        cur = cur-&gt;next;</div><div class="line">        cur-&gt;value = token;</div><div class="line">        count ++;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    newArgv = (<span class="keyword">char</span> **)<span class="built_in">malloc</span>((count + <span class="number">1</span>) * <span class="keyword">sizeof</span>(<span class="keyword">char</span> *));</div><div class="line">    cur = head;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</div><div class="line">        newArgv[i] = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="built_in">strlen</span>(cur-&gt;value) * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</div><div class="line">        <span class="built_in">strcpy</span>(newArgv[i], cur-&gt;value);</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"[%d] : %s\n"</span>, i, cur-&gt;value);</div><div class="line">        <span class="built_in">free</span>(cur);</div><div class="line">        cur = cur-&gt;next;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    newArgv[count] = <span class="literal">NULL</span>; <span class="comment">//tail</span></div><div class="line">    </div><div class="line">    <span class="keyword">return</span> newArgv;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">char</span> ** argv = parse(<span class="string">"system program"</span>);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="第一个问题"><a href="#第一个问题" class="headerlink" title="第一个问题"></a>第一个问题</h3><p>　　首先第一个问题便是这里：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">char</span> str[<span class="built_in">strlen</span>(line)];</div><div class="line"></div><div class="line"><span class="built_in">strcpy</span>(str, line);</div><div class="line">token = strtok(str, delim);</div></pre></td></tr></table></figure>
-<p>　　最初尝试直接把parse函数的参数line直接作为strtok函数的第一参数填入，结果不行。查阅文档后发现strtok的声明为：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//param: str -- 要被分解成一组小字符串的字符串。</span></div><div class="line"><span class="comment">//param: delim -- 包含分隔符的 C 字符串。</span></div><div class="line"><span class="comment">//return: 该函数返回被分解的最后一个子字符串，如果没有可检索的字符串，则返回一个空指针。</span></div><div class="line"><span class="function"><span class="keyword">char</span> *<span class="title">strtok</span><span class="params">(<span class="keyword">char</span> * str, <span class="keyword">const</span> <span class="keyword">char</span> * delim)</span></span>;</div></pre></td></tr></table></figure>
-<p>　　可以发现，第一参数char * str要求的并非const，而我在调用时填入的参数为‘system program’，这种字符串数据是作为‘const char[]’保存在字符串常量区的，故不符合参数需求。需要重新申请一片栈空间复制line的内容再作为参数填入。</p>
-<h3 id="第二个问题"><a href="#第二个问题" class="headerlink" title="第二个问题"></a>第二个问题</h3><p>　　由此衍生的第二个问题便是：为何要为newArgv[i]申请新的空间，而非<code>newArgv[i] = cur-&gt;value;</code>？</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">newArgv[i] = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="built_in">strlen</span>(cur-&gt;value) * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</div><div class="line"><span class="built_in">strcpy</span>(newArgv[i], cur-&gt;value);</div></pre></td></tr></table></figure>
-<p>　　这一点的原因主要是 <strong>strtok返回的字符串其实并非新的副本，而是从str上截取的一部分而已。</strong> 而cur-&gt;value便是来自于str，且str是拥有生命周期的栈数据，而如果将这样的部分保存在newArgv后返回到外部，便会因为生命周期问题，导致数据被回收。这将会产生很可怕的后果。所以必须申请新的空间，形成复制。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　没有垃圾回收的C/C++，编程时必须对内存的分配和流向必须要有十分清晰的认识，不然就很容易发生内存泄漏和野指针现象。慎之、慎之。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2084,7 +2113,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -2102,7 +2131,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-count">37</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
@@ -2171,7 +2200,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

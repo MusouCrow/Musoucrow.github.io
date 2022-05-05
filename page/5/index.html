@@ -291,6 +291,179 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/10/13/about_strtok/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/10/13/about_strtok/" itemprop="url">
+                  关于C语言函数strtok引发的思考
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-10-13T16:03:33+08:00">
+                2017-10-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/10/13/about_strtok/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/10/13/about_strtok/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/10/13/about_strtok/" class="leancloud_visitors" data-flag-title="关于C语言函数strtok引发的思考">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　近期遇到个C语言的课题作业，要求完成parse功能（以空格、回车、TAB为分割符分割字符串，输出结果且返回数组。）该功能涉及到strtok函数的一些问题，特此开贴记录。</p>
+<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　以下为程序源码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"></div><div class="line"><span class="keyword">struct</span> ListNode &#123;</div><div class="line">	<span class="keyword">char</span> * value;</div><div class="line">	<span class="keyword">struct</span> ListNode * next;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">char</span> ** <span class="title">parse</span><span class="params">(<span class="keyword">char</span> * line)</span> </span>&#123;</div><div class="line">    <span class="keyword">if</span> (line == <span class="literal">NULL</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">static</span> <span class="keyword">char</span> delim[] = <span class="string">" \t\n"</span>; <span class="comment">/* SPACE or TAB or NL */</span></div><div class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</div><div class="line">    <span class="keyword">char</span> * token;</div><div class="line">    <span class="keyword">char</span> ** newArgv;</div><div class="line">    <span class="keyword">char</span> str[<span class="built_in">strlen</span>(line)];</div><div class="line">    </div><div class="line">    <span class="built_in">strcpy</span>(str, line);</div><div class="line">    token = strtok(str, delim);</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (token == <span class="literal">NULL</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</div><div class="line">    &#125;</div><div class="line">    </div><div class="line">    <span class="keyword">struct</span> ListNode * head = (<span class="keyword">struct</span> ListNode *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ListNode));</div><div class="line">    <span class="keyword">struct</span> ListNode * cur = head;</div><div class="line">    cur-&gt;value = token;</div><div class="line">    count ++;</div><div class="line">    </div><div class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</div><div class="line">        token = strtok(<span class="literal">NULL</span>, delim);</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (token == <span class="literal">NULL</span>) &#123;</div><div class="line">            <span class="keyword">break</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        cur-&gt;next = (<span class="keyword">struct</span> ListNode *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ListNode));</div><div class="line">        cur = cur-&gt;next;</div><div class="line">        cur-&gt;value = token;</div><div class="line">        count ++;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    newArgv = (<span class="keyword">char</span> **)<span class="built_in">malloc</span>((count + <span class="number">1</span>) * <span class="keyword">sizeof</span>(<span class="keyword">char</span> *));</div><div class="line">    cur = head;</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;</div><div class="line">        newArgv[i] = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="built_in">strlen</span>(cur-&gt;value) * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</div><div class="line">        <span class="built_in">strcpy</span>(newArgv[i], cur-&gt;value);</div><div class="line">        <span class="built_in">printf</span>(<span class="string">"[%d] : %s\n"</span>, i, cur-&gt;value);</div><div class="line">        <span class="built_in">free</span>(cur);</div><div class="line">        cur = cur-&gt;next;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    newArgv[count] = <span class="literal">NULL</span>; <span class="comment">//tail</span></div><div class="line">    </div><div class="line">    <span class="keyword">return</span> newArgv;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">char</span> ** argv = parse(<span class="string">"system program"</span>);</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="第一个问题"><a href="#第一个问题" class="headerlink" title="第一个问题"></a>第一个问题</h3><p>　　首先第一个问题便是这里：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">char</span> str[<span class="built_in">strlen</span>(line)];</div><div class="line"></div><div class="line"><span class="built_in">strcpy</span>(str, line);</div><div class="line">token = strtok(str, delim);</div></pre></td></tr></table></figure>
+<p>　　最初尝试直接把parse函数的参数line直接作为strtok函数的第一参数填入，结果不行。查阅文档后发现strtok的声明为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//param: str -- 要被分解成一组小字符串的字符串。</span></div><div class="line"><span class="comment">//param: delim -- 包含分隔符的 C 字符串。</span></div><div class="line"><span class="comment">//return: 该函数返回被分解的最后一个子字符串，如果没有可检索的字符串，则返回一个空指针。</span></div><div class="line"><span class="function"><span class="keyword">char</span> *<span class="title">strtok</span><span class="params">(<span class="keyword">char</span> * str, <span class="keyword">const</span> <span class="keyword">char</span> * delim)</span></span>;</div></pre></td></tr></table></figure>
+<p>　　可以发现，第一参数char * str要求的并非const，而我在调用时填入的参数为‘system program’，这种字符串数据是作为‘const char[]’保存在字符串常量区的，故不符合参数需求。需要重新申请一片栈空间复制line的内容再作为参数填入。</p>
+<h3 id="第二个问题"><a href="#第二个问题" class="headerlink" title="第二个问题"></a>第二个问题</h3><p>　　由此衍生的第二个问题便是：为何要为newArgv[i]申请新的空间，而非<code>newArgv[i] = cur-&gt;value;</code>？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">newArgv[i] = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="built_in">strlen</span>(cur-&gt;value) * <span class="keyword">sizeof</span>(<span class="keyword">char</span>));</div><div class="line"><span class="built_in">strcpy</span>(newArgv[i], cur-&gt;value);</div></pre></td></tr></table></figure>
+<p>　　这一点的原因主要是 <strong>strtok返回的字符串其实并非新的副本，而是从str上截取的一部分而已。</strong> 而cur-&gt;value便是来自于str，且str是拥有生命周期的栈数据，而如果将这样的部分保存在newArgv后返回到外部，便会因为生命周期问题，导致数据被回收。这将会产生很可怕的后果。所以必须申请新的空间，形成复制。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　没有垃圾回收的C/C++，编程时必须对内存的分配和流向必须要有十分清晰的认识，不然就很容易发生内存泄漏和野指针现象。慎之、慎之。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/08/26/frame_sync/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2108,270 +2281,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/02/26/build_bolg/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/02/26/build_bolg/" itemprop="url">
-                  在Mac平台使用GitHub和Hexo搭建博客
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-26T06:01:28+08:00">
-                2017-02-26
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Teach/" itemprop="url" rel="index">
-                    <span itemprop="name">Teach</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/02/26/build_bolg/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/26/build_bolg/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/02/26/build_bolg/" class="leancloud_visitors" data-flag-title="在Mac平台使用GitHub和Hexo搭建博客">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　在整这个博客时遇到了不少坑，正适合作为此博客的第一篇正文。另外本文会随博客的调整而更新，可保持关注。<br>　　本次的博客搭建平台为<strong>Mac OS X 11.6</strong>，但总体来说用到系统本身特性的地方很少，所以其他系统的使用者亦可参考。<br>　　本文涉及到一些软件的相关知识，如果你不了解它们，请先去了解一番。<br>　　如果你已是<a href="https://github.com/" target="_blank" rel="external">GitHub</a>用户并且创建了<a href="https://pages.github.com/" target="_blank" rel="external">GitHub Pages</a>仓库，你可以跳过<em>部署GitHub</em>。<br>　　如果你已安装<a href="https://git-scm.com/" target="_blank" rel="external">Git</a>、<a href="https://www.npmjs.com/" target="_blank" rel="external">NPM</a>和<a href="https://nodejs.org/" target="_blank" rel="external">Node.js</a>，或<strong>非Mac OS平台</strong>，你可以跳过<em>安装前置软件</em>，但非Mac OS平台的用户请自行解决前置软件的问题。</p>
-<h2 id="部署GitHub"><a href="#部署GitHub" class="headerlink" title="部署GitHub"></a>部署GitHub</h2><h3 id="前言-1"><a href="#前言-1" class="headerlink" title="前言"></a>前言</h3><p>　　本次博客的发布网站是隶属于GitHub的GitHub Pages仓库，通过把网站文件存放到这种仓库里，你便可以利用GitHub提供给你的外链访问它。<br>　　声明：以下部分内容转载自铁锚的<a href="http://blog.csdn.net/renfufei/article/details/37725057/" target="_blank" rel="external">创建GitHub技术博客全攻略</a>。</p>
-<h3 id="注册账号"><a href="#注册账号" class="headerlink" title="注册账号"></a>注册账号</h3><p>　　前往<a href="https://github.com/" target="_blank" rel="external">GitHub</a>官网，参考下图输入账号、邮箱、密码，然后点击注册按钮。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/register.png" alt="register"></p>
-<h3 id="初始设置"><a href="#初始设置" class="headerlink" title="初始设置"></a>初始设置</h3><p>　　注册完成后，选择Free免费账号完成设置。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/welcome.png" alt="welcome.png"></p>
-<h3 id="验证邮箱"><a href="#验证邮箱" class="headerlink" title="验证邮箱"></a>验证邮箱</h3><p>　　请打开你的邮箱，查看发送给你的确认邮件。你需要验证邮箱后，后面生成的个人主页才会被接受和发布。</p>
-<h3 id="创建页面仓库"><a href="#创建页面仓库" class="headerlink" title="创建页面仓库"></a>创建页面仓库</h3><p>　　前往<a href="https://github.com/new" target="_blank" rel="external">创建仓库</a>，参考下图。<br>　　仓库的名字需要和你的账号对应， 如 <em>tiemaocsdn.github.io</em>。<br>　　输入基本信息，然后点击创建仓库。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/newrep.png" alt="newrep"></p>
-<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>　　当你创建完页面仓库后，此时你的个人页面<em><a href="https://username.github.io/" target="_blank" rel="external">https://username.github.io/</a></em>已经创建完成（username即你的GitHub用户名，下同），虽然还是空无一物，不过你已可以进行下一步了。  </p>
-<h2 id="安装前置软件"><a href="#安装前置软件" class="headerlink" title="安装前置软件"></a>安装前置软件</h2><h3 id="前言-2"><a href="#前言-2" class="headerlink" title="前言"></a>前言</h3><p>　　在进行安装核心软件之前，你需要先准备好其所依赖的软件。包括<a href="https://git-scm.com/" target="_blank" rel="external">Git</a>、<a href="https://www.npmjs.com/" target="_blank" rel="external">NPM</a>和<a href="https://nodejs.org/" target="_blank" rel="external">Node.js</a>。  </p>
-<h3 id="安装Homebrew"><a href="#安装Homebrew" class="headerlink" title="安装Homebrew"></a>安装Homebrew</h3><p>　　在Mac OS下，你可以选择通过<a href="https://brew.sh/" target="_blank" rel="external">Homebrew</a>来进行许多服务类软件的安装（这样会方便很多），在其他系统下也有类似的替代方案。<br>　　打开终端, 输入以下脚本。  </p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/bin/ruby <span class="_">-e</span> <span class="string">"<span class="variable">$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)</span>"</span></div></pre></td></tr></table></figure>
-<p>　　等待安装完成后，在终端输入<strong>brew</strong>进行调试，如无报错则可继续。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/brew.png" alt="brew"></p>
-<h3 id="通过Homebrew安装其余软件"><a href="#通过Homebrew安装其余软件" class="headerlink" title="通过Homebrew安装其余软件"></a>通过Homebrew安装其余软件</h3><p>　　如果你不用Homebrew，那么请通过其他方式进行下载并安装（例如官网）。以下演示使用Homebrew安装他们，一样是通过终端输入，需要按照顺序。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">brew install git</div><div class="line">brew install node</div><div class="line">brew install npm</div></pre></td></tr></table></figure>
-<p>　　与Homebrew一样，安装完成后，你可以尝试依次在终端输入<strong>git</strong>、<strong>node</strong>、<strong>npm</strong>进行调试，如无报错则可继续。  </p>
-<h3 id="后记-1"><a href="#后记-1" class="headerlink" title="后记"></a>后记</h3><p>　　如果你觉得Homebrew的速度很慢，那么你可以考虑选择<strong>更换镜像</strong>。请通过搜索引擎寻找相关资料。  </p>
-<h2 id="安装Hexo及主题"><a href="#安装Hexo及主题" class="headerlink" title="安装Hexo及主题"></a>安装Hexo及主题</h2><h3 id="前言-3"><a href="#前言-3" class="headerlink" title="前言"></a>前言</h3><p>　　本次博客的框架源自<a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>，我们通过使用它来搭建出博客。Hexo基于Node.js，所以我们可以使用NPM来安装它，这在其他系统下也是一样的。  </p>
-<h3 id="使用NPM安装"><a href="#使用NPM安装" class="headerlink" title="使用NPM安装"></a>使用NPM安装</h3><p>　　与之前一样，在终端输入以下内容（选择其中之一），你的网络如果不是很好的话，可以选择方案二（通过淘宝镜像进行下载）。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm install -g hexo-cli</div><div class="line">npm install -g hexo-cli --registry=https://registry.npm.taobao.org</div></pre></td></tr></table></figure>
-<h3 id="新建博客工程"><a href="#新建博客工程" class="headerlink" title="新建博客工程"></a>新建博客工程</h3><p>　　接下来你需要在终端切换到你觉得合适的目录下通过Hexo新建你的博客工程（也可以不管，只要你知道当前终端目录的所在）。例如（目录可通过拖动文件夹到终端指定）：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">cd</span> /Users/Username/Documents/Bolg</div><div class="line">hexo init</div></pre></td></tr></table></figure>
-<p>　　经过一段时间后便会在Bolg文件夹下新建一堆文件，如下图这般，如无报错则可继续。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/path.png" alt="path"></p>
-<h3 id="关于博客主题"><a href="#关于博客主题" class="headerlink" title="关于博客主题"></a>关于博客主题</h3><p>　　在你新建博客工程后仍需要选择一个<em>主题(theme)</em>应用到博客里，主题文件位于博客工程下的<strong>themes</strong>目录，默认便存在一款名为<em>landscape</em>的主题。你可以选择从Hexo官网的<a href="https://hexo.io/themes/" target="_blank" rel="external">主题专栏</a>下载其他主题。<br>　　以下便以本博客所使用的<a href="https://github.com/iissnan/hexo-theme-next/" target="_blank" rel="external">NexT</a>为范例进行演示。接下来的内容将会参考<a href="http://theme-next.iissnan.com/getting-started.html" target="_blank" rel="external">这里</a>。</p>
-<h3 id="安装NexT主题"><a href="#安装NexT主题" class="headerlink" title="安装NexT主题"></a>安装NexT主题</h3><p>　　前往<a href="https://github.com/iissnan/hexo-theme-next/releases" target="_blank" rel="external">发布页面</a>选择你想要的版本（下图0.4.0版仅为示范），下载解压后获得Next主题，然后将其以文件夹的形式放到themes目录下。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/download.png" alt="download">  </p>
-<p>　　贴士：你可以考虑像我这样把解压后的文件夹名称更改为next，这样会更清晰。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/themes.png" alt="themes"></p>
-<h3 id="后记-2"><a href="#后记-2" class="headerlink" title="后记"></a>后记</h3><p>　　关于主题的选择其实远不止官网所刊，关于这些方面的你可以多去寻觅甚至自己动手丰衣足食！</p>
-<h2 id="部署博客"><a href="#部署博客" class="headerlink" title="部署博客"></a>部署博客</h2><h3 id="前言-4"><a href="#前言-4" class="headerlink" title="前言"></a>前言</h3><p>　　接下来我们要确立一个概念：在 Hexo 中有两份主要的配置文件，其名称都是 <em>_config.yml</em>。 其中，一份位于<strong>博客工程目录（根目录）</strong>下，主要包含 Hexo 本身的配置；另一份位于<strong>主题目录</strong>下，这份配置由主题作者提供，主要用于配置主题相关的选项。<br>　　为了描述方便，在以下说明中，将前者称为<strong>站点配置文件</strong>， 后者称为<strong>主题配置文件</strong>。  </p>
-<h3 id="启用主题并调试"><a href="#启用主题并调试" class="headerlink" title="启用主题并调试"></a>启用主题并调试</h3><p>　　打开<strong>站点配置文件</strong>，找到<em>theme</em>字段，并将其值更改为<em>next</em>（主题文件夹名称）。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/change_theme.png" alt="change_theme"><br>　　到此，NexT 主题安装完成。下一步我们将验证主题是否正确启用。<br>　　首先打开终端并切换目录到博客工程，输入<code>hexo server --debug</code>进行网站调试。当命令行输出中提示出：<br>　　<code>INFO  Hexo is running at http://0.0.0.0:4000/. Press Ctrl+C to stop.</code><br>　　此时即可使用浏览器访问<code>http://localhost:4000</code>，检查站点是否正确运行。<br>　　当你看到站点的外观与下图所示类似时即说明你已成功安装 NexT 主题。这是 NexT 默认的 Scheme —— Muse。<br>　　<img src="https://musoucrow.github.io/images/build_bolg/muse.png" alt="muse"><br>　　现在，你已经成功安装并启用了 NexT 主题。你现在可以在终端按下Ctrl+C结束调试，下一步我们将要更改一些主题的设定，包括个性化以及集成第三方服务。</p>
-<h3 id="个性化设置"><a href="#个性化设置" class="headerlink" title="个性化设置"></a>个性化设置</h3><p>　　打开<strong>站点配置文件</strong>，你可以修改以下字段来实现：  </p>
-<ul>
-<li><p>language  </p>
-<ul>
-<li>设置成你所需要的语言，例如：<em>language: zh-Hans</em></li>
-<li>目前 NexT 支持的语言如以下表格所示：<img src="https://musoucrow.github.io/images/build_bolg/language.png" alt="language"></li>
-</ul>
-</li>
-<li><p>avatar</p>
-<ul>
-<li>设置成头像的链接地址，例如：<em>avatar: <a href="http://example.com/avatar.png" target="_blank" rel="external">http://example.com/avatar.png</a></em></li>
-<li>其中，头像的链接地址可以是：<img src="https://musoucrow.github.io/images/build_bolg/avatar.png" alt="avatar"></li>
-</ul>
-</li>
-<li><p>author</p>
-<ul>
-<li><p>设置author为你的昵称，例如：<em>Musoucrow</em></p>
-<p>打开<strong>主题配置文件</strong>，你可以修改以下字段来实现：</p>
-</li>
-</ul>
-</li>
-<li><p>scheme</p>
-<ul>
-<li>Scheme是NexT提供的一种特性，借助于Scheme，NexT为你提供多种不同的外观。同时，几乎所有的配置都可以 在Scheme之间共用。目前NexT支持三种Scheme，他们是：<ul>
-<li>Muse - 默认 Scheme，这是 NexT 最初的版本，黑白主调，大量留白</li>
-<li>Mist - Muse 的紧凑版本，整洁有序的单栏外观</li>
-<li>Pisces - 双栏 Scheme，小家碧玉似的清新</li>
-</ul>
-</li>
-<li>搜索scheme关键字。 你会看到有三行scheme的配置，将你需用启用的scheme前面注释<em>#</em>即可。<img src="https://musoucrow.github.io/images/build_bolg/scheme.png" alt="scheme"></li>
-</ul>
-</li>
-<li><p>menu</p>
-<ul>
-<li>设定菜单内容，可通过解除几个自带项的注释<em>#</em>来开启栏目。</li>
-<li>也可以自己进行新增，格式为<em>item name: link</em>。<ul>
-<li>item name是一个名称，这个名称并不直接显示在页面上，它将用于匹配图标以及翻译。</li>
-</ul>
-</li>
-<li>NexT 默认的菜单项有（标注！的项表示需要手动创建这个页面）：<img src="https://musoucrow.github.io/images/build_bolg/menu.png" alt="menu"> </li>
-</ul>
-</li>
-<li><p>social</p>
-<ul>
-<li>social可让博客的侧栏里的角色介绍栏目下增加链接项（可添加多个），你可以这样设置：<img src="https://musoucrow.github.io/images/build_bolg/social1.png" alt="social1"> </li>
-<li>博客的具体效果为：<img src="https://musoucrow.github.io/images/build_bolg/social2.png" alt="social2"> </li>
-</ul>
-</li>
-</ul>
-<h3 id="新建标签和分类栏目"><a href="#新建标签和分类栏目" class="headerlink" title="新建标签和分类栏目"></a>新建标签和分类栏目</h3><p>　　回到终端，仍然是博客工程目录下，依次输入以下两句：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">hexo new page tags</div><div class="line">hexo new page categories</div></pre></td></tr></table></figure>
-<p>　　这样便创建好了标签和分类栏目的页面文件，但仍需要做一些处理。<br>　　打开<em>source/categories/index.md</em>和<em>source/tags/index.md</em>，分别修改成： </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: categories</div><div class="line">date: 2017-02-25 21:43:34</div><div class="line">comments: false</div><div class="line">type: &quot;categories&quot;</div><div class="line">---</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: tags</div><div class="line">date: 2017-02-25 22:40:53</div><div class="line">comments: false</div><div class="line">type: &quot;tags&quot;</div><div class="line">---</div></pre></td></tr></table></figure>
-<p>　　你现在可以再次调试一下看看效果，不出意外的话，已经实现了标签和分类栏目。记得要先结束之前的网站调试（在调试终端下按<strong>Ctrl+C</strong>），再重新进行。</p>
-<h3 id="后记-3"><a href="#后记-3" class="headerlink" title="后记"></a>后记</h3><p>　　静态站点拥有一定的局限性，因此我们需要借助于第三方服务来扩展站点的功能。 以下是 NexT 目前支持的第三方服务，你可以根据你的需求集成一些功能进来。<a href="http://theme-next.iissnan.com/getting-started.html" target="_blank" rel="external">详情查看</a></p>
-<h2 id="发表帖子"><a href="#发表帖子" class="headerlink" title="发表帖子"></a>发表帖子</h2><h3 id="前言-5"><a href="#前言-5" class="headerlink" title="前言"></a>前言</h3><p>　　博客的帖子是Markdown格式（后缀名为.md），如果你尚未熟悉，请去进行专门的学习。
-　</p>
-<h3 id="新建帖子"><a href="#新建帖子" class="headerlink" title="新建帖子"></a>新建帖子</h3><p>　　在终端、博客工程目录下输入：<code>hexo new post test1</code>以创建一个标题名为test1的帖子。你可以在<em>source/_posts/</em>目录下看到它。<br>　　在文件顶部有着与<em>source/categories/index.md</em>和<em>source/tags/index.md</em>相同格式的配置，该类配置可拥有如下属性（comments属性必须保证已经安装了第三方服务后才能生效）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">title: 文章的标题</div><div class="line">date: 创建日期，例如(2017-02-26 00:54:28)</div><div class="line">updated: 修改日期</div><div class="line">comments: 是否开启评论(true or false)</div><div class="line">type: 标签，多个时表示为([a, b, c])</div><div class="line">categories: 分类</div></pre></td></tr></table></figure>
-<h3 id="修改创建格式"><a href="#修改创建格式" class="headerlink" title="修改创建格式"></a>修改创建格式</h3><p>　　使用命令创建的帖子文件的格式，系源自于<em>scaffolds/post.md</em>，你可以通过修改它来达到帖子模板化的效果，例如：<br>　　<img src="https://musoucrow.github.io/images/build_bolg/format.png" alt="format"> </p>
-<h3 id="后记-4"><a href="#后记-4" class="headerlink" title="后记"></a>后记</h3><p>　　帖子文件的本质就是从模板产生的克隆品，所以也可以自己手动新建文件。同理删除帖子也只需要直接删除文件即可，无需通过网站管理之类的手段，非常方便。</p>
-<h2 id="发布网站"><a href="#发布网站" class="headerlink" title="发布网站"></a>发布网站</h2><h3 id="前言-6"><a href="#前言-6" class="headerlink" title="前言"></a>前言</h3><p>　　发布网站的原理其实就是生成网站文件夹并传输到GitHub上对应的仓库<em><a href="https://github.com/username/username.github.io" target="_blank" rel="external">https://github.com/username/username.github.io</a></em>，然后便可通过<em><a href="https://username.github.io" target="_blank" rel="external">https://username.github.io</a></em>进行访问。</p>
-<h3 id="上传部署"><a href="#上传部署" class="headerlink" title="上传部署"></a>上传部署</h3><p>　　在终端输入<code>npm install hexo-deployer-git --save</code>，安装完毕后打开<strong>站点配置文件</strong>，添加<em>deploy</em>字段。  </p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">deploy:</div><div class="line">  type: git</div><div class="line">  repository: http://github.com/username/username.github.io.git</div><div class="line">  branch: master</div></pre></td></tr></table></figure>
-<ul>
-<li>注意事项<ul>
-<li>是http而非https。</li>
-<li>在旧版(&lt;3.0)的Hexo里是github而非git。</li>
-<li>username即你的GitHub用户名，实际以你自己创建的仓库地址为准。</li>
-</ul>
-</li>
-</ul>
-<h3 id="生成并上传"><a href="#生成并上传" class="headerlink" title="生成并上传"></a>生成并上传</h3><p>　　在终端、博客工程目录下输入：<code>hexo generate</code>，完成后便会发现新增了<em>public</em>目录。那便是网站文件夹，用于上传到GitHub仓库。<br>　　接下来再输入<code>hexo deploy</code>，将网站文件夹上传到GitHub仓库。以后在本地做了修改后，便进行这两个操作将网站生成并上传即可。</p>
-<h3 id="后记-5"><a href="#后记-5" class="headerlink" title="后记"></a>后记</h3><p>　　有时候把一些配置文件搞炸的时候或者上传有问题时，可以使用<code>hexo clean</code>来尝试修复。<br>　　如果觉得GitHub的传输速度过慢，可考虑修改<em>host</em>尝试能否增速，以下是一个江湖偏方：<br>　　<code>151.101.88.249 github.global.ssl.fastly.Net</code>
-　    </p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2421,7 +2330,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
@@ -2439,7 +2348,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-count">37</span>
                 <span class="site-state-item-name">tags</span>
               </a>
             </div>
@@ -2508,7 +2417,7 @@
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
