@@ -291,6 +291,183 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/06/23/dfq_sheet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2018/06/23/dfq_sheet/" itemprop="url">
+                  《DFQ》开发随录——图集
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-23T22:11:23+08:00">
+                2018-06-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Development/" itemprop="url" rel="index">
+                    <span itemprop="name">Development</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/23/dfq_sheet/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/06/23/dfq_sheet/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/23/dfq_sheet/" class="leancloud_visitors" data-flag-title="《DFQ》开发随录——图集">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong>      </p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　在游戏开发的领域里，<a href="http://docs.cocos.com/creator/manual/zh/asset-workflow/atlas.html" target="_blank" rel="external">图集（SpriteSheet）</a>是一个很重要的概念，其好处在链接处也已言明。但若是引擎没提供相关的支持，那么便需要自己搞个解决方案了。而<a href="http://love2d.org" target="_blank" rel="external">LÖVE</a>也恰好是没有提供相关支持的，那么只好自己动手丰衣足食了，本文便记录其中心得。</p>
+<h2 id="装箱问题"><a href="#装箱问题" class="headerlink" title="装箱问题"></a>装箱问题</h2><p>　　要实现图集的核心便是对图片进行拼合打包，其实类似的工具市面上亦有存在（如<a href="https://www.codeandweb.com/texturepacker" target="_blank" rel="external">TexturePacker</a>）。从功能上而论，TexturePacker完全可以满足需求（有提供命令行模式，可实现自动化）。可惜TexturePacker的免费版根本不堪使用，而破解也相继失败。而其他类似的工具要么无法满足需求，要么不支持macOS。只好自己手写一套了。<br>　　实现的图集的难点无非在于拼合时图片排列的算法，由<a href="https://www.cnblogs.com/clrs97/" target="_blank" rel="external">Claris</a>告知得这种属于<a href="https://baike.baidu.com/item/装箱问题/7749220" target="_blank" rel="external">装箱问题</a>，目前并无最优解。由装箱问题为关键字进行展开搜索，发现一种名为<a href="http://wiki.unity3d.com/index.php/MaxRectsBinPack" target="_blank" rel="external">MaxRectsBinPack</a>的算法可解决问题，我将之翻译成了<a href="https://github.com/MusouCrow/MaxRectsBinPack" target="_blank" rel="external">Python版</a>。如此装箱问题便解决了。</p>
+<h2 id="拼合问题"><a href="#拼合问题" class="headerlink" title="拼合问题"></a>拼合问题</h2><p>　　接下来的问题便是“谁和谁拼合成一张图”了，我对此立下三个原则：</p>
+<ul>
+<li>关联性不高者不拼（拼成大图的代价便是成为资源共同体，如果关联性不高的拼合一块则会造成极大的内存浪费）</li>
+<li>黑底与透明者不拼（黑底图拼成大图必须得保证全图无透明点，否则游戏里会出现奇怪的线条）</li>
+<li>拼合后过大者不拼（需保证图片大小在4096*4096及以下，否则恐怕出现上限问题）</li>
+</ul>
+<p>　　以这三原则来看，是无法做到以文件夹为单位进行粗暴的拼合了。所以采用了编写配置的方式进行。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">"effect": &#123;</div><div class="line">    "map": &#123;</div><div class="line">        "lorien": [</div><div class="line">            "lorien",</div><div class="line">            "/actor/article/lorien/pathgate",</div><div class="line">            "/actor/article/lorien/largegrass"</div><div class="line">        ]</div><div class="line">    &#125;,</div><div class="line">    "death": [</div><div class="line">        "death",</div><div class="line">        "dieFlash"</div><div class="line">    ],</div><div class="line">    "buff": &#123;</div><div class="line">        "freeze": "freeze"</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　配置以JSON形式存储，配置中的key代表着合图文件夹的层级，value则为欲拼合的图片文件夹，若无<code>/</code>开头则代表以当前文件夹层级为路径，反之则为全路径。以这套方案便可很自由地选择拼合的方案了。</p>
+<h2 id="配置问题"><a href="#配置问题" class="headerlink" title="配置问题"></a>配置问题</h2><p>　　图片的拼合问题解决后，便是游戏要如何以最低的代价去兼容新的图片形式了。解决方案自然是为原图片生成路径一致的配置文件，游戏通过读取配置文件以无缝对接新的图片形式。配置文件格式如下：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">return</span> &#123;</div><div class="line">    image = <span class="string">"ui"</span>,</div><div class="line">    x = <span class="number">0</span>,</div><div class="line">    y = <span class="number">151</span>,</div><div class="line">    w = <span class="number">45</span>,</div><div class="line">    h = <span class="number">41</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>　　配置文件记录了所属合图的路径以及在合图中的坐标宽高，如此便可清晰无比地取得了。由于Python的<a href="https://pypi.python.org/pypi/lupa/" target="_blank" rel="external">lupa模块</a>装不上，为此还专门写了个<a href="https://github.com/MusouCrow/json_lua_exchange" target="_blank" rel="external">Lua与JSON的转换器</a>。</p>
+<h2 id="大小问题"><a href="#大小问题" class="headerlink" title="大小问题"></a>大小问题</h2><p>　　一般而言，因为光栅化需要对纹理采样进行快速取值，图片大小需要遵循2的N次幂（256、512、1024…）。这种符合的图片被称为POT(Power-Of-Two)，同理不满足的称为NPOT(Non-Power-Of-Two)。在早期POT纹理可以说是必须的，而今在OpenGL ES2.0后支持了NPOT。但为了能满足ETC压缩以及兼容性，个人推荐还是对合图进行POT化。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　其实从这个问题来看，选择流行的大引擎的确会更为方便。在Unity里可以由后台自动完成的事情现在却要一篇文章来总结，不过贼船已经上了，就只能走到黑了。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2018/04/17/lua_local/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -988,25 +1165,25 @@
 <h2 id="接入用户"><a href="#接入用户" class="headerlink" title="接入用户"></a>接入用户</h2><p>　　按理来说客户端与服务端的初次连接使用TCP更为适合（一个KCP对象只服务一个连接，所以初次连接的客户端在服务端并没有对应的KCP对象），但是为了偷懒我采用了这样的方式：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Check ID of packet is ID.connect</span></div><div class="line"><span class="keyword">if</span> (<span class="keyword">not</span> _agentMap[from] <span class="keyword">and</span> <span class="built_in">string</span>.<span class="built_in">unpack</span>(<span class="string">"b"</span>, data, #data) == _ID.connect) <span class="keyword">then</span></div><div class="line">    <span class="keyword">local</span> addr = _SOCKET.ToAddress(from)</div><div class="line">    _SKYNET.Log(<span class="string">"connect"</span>, addr)</div><div class="line">    _agentMap[from] = _Agent.New(<span class="number">1</span>, from, <span class="function"><span class="keyword">function</span> <span class="params">(_data)</span></span></div><div class="line">        _SOCKET.sendto(_udp, from, _data)</div><div class="line">    <span class="keyword">end</span>)</div><div class="line"></div><div class="line">    _clientCount = _clientCount + <span class="number">1</span></div><div class="line">    _agentMap[from]:Send(_ID.connect, &#123;addr = addr, version = _version, isFull = _clientCount &gt; _maxClient&#125;)</div><div class="line"><span class="keyword">elseif</span> (_agentMap[from]) <span class="keyword">then</span></div><div class="line">    _agentMap[from]:Input(data)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure></p>
 <p>　　对于不在用户列表的来源，则直接判定该包尾部1字节是否等于<code>_ID.connect</code>（KCP会在封包的头部添加信息，所以在没有JSON内容的情况下，该包尾部则是原封包的头部），这种野蛮的方式缺点自然是只能填写标识而不能添加JSON。所以如果客户端还需要一些信息的话还需要收到回执后补充，当然事实上就需要回执：存在着因版本不对、服务器爆满的情况而拒绝连接的情况。所以服务端需要回执后方正式将其接入。</p>
 <h2 id="心跳包"><a href="#心跳包" class="headerlink" title="心跳包"></a>心跳包</h2><p>　　鉴于UDP的无连接特性，是无法判断用户是否掉线的（事实上TCP的机制也非完美）。业界通行的做法是做心跳包，即每隔一段时间进行通信以确定对方仍存活。BNB采用的方式是礼尚往来（客户端每隔一段时间发送心跳包，服务端收到后发送回执），即双端皆有心跳状态：在客户端看来，无论是超时没有收到心跳包、亦或是自身无法发出心跳包，都视为掉线。在服务端看来，只要该客户端超时没有发过心跳包，即踢出之：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Server</span></div><div class="line"><span class="function"><span class="keyword">function</span> _FUNC.Heartbeat<span class="params">()</span></span></div><div class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(_agentMap) <span class="keyword">do</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> v.heartbeat) <span class="keyword">then</span></div><div class="line">            _FUNC.Kick(k)</div><div class="line">        <span class="keyword">else</span></div><div class="line">            v.heartbeat = <span class="keyword">false</span></div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Server</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_FUNC.Heartbeat</span><span class="params">()</span></span></div><div class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(_agentMap) <span class="keyword">do</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> v.heartbeat) <span class="keyword">then</span></div><div class="line">            _FUNC.Kick(k)</div><div class="line">        <span class="keyword">else</span></div><div class="line">            v.heartbeat = <span class="keyword">false</span></div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Client</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">HeartbeatTick</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.heartbeat) &#123;</div><div class="line">        <span class="keyword">this</span>.Disconnect();</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">this</span>.Send(EventCode.Heartbeat);</div><div class="line">        <span class="keyword">this</span>.heartbeat = <span class="literal">false</span>;</div><div class="line">        <span class="keyword">this</span>.heartbeatTimer.Enter(HEARTBEAT_INTERVAL, <span class="keyword">this</span>.HeartbeatTick);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h2 id="匹配队列"><a href="#匹配队列" class="headerlink" title="匹配队列"></a>匹配队列</h2><p>　　BNB的匹配规则就是没有规则，匹配到了两名玩家就开始游戏，所以只需设计一个队列即可。每逢有新用户接入后便会进入队列，如用户离去则从队列消除，若匹配成功则为他们创建一场游戏：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.OnHandshake<span class="params">(id, fd)</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _SKYNET.Call(_gate, <span class="string">"CheckAgent"</span>, fd)) <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _readyFd) <span class="keyword">then</span></div><div class="line">        _readyFd = fd</div><div class="line">    <span class="keyword">else</span></div><div class="line">        _SKYNET.Send(_lobby, <span class="string">"NewRoom"</span>, _readyFd, fd)</div><div class="line">        _readyFd = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> _CMD.OnDisconnect<span class="params">(id, fd)</span></span></div><div class="line">    <span class="keyword">if</span> (_readyFd == fd) <span class="keyword">then</span></div><div class="line">        _readyFd = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_CMD.OnHandshake</span><span class="params">(id, fd)</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _SKYNET.Call(_gate, <span class="string">"CheckAgent"</span>, fd)) <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _readyFd) <span class="keyword">then</span></div><div class="line">        _readyFd = fd</div><div class="line">    <span class="keyword">else</span></div><div class="line">        _SKYNET.Send(_lobby, <span class="string">"NewRoom"</span>, _readyFd, fd)</div><div class="line">        _readyFd = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_CMD.OnDisconnect</span><span class="params">(id, fd)</span></span></div><div class="line">    <span class="keyword">if</span> (_readyFd == fd) <span class="keyword">then</span></div><div class="line">        _readyFd = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <h2 id="创建游戏"><a href="#创建游戏" class="headerlink" title="创建游戏"></a>创建游戏</h2><p>　　在匹配完成后，便会由Lobby服务为一对用户创建房间（Room服务），在此之前会对两名用户是否在线进行检查，若不满足则将两名用户进行踢出，需重新进行连接：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.NewRoom<span class="params">(leftFd, rightFd)</span></span></div><div class="line">    <span class="keyword">local</span> fds = &#123;leftFd, rightFd&#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _SKYNET.Call(_gate, <span class="string">"CheckAgent"</span>, fds)) <span class="keyword">then</span></div><div class="line">        _SKYNET.Send(_gate, <span class="string">"Kick"</span>, fds)</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> deviceModels = _SKYNET.Call(_gate, <span class="string">"GetAgentValue"</span>, fds, <span class="string">"deviceModel"</span>)</div><div class="line"></div><div class="line">    _leftFdMap[leftFd] = rightFd</div><div class="line">    _rightFdMap[rightFd] = leftFd</div><div class="line">    _roomMap[leftFd .. rightFd] = _SKYNET.newservice(<span class="string">"room"</span>)</div><div class="line">    _SKYNET.Send(_roomMap[leftFd .. rightFd], <span class="string">"Start"</span>, leftFd, rightFd, deviceModels[<span class="number">1</span>], deviceModels[<span class="number">2</span>])</div><div class="line"></div><div class="line">    _SKYNET.Log(<span class="string">"start room"</span>, _SOCKET.ToAddress(leftFd), _SOCKET.ToAddress(rightFd))</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_CMD.NewRoom</span><span class="params">(leftFd, rightFd)</span></span></div><div class="line">    <span class="keyword">local</span> fds = &#123;leftFd, rightFd&#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _SKYNET.Call(_gate, <span class="string">"CheckAgent"</span>, fds)) <span class="keyword">then</span></div><div class="line">        _SKYNET.Send(_gate, <span class="string">"Kick"</span>, fds)</div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> deviceModels = _SKYNET.Call(_gate, <span class="string">"GetAgentValue"</span>, fds, <span class="string">"deviceModel"</span>)</div><div class="line"></div><div class="line">    _leftFdMap[leftFd] = rightFd</div><div class="line">    _rightFdMap[rightFd] = leftFd</div><div class="line">    _roomMap[leftFd .. rightFd] = _SKYNET.newservice(<span class="string">"room"</span>)</div><div class="line">    _SKYNET.Send(_roomMap[leftFd .. rightFd], <span class="string">"Start"</span>, leftFd, rightFd, deviceModels[<span class="number">1</span>], deviceModels[<span class="number">2</span>])</div><div class="line"></div><div class="line">    _SKYNET.Log(<span class="string">"start room"</span>, _SOCKET.ToAddress(leftFd), _SOCKET.ToAddress(rightFd))</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <p>　　创建房间之后，会为对应的客户端发送开始游戏所需的数据（随机数种子、双方阵营所属）。待客户端初始化完毕后，游戏正式开始：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Server</span></div><div class="line"><span class="function"><span class="keyword">function</span> _CMD.Start<span class="params">(leftFd, rightFd, leftDevice, rightDevice)</span></span></div><div class="line">    _fds = &#123;leftFd, rightFd&#125;</div><div class="line">    _deviceMap[leftFd] = leftDevice</div><div class="line">    _deviceMap[rightFd] = rightDevice</div><div class="line">    _FUNC.Send(_ID.start, &#123;seed = <span class="built_in">os</span>.time(), leftAddr = _SOCKET.ToAddress(leftFd), rightAddr = _SOCKET.ToAddress(rightFd)&#125;)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">-- Server</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_CMD.Start</span><span class="params">(leftFd, rightFd, leftDevice, rightDevice)</span></span></div><div class="line">    _fds = &#123;leftFd, rightFd&#125;</div><div class="line">    _deviceMap[leftFd] = leftDevice</div><div class="line">    _deviceMap[rightFd] = rightDevice</div><div class="line">    _FUNC.Send(_ID.start, &#123;seed = <span class="built_in">os</span>.time(), leftAddr = _SOCKET.ToAddress(leftFd), rightAddr = _SOCKET.ToAddress(rightFd)&#125;)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <figure class="highlight csharp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Client</span></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnStart</span>(<span class="params"><span class="keyword">byte</span> id, <span class="keyword">string</span> data</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> obj = JsonUtility.FromJson&lt;Datas.Start&gt;(data);</div><div class="line">    Random.InitState(obj.seed);</div><div class="line">    Judge.PlayerType = <span class="keyword">this</span>.addr == obj.leftAddr ? PlayerType.A : PlayerType.B;</div><div class="line">    Judge.SetAddr(obj.leftAddr, obj.rightAddr);</div><div class="line">    <span class="keyword">this</span>.startGameSlot.Run(<span class="keyword">this</span>.gameObject);</div><div class="line">    <span class="keyword">this</span>.online = <span class="literal">true</span>;</div><div class="line">    <span class="keyword">this</span>.updateTimer = <span class="number">0</span>;</div><div class="line">    <span class="keyword">this</span>.frame = <span class="number">0</span>;</div><div class="line">    <span class="keyword">this</span>.playFrame = <span class="number">0</span>;</div><div class="line">    <span class="keyword">this</span>.exitCode = ExitCode.None;</div><div class="line">    <span class="keyword">this</span>.sendInLoop = <span class="literal">false</span>;</div><div class="line">    <span class="keyword">this</span>.playDataList.Clear();</div><div class="line">    <span class="keyword">this</span>.playDataList.Add(<span class="keyword">new</span> PlayData());</div><div class="line">    Networkmgr.MovingValue = <span class="number">0</span>;</div><div class="line">    Networkmgr.WillElaste = <span class="literal">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <h2 id="帧锁定同步"><a href="#帧锁定同步" class="headerlink" title="帧锁定同步"></a>帧锁定同步</h2><p>　　如<a href="https://musoucrow.github.io/2018/03/09/bnb_1/">上文</a>所言（在采用传统帧锁定同步的基础上，服务端设定等待时长，超时则继续），服务端的业务设计成当接收到一名用户的输入包后，就会开始进行计时（9毫秒，约等于客户端的5帧，即WAITTING_INTERVAL）。若超时或在时间内抵达第二名用户的输入包，则进行结算（广播用户们的输入数据）。用户的输入数据在服务端是作为缓存式的，超时了也会进行记录，作为下一次结算所用，每次结算后输入数据则会清空：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.ReceiveInput<span class="params">(fd, obj)</span></span></div><div class="line">    _inputMap[fd] = obj.data</div><div class="line"></div><div class="line">    <span class="comment">-- Must be current frame, otherwise only save input data.</span></div><div class="line">    <span class="keyword">if</span> (obj.frame == _playFrame) <span class="keyword">then</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> _readyPlay) <span class="keyword">then</span></div><div class="line">            _readyPlay = <span class="keyword">true</span></div><div class="line">            <span class="keyword">local</span> time = _playInterval - (_SKYNET.now() - _timer)</div><div class="line">            time = time &lt; <span class="number">0</span> <span class="keyword">and</span> <span class="number">0</span> <span class="keyword">or</span> time</div><div class="line">            _SKYNET.timeout(time, _FUNC.Play) <span class="comment">-- Server will run _FUNC.Play after the time goes on.</span></div><div class="line">        <span class="keyword">else</span></div><div class="line">            _FUNC.Play()</div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> _FUNC.Play<span class="params">()</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _readyPlay) <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _TABLE.Clear(_playSender.addrs)</div><div class="line">    _TABLE.Clear(_playSender.inputs)</div><div class="line"></div><div class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(_inputMap) <span class="keyword">do</span></div><div class="line">        <span class="built_in">table</span>.insert(_playSender.addrs, _SOCKET.ToAddress(k))</div><div class="line">        <span class="built_in">table</span>.insert(_playSender.inputs, v)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _FUNC.Send(_ID.input, _playSender)</div><div class="line">    _TABLE.Clear(_inputMap)</div><div class="line">    _readyPlay = <span class="keyword">false</span></div><div class="line">    _timer = _SKYNET.now()</div><div class="line">    _playFrame = _playFrame + <span class="number">1</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_CMD.ReceiveInput</span><span class="params">(fd, obj)</span></span></div><div class="line">    _inputMap[fd] = obj.data</div><div class="line"></div><div class="line">    <span class="comment">-- Must be current frame, otherwise only save input data.</span></div><div class="line">    <span class="keyword">if</span> (obj.frame == _playFrame) <span class="keyword">then</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">not</span> _readyPlay) <span class="keyword">then</span></div><div class="line">            _readyPlay = <span class="keyword">true</span></div><div class="line">            <span class="keyword">local</span> time = _playInterval - (_SKYNET.now() - _timer)</div><div class="line">            time = time &lt; <span class="number">0</span> <span class="keyword">and</span> <span class="number">0</span> <span class="keyword">or</span> time</div><div class="line">            _SKYNET.timeout(time, _FUNC.Play) <span class="comment">-- Server will run _FUNC.Play after the time goes on.</span></div><div class="line">        <span class="keyword">else</span></div><div class="line">            _FUNC.Play()</div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_FUNC.Play</span><span class="params">()</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _readyPlay) <span class="keyword">then</span></div><div class="line">        <span class="keyword">return</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _TABLE.Clear(_playSender.addrs)</div><div class="line">    _TABLE.Clear(_playSender.inputs)</div><div class="line"></div><div class="line">    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(_inputMap) <span class="keyword">do</span></div><div class="line">        <span class="built_in">table</span>.insert(_playSender.addrs, _SOCKET.ToAddress(k))</div><div class="line">        <span class="built_in">table</span>.insert(_playSender.inputs, v)</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _FUNC.Send(_ID.input, _playSender)</div><div class="line">    _TABLE.Clear(_inputMap)</div><div class="line">    _readyPlay = <span class="keyword">false</span></div><div class="line">    _timer = _SKYNET.now()</div><div class="line">    _playFrame = _playFrame + <span class="number">1</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <h2 id="维护"><a href="#维护" class="headerlink" title="维护"></a>维护</h2><p>　　服务端不同于客户端，发生错误使程序崩溃的代价是很大的，所以有必要建立完善的应对措施。所幸目前发现Skynet发生错误时会影响的仅为<code>Skynet.fork</code>的函数（发生错误后函数会停止运行），并不会导致整个服务崩溃乃至进程崩溃。于是只要利用Lua的<code>pcall(func, ...)</code>函数进行异常处理即可：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _SKYNET.Loop<span class="params">(Func, sleepTime)</span></span></div><div class="line">    <span class="keyword">local</span> LoopFunc = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></div><div class="line">        <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span></div><div class="line">            <span class="keyword">local</span> ret, text = <span class="built_in">pcall</span>(Func)</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (<span class="keyword">not</span> ret) <span class="keyword">then</span></div><div class="line">                _SKYNET.Log(text)</div><div class="line">                _SKYNET.Warn()</div><div class="line">            <span class="keyword">end</span></div><div class="line"></div><div class="line">            _ORIGIN_SKYNET.sleep(sleepTime)</div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _ORIGIN_SKYNET.fork(LoopFunc)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_SKYNET.Loop</span><span class="params">(Func, sleepTime)</span></span></div><div class="line">    <span class="keyword">local</span> LoopFunc = <span class="function"><span class="keyword">function</span><span class="params">()</span></span></div><div class="line">        <span class="keyword">while</span> <span class="keyword">true</span> <span class="keyword">do</span></div><div class="line">            <span class="keyword">local</span> ret, text = <span class="built_in">pcall</span>(Func)</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (<span class="keyword">not</span> ret) <span class="keyword">then</span></div><div class="line">                _SKYNET.Log(text)</div><div class="line">                _SKYNET.Warn()</div><div class="line">            <span class="keyword">end</span></div><div class="line"></div><div class="line">            _ORIGIN_SKYNET.sleep(sleepTime)</div><div class="line">        <span class="keyword">end</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    _ORIGIN_SKYNET.fork(LoopFunc)</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <p>　　当然遇到问题仅仅是堵住那只是治标不治本，所以我采用了邮件报警机制。只要在<code>config</code>文件填写<code>mail</code>，然后调用<code>_SKYNET.Warn()</code>即会发送到目标邮箱，且整个进程生命周期内只会发送一次，避免疯狂轰炸的情况：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _SKYNET.Warn<span class="params">()</span></span></div><div class="line">    <span class="keyword">if</span> (_mail <span class="keyword">and</span> <span class="keyword">not</span> _DATA_CENTER.get(<span class="string">"hasWarn"</span>)) <span class="keyword">then</span></div><div class="line">        <span class="built_in">os</span>.execute(<span class="built_in">string</span>.format(<span class="string">"shell/warn.sh %s '%s'"</span>, _mail, _logger))</div><div class="line">        _DATA_CENTER.set(<span class="string">"hasWarn"</span>, <span class="keyword">true</span>)</div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_SKYNET.Warn</span><span class="params">()</span></span></div><div class="line">    <span class="keyword">if</span> (_mail <span class="keyword">and</span> <span class="keyword">not</span> _DATA_CENTER.get(<span class="string">"hasWarn"</span>)) <span class="keyword">then</span></div><div class="line">        <span class="built_in">os</span>.execute(<span class="built_in">string</span>.format(<span class="string">"shell/warn.sh %s '%s'"</span>, _mail, _logger))</div><div class="line">        _DATA_CENTER.set(<span class="string">"hasWarn"</span>, <span class="keyword">true</span>)</div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <p>　　虽然理论上没有会令Skynet进程崩溃的情况，但以防万一，还是专门做了崩溃重启的措施：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">basepath=$(<span class="built_in">cd</span> `dirname <span class="variable">$0</span>`; <span class="built_in">cd</span> ..; <span class="built_in">pwd</span>)</div><div class="line"><span class="built_in">cd</span> <span class="variable">$basepath</span></div><div class="line"></div><div class="line"><span class="keyword">while</span> <span class="literal">true</span></div><div class="line"><span class="keyword">do</span></div><div class="line">	count=`ps -ef | grep skynet | grep -v <span class="string">"grep"</span> | wc <span class="_">-l</span>`</div><div class="line"></div><div class="line">	<span class="keyword">if</span> [ <span class="variable">$count</span> <span class="_">-gt</span> 0 ]; <span class="keyword">then</span></div><div class="line">	    :</div><div class="line">	<span class="keyword">else</span></div><div class="line">	    <span class="built_in">echo</span> <span class="string">"program has crashed, restarting..."</span></div><div class="line">	    screen shell/run.sh</div><div class="line">	<span class="keyword">fi</span></div><div class="line">	</div><div class="line">	sleep 10</div><div class="line"><span class="keyword">done</span></div></pre></td></tr></table></figure>
 <p>　　还有一点就是，帧锁定同步的浮点数问题并不是那么令人放心的存在。所以有必要对其进行监控（这个在上文也有提到），同理遇到异常情况也会进行邮件报警：</p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> _CMD.ReceiveComparison<span class="params">(fd, obj)</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _comparsionHandler[obj.playFrame]) <span class="keyword">then</span></div><div class="line">        _comparsionHandler[obj.playFrame] = &#123;&#125;</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> map = _comparsionHandler[obj.playFrame]</div><div class="line">    map[fd] = obj.content</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (_TABLE.Count(map) == _playerCount) <span class="keyword">then</span></div><div class="line">        <span class="keyword">local</span> lk, lv</div><div class="line"></div><div class="line">        <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(map) <span class="keyword">do</span></div><div class="line">            <span class="keyword">if</span> (lv <span class="keyword">and</span> v ~= lv) <span class="keyword">then</span></div><div class="line">                <span class="comment">-- Output current frame, each device name and comparsion data.</span></div><div class="line">                _SKYNET.Log(obj.playFrame, _deviceMap[k], v, <span class="string">"!="</span>, _deviceMap[lk], lv)</div><div class="line">                _SKYNET.Warn()</div><div class="line">            <span class="keyword">end</span></div><div class="line"></div><div class="line">            lk = k</div><div class="line">            lv = v</div><div class="line">        <span class="keyword">end</span></div><div class="line"></div><div class="line">        _comparsionHandler[obj.playFrame] = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">_CMD.ReceiveComparison</span><span class="params">(fd, obj)</span></span></div><div class="line">    <span class="keyword">if</span> (<span class="keyword">not</span> _comparsionHandler[obj.playFrame]) <span class="keyword">then</span></div><div class="line">        _comparsionHandler[obj.playFrame] = &#123;&#125;</div><div class="line">    <span class="keyword">end</span></div><div class="line"></div><div class="line">    <span class="keyword">local</span> map = _comparsionHandler[obj.playFrame]</div><div class="line">    map[fd] = obj.content</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (_TABLE.Count(map) == _playerCount) <span class="keyword">then</span></div><div class="line">        <span class="keyword">local</span> lk, lv</div><div class="line"></div><div class="line">        <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(map) <span class="keyword">do</span></div><div class="line">            <span class="keyword">if</span> (lv <span class="keyword">and</span> v ~= lv) <span class="keyword">then</span></div><div class="line">                <span class="comment">-- Output current frame, each device name and comparsion data.</span></div><div class="line">                _SKYNET.Log(obj.playFrame, _deviceMap[k], v, <span class="string">"!="</span>, _deviceMap[lk], lv)</div><div class="line">                _SKYNET.Warn()</div><div class="line">            <span class="keyword">end</span></div><div class="line"></div><div class="line">            lk = k</div><div class="line">            lv = v</div><div class="line">        <span class="keyword">end</span></div><div class="line"></div><div class="line">        _comparsionHandler[obj.playFrame] = <span class="keyword">nil</span></div><div class="line">    <span class="keyword">end</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
 <h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　这次是本人初次进行服务端开发，如有不妥之处但请指教。虽无涉及数据库、反作弊、集群、运维等方面，但也不失为一个匹配-房间-帧锁定同步的好范例。</p>
 
           
@@ -1897,173 +2074,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/12/07/dfq_building/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/12/07/dfq_building/" itemprop="url">
-                  游戏测试同步于Android设备的解决方案
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-07T05:33:42+08:00">
-                2017-12-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Teach/" itemprop="url" rel="index">
-                    <span itemprop="name">Teach</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/12/07/dfq_building/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/12/07/dfq_building/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/12/07/dfq_building/" class="leancloud_visitors" data-flag-title="游戏测试同步于Android设备的解决方案">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　最近开发中的游戏需要在Android手机上进行测试，但采用USB数据线连接主机进行文件替换的更新实在是太麻烦了。遂考虑整个远程更新的解决方案，在研究的过程中排除了开发APP（耗费时长）与内置热更新（LuaSocket遇到点问题），最终选择了现在的在手机上安装Git客户端的方案。</p>
-<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　首先我选用了<a href="https://hsojo.github.io/assets/AndroidGit/com.aor.pocketgit.apk" target="_blank" rel="external">PocketGit</a>作为Android的Git客户端，它可以满足我的基本需求。（感谢<a href="https://hsojo.github.io/2017/12/05/AndroidGit/" target="_blank" rel="external">Hs</a>的提供）但是仅仅如此是不够的，事实上不可能直接使用工程所用的Git仓库作为测试使用，毕竟测试的提交是十分频繁的。于是我首先考虑到了在工程仓库上创建测试分支，但是这也不够舒适，因为各分支的文件情况是独立的，到了特定时刻还得考虑合并的事。且测试分支的提交也会影响节点视图的观赏性，所以我选择了专门开一个测试仓库，通过编写Python脚本以一键同步相关文件并commit，十分方便。</p>
-<h2 id="脚本的实现"><a href="#脚本的实现" class="headerlink" title="脚本的实现"></a>脚本的实现</h2><p>　　以下为程序源码：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> os</div><div class="line"><span class="keyword">import</span> time</div><div class="line"><span class="keyword">import</span> shutil</div><div class="line"><span class="keyword">import</span> zipfile</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync</span><span class="params">(path_a, path_b)</span>:</span></div><div class="line">    is_file_a = os.path.isfile(path_a)</div><div class="line">    is_file_b = os.path.isfile(path_b)</div><div class="line">    is_dir_a = os.path.isdir(path_a)</div><div class="line">    is_dir_b = os.path.isdir(path_b)</div><div class="line"></div><div class="line">    <span class="keyword">if</span> is_file_a:</div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            shutil.rmtree(path_b, <span class="keyword">True</span>)</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> is_file_b:</div><div class="line">            time_a = os.stat(path_a).st_mtime</div><div class="line">            time_b = os.stat(path_b).st_mtime</div><div class="line">            </div><div class="line">            <span class="keyword">if</span> time_a != time_b:</div><div class="line">                shutil.copy2(path_a, path_b)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            shutil.copy2(path_a, path_b)</div><div class="line">    <span class="keyword">elif</span> is_dir_a:</div><div class="line">        <span class="keyword">if</span> is_file_b:</div><div class="line">            os.remove(path_b)</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            list_a = os.listdir(path_a)</div><div class="line">            list_b = os.listdir(path_b)</div><div class="line">            list_merger = list(set(list_a + list_b))</div><div class="line"></div><div class="line">            <span class="keyword">for</span> path <span class="keyword">in</span> list_merger:</div><div class="line">                sync(path_a + <span class="string">"/"</span> + path, path_b + <span class="string">"/"</span> + path)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            shutil.copytree(path_a, path_b)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            shutil.rmtree(path_b, <span class="keyword">True</span>)</div><div class="line">        <span class="keyword">elif</span> is_file_b:</div><div class="line">            os.remove(path_b)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_archive</span><span class="params">(path)</span>:</span></div><div class="line">    zip_file = zipfile.ZipFile(path, <span class="string">"w"</span>)</div><div class="line">    zip_file.write(<span class="string">"conf.lua"</span>)</div><div class="line">    zip_file.write(<span class="string">"main.lua"</span>)</div><div class="line">    zip_file.write(<span class="string">"path.lua"</span>)</div><div class="line">    </div><div class="line">    <span class="keyword">for</span> root, dirs, files <span class="keyword">in</span> os.walk(<span class="string">"asset/font"</span>):</div><div class="line">        <span class="keyword">for</span> f <span class="keyword">in</span> files:</div><div class="line">            zip_file.write(root + <span class="string">"/"</span> + f)</div><div class="line">    </div><div class="line">    zip_file.close()</div><div class="line"></div><div class="line">sync(<span class="string">"asset"</span>, <span class="string">"build/asset"</span>)</div><div class="line">sync(<span class="string">"config"</span>, <span class="string">"build/config"</span>)</div><div class="line">sync(<span class="string">"source"</span>, <span class="string">"build/source"</span>)</div><div class="line">make_archive(<span class="string">"build/game.love"</span>)</div><div class="line"></div><div class="line">now_time = time.strftime(<span class="string">"%Y-%m-%d-%H:%M:%S"</span>, time.localtime(time.time()))</div><div class="line">os.system(</div><div class="line">    <span class="string">"""</span></div><div class="line">    cd build</div><div class="line">    git add .</div><div class="line">    git commit -m %s</div><div class="line">    """ % now_time</div><div class="line">)</div></pre></td></tr></table></figure>
-<p>　　脚本的实现思路为将工程仓库下的三个文件夹与对应的测试仓库里的文件夹做对比，若工程仓库存在文件而测试仓库不存在，则复制之。若存在，则对比两者的最后修改日期，不一致则复制。（这里原本是考虑使用MD5检测文件完整性的，不过这将会影响到效率，发现在<strong>合理使用的前提下</strong>，只检测最后修改日期也无妨，遂采用）若出现测试仓库存在而工程仓库不存在的文件/文件夹，则删除之。<br>　　然后便是对某些关键文件进行打包为.love文件存放到测试仓库，它是<a href="https://love2d.org" target="_blank" rel="external">LÖVE</a>的可执行文件，但实际上只是个.zip文件。最后便是对测试仓库进行commit。</p>
-<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　<img src="https://musoucrow.github.io/images/dfq_building/config.png" alt="config">然后如这般做好配置，便可在Android设备上克隆主机的测试仓库了（以局域网的形式）。<img src="https://musoucrow.github.io/images/dfq_building/ssh.png" alt="config">当然还得确保主机开启了ssh，在macOS下开启ssh的方式为：System Preferences → Sharing → Remote Login。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2113,7 +2123,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">53</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>

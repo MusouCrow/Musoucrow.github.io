@@ -291,6 +291,173 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/12/07/dfq_building/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Musoucrow">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Musoucrow' BLOG">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/12/07/dfq_building/" itemprop="url">
+                  游戏测试同步于Android设备的解决方案
+                </a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-12-07T05:33:42+08:00">
+                2017-12-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Teach/" itemprop="url" rel="index">
+                    <span itemprop="name">Teach</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/07/dfq_building/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/12/07/dfq_building/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/12/07/dfq_building/" class="leancloud_visitors" data-flag-title="游戏测试同步于Android设备的解决方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　最近开发中的游戏需要在Android手机上进行测试，但采用USB数据线连接主机进行文件替换的更新实在是太麻烦了。遂考虑整个远程更新的解决方案，在研究的过程中排除了开发APP（耗费时长）与内置热更新（LuaSocket遇到点问题），最终选择了现在的在手机上安装Git客户端的方案。</p>
+<h2 id="详解"><a href="#详解" class="headerlink" title="详解"></a>详解</h2><p>　　首先我选用了<a href="https://hsojo.github.io/assets/AndroidGit/com.aor.pocketgit.apk" target="_blank" rel="external">PocketGit</a>作为Android的Git客户端，它可以满足我的基本需求。（感谢<a href="https://hsojo.github.io/2017/12/05/AndroidGit/" target="_blank" rel="external">Hs</a>的提供）但是仅仅如此是不够的，事实上不可能直接使用工程所用的Git仓库作为测试使用，毕竟测试的提交是十分频繁的。于是我首先考虑到了在工程仓库上创建测试分支，但是这也不够舒适，因为各分支的文件情况是独立的，到了特定时刻还得考虑合并的事。且测试分支的提交也会影响节点视图的观赏性，所以我选择了专门开一个测试仓库，通过编写Python脚本以一键同步相关文件并commit，十分方便。</p>
+<h2 id="脚本的实现"><a href="#脚本的实现" class="headerlink" title="脚本的实现"></a>脚本的实现</h2><p>　　以下为程序源码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> os</div><div class="line"><span class="keyword">import</span> time</div><div class="line"><span class="keyword">import</span> shutil</div><div class="line"><span class="keyword">import</span> zipfile</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync</span><span class="params">(path_a, path_b)</span>:</span></div><div class="line">    is_file_a = os.path.isfile(path_a)</div><div class="line">    is_file_b = os.path.isfile(path_b)</div><div class="line">    is_dir_a = os.path.isdir(path_a)</div><div class="line">    is_dir_b = os.path.isdir(path_b)</div><div class="line"></div><div class="line">    <span class="keyword">if</span> is_file_a:</div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            shutil.rmtree(path_b, <span class="keyword">True</span>)</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> is_file_b:</div><div class="line">            time_a = os.stat(path_a).st_mtime</div><div class="line">            time_b = os.stat(path_b).st_mtime</div><div class="line">            </div><div class="line">            <span class="keyword">if</span> time_a != time_b:</div><div class="line">                shutil.copy2(path_a, path_b)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            shutil.copy2(path_a, path_b)</div><div class="line">    <span class="keyword">elif</span> is_dir_a:</div><div class="line">        <span class="keyword">if</span> is_file_b:</div><div class="line">            os.remove(path_b)</div><div class="line">        </div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            list_a = os.listdir(path_a)</div><div class="line">            list_b = os.listdir(path_b)</div><div class="line">            list_merger = list(set(list_a + list_b))</div><div class="line"></div><div class="line">            <span class="keyword">for</span> path <span class="keyword">in</span> list_merger:</div><div class="line">                sync(path_a + <span class="string">"/"</span> + path, path_b + <span class="string">"/"</span> + path)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            shutil.copytree(path_a, path_b)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">if</span> is_dir_b:</div><div class="line">            shutil.rmtree(path_b, <span class="keyword">True</span>)</div><div class="line">        <span class="keyword">elif</span> is_file_b:</div><div class="line">            os.remove(path_b)</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_archive</span><span class="params">(path)</span>:</span></div><div class="line">    zip_file = zipfile.ZipFile(path, <span class="string">"w"</span>)</div><div class="line">    zip_file.write(<span class="string">"conf.lua"</span>)</div><div class="line">    zip_file.write(<span class="string">"main.lua"</span>)</div><div class="line">    zip_file.write(<span class="string">"path.lua"</span>)</div><div class="line">    </div><div class="line">    <span class="keyword">for</span> root, dirs, files <span class="keyword">in</span> os.walk(<span class="string">"asset/font"</span>):</div><div class="line">        <span class="keyword">for</span> f <span class="keyword">in</span> files:</div><div class="line">            zip_file.write(root + <span class="string">"/"</span> + f)</div><div class="line">    </div><div class="line">    zip_file.close()</div><div class="line"></div><div class="line">sync(<span class="string">"asset"</span>, <span class="string">"build/asset"</span>)</div><div class="line">sync(<span class="string">"config"</span>, <span class="string">"build/config"</span>)</div><div class="line">sync(<span class="string">"source"</span>, <span class="string">"build/source"</span>)</div><div class="line">make_archive(<span class="string">"build/game.love"</span>)</div><div class="line"></div><div class="line">now_time = time.strftime(<span class="string">"%Y-%m-%d-%H:%M:%S"</span>, time.localtime(time.time()))</div><div class="line">os.system(</div><div class="line">    <span class="string">"""</span></div><div class="line">    cd build</div><div class="line">    git add .</div><div class="line">    git commit -m %s</div><div class="line">    """ % now_time</div><div class="line">)</div></pre></td></tr></table></figure>
+<p>　　脚本的实现思路为将工程仓库下的三个文件夹与对应的测试仓库里的文件夹做对比，若工程仓库存在文件而测试仓库不存在，则复制之。若存在，则对比两者的最后修改日期，不一致则复制。（这里原本是考虑使用MD5检测文件完整性的，不过这将会影响到效率，发现在<strong>合理使用的前提下</strong>，只检测最后修改日期也无妨，遂采用）若出现测试仓库存在而工程仓库不存在的文件/文件夹，则删除之。<br>　　然后便是对某些关键文件进行打包为.love文件存放到测试仓库，它是<a href="https://love2d.org" target="_blank" rel="external">LÖVE</a>的可执行文件，但实际上只是个.zip文件。最后便是对测试仓库进行commit。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>　　<img src="https://musoucrow.github.io/images/dfq_building/config.png" alt="config">然后如这般做好配置，便可在Android设备上克隆主机的测试仓库了（以局域网的形式）。<img src="https://musoucrow.github.io/images/dfq_building/ssh.png" alt="config">当然还得确保主机开启了ssh，在macOS下开启ssh的方式为：System Preferences → Sharing → Remote Login。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/10/13/about_strtok/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1853,434 +2020,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="https://musoucrow.github.io/2017/03/03/research_awesomenauts/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Musoucrow">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Musoucrow' BLOG">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/03/research_awesomenauts/" itemprop="url">
-                  王牌英雄(Awesomenauts)研究报告
-                </a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-03T20:13:40+08:00">
-                2017-03-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Research/" itemprop="url" rel="index">
-                    <span itemprop="name">Research</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2017/03/03/research_awesomenauts/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/03/research_awesomenauts/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-             <span id="/2017/03/03/research_awesomenauts/" class="leancloud_visitors" data-flag-title="王牌英雄(Awesomenauts)研究报告">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Visitors </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>　　<strong>欢迎参与讨论，转载请注明出处。</strong></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>　　出于项目的需要，需要对市面上的<strong>横版MOBA动作游戏</strong>进行研究，特撰此文，以便记录和交流。本文将对《王牌英雄》分为几个部分进行研究并以章节的形式体现，文中观点仅为本人一家之言，仅供参考。</p>
-<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>　　《王牌英雄》是一款由Ronimo Games制作，DTP Entertainment发行于2012年的2D横版动作游戏。游戏平台繁多，包括Windows、macOS、Linux、PS3、PS4、Xbox360、Xbox One。玩家可于Steam、PSN和XBLA进行购买下载。<br>　　游戏虽然是2D横版动作游戏，但其实他更讲究玩家间的对抗，属于MOBA游戏，而且武器、职业和招式的种类也繁多非常值得多人一起游戏。<br>　　《王牌英雄》主要讲述了星系间的领土争夺战争，巨型机器人、外星人等都会成为出战角色。<br>　　与众多的MOBA游戏类似，《王牌英雄》也是以与队友（<strong>3V3</strong>）合作，摧毁敌方的基地为胜利目标。一场游戏的时间大致在<strong>10-15分钟</strong>，拥有PVE/PVP两种模式，可进行各种设置以增添游戏特色。</p>
-<h2 id="地图"><a href="#地图" class="headerlink" title="地图"></a>地图</h2><h3 id="前言-1"><a href="#前言-1" class="headerlink" title="前言"></a>前言</h3><p>　　地图分为上下两路，需要利用跳跃到踏板上进行Y轴移动。拥有多张地图，但皆大同小异。总体结构如下图：<img src="http://vignette1.wikia.nocookie.net/awesomenauts/images/4/4b/Ribbit_IV.jpg" alt="Ribbit_IV"></p>
-<h3 id="要素"><a href="#要素" class="headerlink" title="要素"></a>要素</h3><ul>
-<li>商店<ul>
-<li>商店是英雄支付太阳能以强化技能的地方，并提供了恢复功能。</li>
-<li>商店属于阵营设施，位于阵营的最深处，可视为传统MOBA的泉水。</li>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/shop.png" alt="shop"></li>
-</ul>
-</li>
-<li>基地<ul>
-<li>基地属于阵营设施，可摧毁，位于商店之前，是阵营的核心，若基地被摧毁，则视为游戏失败。</li>
-<li>基地不会攻击，不会自我恢复，敌人不可通过。</li>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/main_tower.png" alt="main_tower"></li>
-</ul>
-</li>
-<li>屏障<ul>
-<li>屏障属于阵营设施，位于地图各处，敌人不可通过。</li>
-<li><img src="http://vignette4.wikia.nocookie.net/awesomenauts/images/b/b3/Energy_Wall.jpg" alt="Energy_Wall"></li>
-</ul>
-</li>
-<li>工厂<ul>
-<li>工厂属于阵营设施，位于基地下方，负责生成士兵。</li>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/factory.png" alt="factory"></li>
-</ul>
-</li>
-<li>塔<ul>
-<li>塔属于阵营设施，可摧毁，位于上下二路，每路各有两座。</li>
-<li>负责攻击附近的敌人，敌人不可通过。</li>
-<li>攻击方式为多角度子弹，且只会锁定并伤害一个单位（单一伤害）。</li>
-<li>在建筑本身还有一个群体伤害判定，强行通过时会触发。</li>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/tower.png" alt="tower"></li>
-</ul>
-</li>
-<li>士兵<ul>
-<li>士兵属于阵营单位，可摧毁，敌人不可通过（会将士兵推后），从工厂诞生，前往上下二路。（前往上路需要跳跃/飞行等方式）目标为攻击敌人，拥有两种类型。</li>
-<li>士兵分为三个等级，每隔<strong>6分钟</strong>升级一次。升级后士兵的属性将会得到提升。（用于推进游戏节奏）</li>
-<li>种类<ul>
-<li>近战兵<ul>
-<li>最基础的种类，每隔20秒诞生2个。</li>
-<li>攻击方式为齿轮切割，属于单一伤害。和塔一样，强行通过时会被连带攻击。</li>
-<li><img src="http://vignette3.wikia.nocookie.net/awesomenauts/images/e/e1/Sawblade_Droid.png" alt="Sawblade_Droid"></li>
-</ul>
-</li>
-<li>超级兵<ul>
-<li>当摧毁敌方线上的1座塔后，便会诞生1个。</li>
-<li>攻击方式为发射炮弹，碰到第一个敌人后爆炸，属于群体伤害。</li>
-<li><img src="http://vignette1.wikia.nocookie.net/awesomenauts/images/5/54/Super_Droid.png" alt="Super_Droid"></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>英雄<ul>
-<li>英雄属于阵营单位，可摧毁，敌人不可通过，从基地诞生，由玩家控制。</li>
-<li>英雄死亡后隔一段时间后便会从基地复活，随着游戏时间的增长，复活时间也会增长。</li>
-</ul>
-</li>
-<li>野怪<ul>
-<li>野怪属于公共单位，可摧毁，位于地图中间的几个固定点，目标为攻击进犯者，在不同地图上拥有不同类型，每隔一段时间刷新。</li>
-<li>英雄可通过击杀之获得太阳能和恢复。</li>
-<li><img src="http://vignette3.wikia.nocookie.net/awesomenauts/images/0/0b/Small_Beast_Creep.png" alt="Small_Beast_Creep"></li>
-</ul>
-</li>
-<li>踏板<ul>
-<li>踏板属于公共设施，位于地图各处，可供单位立足，且玩家可通过↓+Space穿透踏板进行下降。</li>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/pad.png" alt="pad"></li>
-</ul>
-</li>
-<li>隐藏区域<ul>
-<li>隐藏区域属于公共设施，位于地图各处，一般会搭配踏板使用，外界无法看到隐藏区域里面的情况。</li>
-<li><img src="http://vignette4.wikia.nocookie.net/awesomenauts/images/e/e7/Hidearea.png" alt="Hidearea"></li>
-</ul>
-</li>
-<li>补给球<ul>
-<li>补给球属于公共设施，位于地图各处，受伤时的英雄触碰后可恢复，然后补给球消失，每隔一段时间刷新。</li>
-<li><img src="http://vignette2.wikia.nocookie.net/awesomenauts/images/3/3a/Healthpack.png" alt="Healthpack"></li>
-</ul>
-</li>
-<li>太阳能结晶<ul>
-<li>太阳能结晶属于公共设施，位于地图各处，诞生自士兵死亡后，英雄触碰后可获得太阳能。</li>
-<li>太阳能分为两种：灰色和黄色，灰色可获得1点太阳能，黄色为5点。</li>
-<li><img src="http://vignette1.wikia.nocookie.net/awesomenauts/images/2/29/Item_5_solar.png" alt="solar"></li>
-</ul>
-</li>
-</ul>
-<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>　　总体来说，《王牌英雄》的地图设计视图让玩家频繁的使用跳跃，利用踏板借助跳跃来增加游戏的操作性，弥补非深度横版的躲招问题。意图不错，不过反倒增加了操作难度，若要考虑移植到手机平台的话，这将是个问题。<br>　　地图中间的野怪设计，可以视为玩家发生冲突时随手杀死野怪以获得恢复的手段。不过结合游戏时间来看，野区其实可以设计一些加剧玩家冲突与游戏节奏的元素。<br>　　士兵的作用非常明显，在英雄单独对抗士兵时，会付出一定程度的代价。不过超级兵的诞生频率太低，几乎没有存在感，作用也相对有限了。</p>
-<h2 id="英雄"><a href="#英雄" class="headerlink" title="英雄"></a>英雄</h2><h3 id="前言-2"><a href="#前言-2" class="headerlink" title="前言"></a>前言</h3><p>　　英雄即玩家参与游戏时扮演的角色，《王牌英雄》的英雄数量繁多，至今发展到几十个左右。</p>
-<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><p>　　《王牌英雄》将英雄做了不同特性的划分，每个英雄可能包括多个特性，以下是特性一览：</p>
-<ul>
-<li>刺客<ul>
-<li>入门角色</li>
-<li>Gank好手</li>
-<li>低生命值</li>
-<li>高机动性</li>
-<li>拥有爆发或高持续的伤害</li>
-<li>拥有逃跑手段</li>
-</ul>
-</li>
-<li>斗士<ul>
-<li>堵路机制</li>
-<li>追逐好手</li>
-<li>擅长近距离战斗</li>
-<li>拥有控制手段</li>
-<li>拥有高持续的伤害</li>
-</ul>
-</li>
-<li>护卫<ul>
-<li>能有效地防御来自敌方的攻击</li>
-<li>能力都集中在撤退和阻挠进攻的方法，而非直接作战。</li>
-</ul>
-</li>
-<li>狙击手<ul>
-<li>长距离攻击，短冷却时间</li>
-<li>善于放风筝</li>
-<li>不善于近战</li>
-<li>有加速手段</li>
-</ul>
-</li>
-<li>开团手<ul>
-<li>擅长打团，不擅长独战</li>
-<li>拥有高风险高回报的特性</li>
-<li>拥有非常强大的控制手段</li>
-</ul>
-</li>
-<li>医师<ul>
-<li>有限的攻击力</li>
-<li>无逃生手段</li>
-<li>需要被保护</li>
-<li>拥有治疗能力</li>
-</ul>
-</li>
-<li>毒师<ul>
-<li>拆塔好手</li>
-<li>拥有能够立即杀死多个目标的能力，通常冷却时间较短</li>
-</ul>
-</li>
-<li>辅助<ul>
-<li>不适合直接战斗</li>
-<li>万金油</li>
-<li>需要被保护</li>
-<li>拥有改变团队的能力</li>
-</ul>
-</li>
-<li>坦克<ul>
-<li>高生命值</li>
-<li>减伤好手</li>
-<li>适合打头阵</li>
-<li>不善于追逐</li>
-</ul>
-</li>
-</ul>
-<h3 id="技能"><a href="#技能" class="headerlink" title="技能"></a>技能</h3><p>　　在《王牌英雄》，每个英雄拥有四个技能，它们分别是：<strong>主动技能1、主动技能2、普通攻击、跳跃</strong>。我们接下来便以<em>谢里夫·龙星</em>为示范：</p>
-<ul>
-<li>主动技能1<ul>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/skill1.png" alt="skill1"></li>
-</ul>
-</li>
-<li>主动技能2<ul>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/skill2.png" alt="skill2"></li>
-</ul>
-</li>
-<li>普通攻击<ul>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/normalatk.png" alt="normalatk"></li>
-</ul>
-</li>
-<li>跳跃<ul>
-<li><img src="https://musoucrow.github.io/images/research_awesomenauts/jump.png" alt="jump"></li>
-</ul>
-</li>
-</ul>
-<p>　　技能还可以在商店支付太阳能进行强化，如下图：<img src="https://musoucrow.github.io/images/research_awesomenauts/skillup.png" alt="skillup"></p>
-<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>　　在《王牌英雄》，属性和一般游戏不同：它明确分为<strong>自身属性和技能属性</strong>。自身属性即单位本身常驻的属性，而技能属性则为描述技能作用的参数。<br>　　自身属性一般来说都是隐藏的，每个英雄的自身属性都是事先决定，这意味着这并不是一款需要属性养成的游戏，你并不需要太关注属性方面的事情，但你仍可在商店里进行一些强化。<br>　　以下是属性一览：</p>
-<ul>
-<li>自身属性<ul>
-<li>生命值<ul>
-<li>生命值是指死亡前可以采取的伤害量。换言之，到了0就会死。</li>
-</ul>
-</li>
-<li>质量<ul>
-<li>质量是指单元推动或被另一单元推动的能力，例如近战兵的质量就很低（可以被推后）。</li>
-</ul>
-</li>
-<li>移动速度<ul>
-<li>移动速度即单位移动时的速度。</li>
-</ul>
-</li>
-<li>太阳能获取<ul>
-<li>每段时间获取太阳能的数额。</li>
-</ul>
-</li>
-<li>太阳能<ul>
-<li>用于商店购买强化技能。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>技能属性<ul>
-<li>攻击速度<ul>
-<li>攻击速度决定每次攻击之间的时间间隔，一般存在于普通攻击。</li>
-<li>攻击速度以一个数值的形式体现，结算到具体的时间需要/60。</li>
-</ul>
-</li>
-<li>攻击范围<ul>
-<li>攻击范围指子弹的行进距离。</li>
-<li>攻击范围对非发射子弹类技能无效。</li>
-</ul>
-</li>
-<li>技能范围<ul>
-<li>俗称AOE，泛指那些覆盖一个区域的技能效果。</li>
-</ul>
-</li>
-<li>冷却时间<ul>
-<li>冷却时间是指技能可以再次使用之前必须经过的时间段。</li>
-<li>每个技能都有自己的冷却时间，普通攻击和跳跃不存在冷却时间。</li>
-</ul>
-</li>
-<li>控制时间<ul>
-<li>控制时间是指使敌方停止/阻碍行动的时间段。</li>
-<li>控制的表现手法多样。</li>
-</ul>
-</li>
-<li>持续伤害<ul>
-<li>俗称DOT，泛指随时间慢慢伤害目标的效果。</li>
-</ul>
-</li>
-<li>飞行<ul>
-<li>飞行是无限跳跃或能够永远留在空中的能力。</li>
-</ul>
-</li>
-<li>治疗<ul>
-<li>治疗是指恢复目标生命值的能力。</li>
-</ul>
-</li>
-<li>隐形<ul>
-<li>隐形是使目标完全不可见的状态效应。当隐形的单位使用能力或自动攻击时，或者在一段时间后，隐形会消失。</li>
-</ul>
-</li>
-<li>生命偷取<ul>
-<li>生命偷取是一种特殊的伤害，它在击中敌人后生效。</li>
-<li>生命偷取可以是基于百分比或固定量。</li>
-</ul>
-</li>
-<li>护盾<ul>
-<li>护盾是给予英雄保护的能力，在存在护盾时，受到攻击后会优先磨损护盾。</li>
-</ul>
-</li>
-<li>反射<ul>
-<li>反射是一种使敌人子弹反射回攻击者的机制。同时因为反射了，所以英雄不会受伤。</li>
-</ul>
-</li>
-<li>加速<ul>
-<li>一段时间内获得移动速度。</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="后记-1"><a href="#后记-1" class="headerlink" title="后记"></a>后记</h3><p>　　《王牌英雄》英雄的特性分类值得思考，技能属性的设计更是优秀，运用这种思路，制作技能将会简单很多。<br>　　但是在技能设计和人设方面就不太合我胃口，尤其是技能方面，由于技能数量和深度不足的原因便显得比较单调，就算拥有强化途径但也感觉稍逊一筹，也许在这方面应该可以做得更好。</p>
-<h2 id="战斗"><a href="#战斗" class="headerlink" title="战斗"></a>战斗</h2><h3 id="前言-3"><a href="#前言-3" class="headerlink" title="前言"></a>前言</h3><p>　　《王牌英雄》在战斗上拥有不少细节值得研究，而有些东西不方便插入到其他章节中，便集中到本章讨论。</p>
-<h3 id="攻击类型"><a href="#攻击类型" class="headerlink" title="攻击类型"></a>攻击类型</h3><p>　　《王牌英雄》的攻击方式分为两种：单一攻击和群体攻击。单一攻击表现为击中一个敌人后便会结束，忽略其他敌人。而群体攻击则不然，会攻击范围内所有敌人。</p>
-<h3 id="打击特征"><a href="#打击特征" class="headerlink" title="打击特征"></a>打击特征</h3><p>　　《王牌英雄》属于轻动作游戏，它不是那种击中敌人后敌人便会陷入硬直，以连招为乐的动作游戏。它似乎连硬直和浮空动作也不具备，尽管会有类似的效果表现。就连打击特效，也仅仅是近战角色才有。平常的打击特征为被击者出现黄色遮罩，以及配合伤害数字来确定被击中，更别提Hit Stop了。因此使得《王牌英雄》的动作性并不高，它主要以不断跳跃位置的游击战为特色。<br>　　幸运的是，《王牌英雄》还是具备了基本的战斗音效，所以总体来说还是不成问题的，只是缺乏了点动作性而已。</p>
-<h3 id="BUFF"><a href="#BUFF" class="headerlink" title="BUFF"></a>BUFF</h3><p>　　《王牌英雄》虽然存在BUFF系统，但并没有展示BUFF的UI，只存在BUFF特效和触发提示，如图：<img src="https://musoucrow.github.io/images/research_awesomenauts/debuff.png" alt="skillup"></p>
-<h3 id="障碍"><a href="#障碍" class="headerlink" title="障碍"></a>障碍</h3><p>　　《王牌英雄》的障碍形式区域制，只要单位能过跨越障碍就能通过，如通过跳跃穿过敌方士兵，但若同时撞上在空中的地方英雄则会无法继续前行，被迫降落。<br>　　至于降落点本身就有障碍该如何处理，这一点<strong>尚不明确</strong>。</p>
-<h3 id="后记-2"><a href="#后记-2" class="headerlink" title="后记"></a>后记</h3><p>　　《王牌英雄》的战斗系统在我看来并不讨喜，主要原因为总体攻击距离太短，加上依赖跳跃的地形，使得直接触发战斗的成本提高，当然好这口的人估计会很喜欢。<br>　　能够在跳跃中使用大部分技能的设计还是很不错的，给人一种空战的感觉。类似的设计还有多角度攻击，不过这个是远程英雄的专利，对于近战英雄并不友好，我认为这个设计已经影响到了平衡性，因为本身能够快速接近敌人手段并不多。</p>
-<h2 id="后记-3"><a href="#后记-3" class="headerlink" title="后记"></a>后记</h2><p>　　《王牌英雄》从游戏的角度上让我评分的话，10分里面只能打个4分：它不是我的菜，无论从战斗、技能、还是人设来看，都是如此。<br>　　但它对我而言的意义在于：提供了一款横版MOBA动作游戏的示范，它还是一款成熟的横版MOBA模型，使我得到了不少启发，也使我明白哪些部分应该加以改善。本次《王牌英雄》的研究报告，就此结束。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2330,7 +2069,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">53</span>
                 <span class="site-state-item-name">posts</span>
               </a>
             </div>
